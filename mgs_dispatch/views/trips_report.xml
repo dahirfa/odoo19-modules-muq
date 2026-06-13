@@ -1,0 +1,203 @@
+<odoo>
+
+    <record id="action_trip_report_view" model="ir.actions.report">
+        <field name="name">Trip Financial Report</field>
+        <field name="model">load.line.dispatch</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">mgs_dispatch.trip_report_template</field>
+        <field name="report_file">mgs_dispatch.trip_report_template</field>
+        <field name="binding_model_id" ref="model_load_line_dispatch" />
+        <field name="binding_type">report</field>
+    </record>
+
+
+    <template id="trip_report_template" name="trip_report_template">
+
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout" t-lang="en_US">
+                <div class="page">
+
+                    <div class="container"
+                        style="font-size:12px;font-family:Arial;margin-top:1px;">
+                        <h2>Trip Statement</h2>
+                        <t t-set="total_balance" t-value="0" />
+                        <t t-foreach="docs" t-as="doc">
+
+                            <div class="row"
+                                style="margin-top: 32px !important;font-size: 1.2em; font-family: 'Lato-Reg'">
+
+                                <!-- <div class="col-3" t-if="date_from or date_to">
+                                        <strong>Date:</strong>
+                                    </div> -->
+
+                                <div class="col-2" t-if="doc.vendor_id">
+                                    <strong>Sub Contractor<p class="m-0" t-esc="doc.vendor_id.name" /></strong>
+                                </div>
+
+                                <div class="col-2" t-if="doc.name">
+                                    <strong>Trip #<p class="m-0" t-esc="doc.name" /></strong>
+                                </div>
+
+                                <div class="col-2" t-if="doc.truck_id">
+                                    <strong>Truck<p class="m-0" t-esc="doc.truck_id.name" /></strong>
+                                </div>
+
+                                <div class="col-2" t-if="doc.tons">
+                                    <strong>Tons<p class="m-0" t-esc="doc.tons" /></strong>
+                                </div>
+                                <div class="col-2" t-if="doc.rate">
+                                    <strong>Rate<p class="m-0" t-esc="doc.rate" /></strong>
+                                </div>
+                                <div class="col-4" t-if="company_id"
+                                    groups="base.group_multi_company">
+                                    <strong>Company:</strong>
+                                    <span
+                                        style="border: 1px solid black; padding: 1px; border-radius: 4px; background: #eeebeb; margin-right: 2px "
+                                        t-esc="company_id.name" />
+                                </div>
+
+                            </div>
+
+                            <table class="table table-sm  table-bordered table-hover table-striped">
+                                <thead>
+                                    <tr>
+                                        <th
+                                            style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;">
+                                            Date</th>
+                                        <th
+                                            style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;"
+                                            colspan="3">Description</th>
+                                        <th
+                                            style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;"
+                                            class="text-right">Amount</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <t t-set="total_amount" t-value="0" />
+                                   
+
+                                    <tr style="font-weight: bold;">
+                                        <td
+                                            style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;">
+                                            <span>-</span>
+                                        </td>
+                                        <td
+                                            style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;"
+                                            colspan="3">
+                                            <span>Transportation Service</span>
+                                        </td>
+                                        <td class="text-right"
+                                            style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;">
+                                            <span t-esc="'{0:,.2f}'.format(doc.amount_total)"  />
+                                        </td>
+                                    </tr>
+
+                                    <tr style="font-weight: bold;" t-if="doc.truck_id.truck_owner == 'type2'">
+                                        <td
+                                            style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;">
+                                            <span>-</span>
+                                        </td>
+                                        <td
+                                            style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529; "
+                                            colspan="3">
+                                            <span>Commission</span>
+                                        </td>
+                                        <td class="text-right"
+                                            style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529; color:red;">
+                                            <span t-esc="'{0:,.2f}'.format(doc.amount_commission)" />
+                                        </td>
+                                    </tr>
+                                    <t t-set="total_amount" t-value="total_amount+doc.amount_total" />
+                                    <t t-set="total_amount"
+                                        t-value="total_amount+doc.amount_commission" />
+
+
+                                    <t t-foreach="doc.get_analytic_line_ids()" t-as="line">
+                                        
+                                        <tr>
+                                            <!-- <td nowrap="nowrap" style="padding:
+                                            0.30rem;border-top: 1px solid #212529;border-bottom: 1px
+                                            solid #212529;"/> -->
+                                            <td nowrap="nowrap"
+                                                style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;">
+                                                <span t-esc="line.date" />
+                                            </td>
+                                            <td
+                                                style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;"
+                                                colspan="3">
+                                                <span t-esc="line.name" />
+                                            </td>
+                                            <td nowrap="nowrap"
+                                                style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529; color:red;"
+                                                class="text-right">
+                                                <span t-esc="'{0:,.2f}'.format(line.amount)" />
+                                            </td>
+                                        </tr>
+                                        <t t-set="total_amount"
+                                            t-value="total_amount+line['amount']" />
+
+                                    </t>
+
+
+                                    <tr>
+                                        <td colspan="5"
+                                            style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;height: 19px" />
+                                    </tr>
+                                    <tr style="font-weight: bold">
+
+                                        <td
+                                            style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529"
+                                            colspan="4">
+                                            <span style="color: blue; font-weight: bold;">TOTAL </span>
+                                        </td>
+
+                                        <td
+                                            style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529"
+                                            class="text-right">
+                                            <span style="color: blue; font-weight: bold;"
+                                                t-esc="'{0:,.2f}'.format(total_amount)" />
+                                        </td>
+
+                                        <t t-set="total_balance"
+                                            t-value="total_balance + total_amount " />
+                                    </tr>
+
+                                        
+
+                                </tbody>
+                            </table>
+
+                           
+
+                        </t> <!--web.external_layout-->
+
+                        <div class="clearfix" name="so_total_summary">
+                            <div id="total" class="row" name="total">
+                                <div
+                                    class="col-3 ms-auto">
+                                    <table class="table table-sm table-borderless">
+
+                                        <tr class="border-black o_total mr-auto">
+                                            <td>
+                                                <strong style="font-weight: bold; font-size:16px;">SUBTOTAL: </strong>
+                                            </td>
+                                            <td class="text-end">
+                                                <t t-esc="symbol" />
+                                                <span style="font-weight: bold; font-size:16px;"
+                                                t-esc="'{0:,.2f}'.format(total_balance)"   />
+
+                                            </td>
+                                        </tr>
+
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div> <!--container-->
+                </div> <!--page-->
+            </t>
+        </t> <!--web.html_container-->
+    </template>
+</odoo>

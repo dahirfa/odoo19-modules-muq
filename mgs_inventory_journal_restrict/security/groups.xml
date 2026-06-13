@@ -1,0 +1,7 @@
+<odoo>       
+
+  <record id="inventory_restrict" model="res.groups">
+        <field name="name">Allow Inventory Journal Reset</field>
+  </record>
+
+  </odoo>

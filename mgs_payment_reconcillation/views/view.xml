@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_payment_form_inherit_custom" model="ir.ui.view">
+        <field name="name">account.payment.form.inherit.custom</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='main_group']" position="after">
+                <notebook invisible="not partner_id or state != 'draft' ">
+                    <page string="Invoices / Bills">
+                        <field name="invoice_selection_ids">
+                            <list string="Selectable Invoices" editable="bottom" delete="false" create="false">
+                                <field name="selected"/>
+                                <field name="invoice_id" readonly="1" force_save="1" />
+                                <field name="invoice_date"/>
+                                <field name="amount_total"/>
+                                <field name="amount_due"/>
+                                <field name="state" widget="badge" decoration-danger="state == 'not_paid'" decoration-warning="state == 'partial'" />
+
+                            </list>
+                            <form>
+                                <field name="selected"/>
+                                <field name="payment_id" readonly="1" force_save="1"/>
+                                <field name="invoice_id" readonly="1" force_save="1" />
+                                <field name="invoice_date"/>
+                                <field name="amount_total"/>
+                                <field name="amount_due"/>
+                            </form>
+                        </field>
+                    </page>
+                </notebook>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

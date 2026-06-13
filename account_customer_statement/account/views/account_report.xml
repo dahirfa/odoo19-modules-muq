@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+       
+        <report 
+            id="action_report_partnerledger"
+            model="account.report.partner.ledger"
+            string="Print Partner Ledger"
+            report_type="qweb-pdf"
+            name="account_customer_statement.report_partnerledger"
+            file="account_customer_statement.report_partnerledger"
+            />
+
+
+    </data>
+</odoo>

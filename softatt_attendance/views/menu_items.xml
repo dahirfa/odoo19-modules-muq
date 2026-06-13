@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+
+<menuitem   
+    id="hr_attendance.menu_hr_attendance_settings"
+    name="Configuration"
+    parent="hr_attendance.menu_hr_attendance_configuration"
+    sequence="1" />
+
+<menuitem
+    id="sa_attendance_res_settings_menu"
+    name="Settings"
+    parent="hr_attendance.menu_hr_attendance_settings"
+    action="hr_attendance.action_hr_attendance_settings"
+    sequence="1" />
+
+
+    <menuitem   
+        id="sa_attendance_settings_menu"
+        name="Other Settings"
+        parent="hr_attendance.menu_hr_attendance_configuration"
+        sequence="2" />
+
+
+    <menuitem
+        id="sa_attendance_punch_states_menu"
+        name="Punch States"
+        parent="sa_attendance_settings_menu"
+        action="action_conf_punch_state_tree"
+        sequence="2" />
+
+    <menuitem
+        id="sa_attendance_employee_code_menu"
+        name="Employee Code"
+        parent="sa_attendance_settings_menu"
+        action="action_sa_attendance_employee_code"
+        sequence="3" />
+
+    <menuitem
+        id="menu_sa_biometric"
+        name="ZKteco"
+        parent="hr_attendance.menu_hr_attendance_configuration"
+        sequence="10"/>
+    
+    <menuitem
+        id="menu_sa_biometric_device"
+        name="ZK Devices"
+        action="action_sa_biometric_device"
+        parent="menu_sa_biometric"
+        sequence="1"/>
+
+
+
+
+
+
+
+    <!-- Dashboard -->
+    <menuitem
+        id="menu_sa_attendance_dashboard"
+        name="Dashboard"
+        parent="hr_attendance.menu_hr_attendance_root"
+        action="action_attendance_dashboard"
+        sequence="1" />
+
+    <!-- Attendance Log -->
+    <menuitem
+        id="menu_sa_attendance_log"
+        name="Attendance Logs"
+        parent="hr_attendance.menu_hr_attendance_root"
+        action="softatt_attendance.action_sa_attendance_log"
+        sequence="97" />
+    <!-- Main Reports -->
+
+    <menuitem 
+        id="sa_attendance_reports_menu" 
+        name="PDF Reports"
+        parent="hr_attendance.menu_hr_attendance_root"
+        sequence="14"
+        />
+
+    <menuitem
+        id="menu_sa_report_absence"
+        name="Absence Report"
+        action="softatt_attendance.action_sa_attendance_absence"
+        parent="sa_attendance_reports_menu"
+        sequence="2" />
+
+    <menuitem
+        id="menu_sa_report_daily"
+        name="Daily Report"
+        action="softatt_attendance.action_sa_attendance_daily"
+        parent="sa_attendance_reports_menu"
+        sequence="4" />
+
+
+    <menuitem
+        id="menu_sa_report_monthly"
+        name="Monthly Report"
+        action="softatt_attendance.action_sa_attendance_monthly"
+        parent="sa_attendance_reports_menu"
+        sequence="5" />
+
+        <!-- <menuitem
+        id="menu_sa_report_employee"
+        name="Employee Report"
+        action="softatt_attendance.action_sa_attendance_employee_report_wizard"
+        parent="sa_attendance_reports_menu"
+        sequence="6" /> -->
+
+        <menuitem
+        id="menu_sa_report_att"
+        name="Attendance Report"
+        action="softatt_attendance.action_sa_attendance_att_wizard"
+        parent="sa_attendance_reports_menu"
+        sequence="7" />
+
+
+
+    <!-- Main Reports -->
+
+
+
+
+
+        <!-- Db Link Configuration-->
+
+        <menuitem 
+                    id="sa_db_link_conf_menu" 
+                    name="DB-Link"
+                    groups="base.group_no_one"
+                    parent="base.menu_custom"/>
+
+        <menuitem 
+                    id="sa_db_link_server_conf_menu" 
+                    name="DB-Link Servers"
+                    groups="base.group_no_one"
+                    parent="sa_db_link_conf_menu"
+                    action="sa_server_conf_action"/>
+
+
+</odoo>

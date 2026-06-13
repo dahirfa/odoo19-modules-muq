@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_download_latest_logs" model="ir.actions.server">
+        <field name="name">Upload Latest Logs</field>
+        <field name="model_id" ref="model_sa_attendance_log" />
+        <field name="binding_model_id" ref="softatt_attendance.model_sa_attendance_log" />
+        <field name="state">code</field>
+        <field name="code">
+            if records:
+            records.download_latest_logs()
+        </field>
+    </record>
+
+
+
+    <record id="view_conf_punch_state_tree" model="ir.ui.view">
+        <field name="name">Conf Punch State Tree</field>
+        <field name="model">sa.punch.state</field>
+        <field name="arch" type="xml">
+            <list editable="top">
+                <field name="code"/>
+                <field name="punch_type"/>
+                <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_conf_punch_state_tree" model="ir.actions.act_window">
+        <field name="name">Punch States</field>
+        <field name="res_model">sa.punch.state</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <record id="view_attendance_log_kanban" model="ir.ui.view">
+        <field name="name">sa.attendance.log.kanban</field>
+        <field name="model">sa.attendance.log</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <header>
+                    <button string="Download" name="download_latest_logs" type="object" class="btn btn-primary o_form_button_save" display='always' />
+                    <button string="Process" name="action_update_hr_attendance" type="object" class="btn btn-info" display="always"/>
+                </header>
+                <field name="punch_state" />
+                <templates>
+                    <t t-name="kanban-box">
+
+                        <div t-attf-class="oe_kanban_global_click" style ='border:1px grey solid; font-size:18px'>
+                            <div>
+                                <span class="o_kanban_record_title">
+                                    <strong>
+                                       <field name="employee_id" />
+                                    </strong>
+                                </span>
+                            </div>
+
+                            <div class="o_kanban_record_subtitle mt-1" style='font-weight:bold;'> 
+                               
+                            </div>
+
+
+                            <div style="display: flex; flex-direction: column;" class='mt-1 mb-1'>
+                                <div style="display: flex; gap: 10px;">
+                                    <div style="flex-grow: 1; text-align: left; font-weight:bold;">
+                                        <field name="punch_time" />
+                                    </div>
+                                    <div style="flex-grow: 1; text-align: left; font-weight:bold;">
+                                        <field name="check_in_check_out" widget="badge"
+                                        decoration-danger=" check_in_check_out == 'Check Out'"
+                                        decoration-success=" check_in_check_out == 'Check In'" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+
+
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_attendance_log_tree" model="ir.ui.view">
+        <field name="name">sa.attendance.log.tree</field>
+        <field name="model">sa.attendance.log</field>
+        <field name="arch" type="xml">
+            <list>
+                <header>
+                    <button string="Download" name="download_latest_logs" type="object" class="oe_highlight" />
+                    <button string="Process" name="action_update_hr_attendance" type="object" class="btn btn-info" />
+                </header>
+                <field name="punch_time" />
+                <field name="dayofweek" optional="hide"/>
+                <field name="code" />
+                <field name="employee_id" />
+                <field name="company_id" />
+                <field name="location_id" optional="hide"/>
+                <field name="punch_state" optional="hide"/>
+                   
+
+                <field name="check_in_check_out" widget="badge"
+                    decoration-danger=" check_in_check_out == 'Check Out'"
+                    decoration-success=" check_in_check_out == 'Check In'" />
+            </list>
+        </field>
+    </record>
+
+    <record id="view_attendance_log_form" model="ir.ui.view">
+        <field name="name">sa.attendance.log.form</field>
+        <field name="model">sa.attendance.log</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="punch_time" />
+                        <field name="punch_state"/>
+                        <field name="code" />
+                        <field name="employee_id" />
+                        <field name="location_id" />
+
+                        <field name="check_in_check_out" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_sa_attendance_employee_log_search" model="ir.ui.view">
+        <field name="name">sa.attendance.log.search</field>
+        <field name="model">sa.attendance.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id" string="Employee" />
+                <field name="punch_time" string="Punch Time"/>
+                <field name="punch_state" string="Punch State" />
+                <field name="code" string="EMP Code"/>
+                <field name="location_id" string="Location" />
+                
+                <filter string="Punch Time" name="punch_time_filter" date="punch_time"/>
+                <filter string="Today" name="today" domain="[('punch_time', '&gt;=', (context_today().strftime('%%Y-%%m-%%d 00:00:00'))), ('punch_time', '&lt;=', (context_today().strftime('%%Y-%%m-%%d 23:59:59')))]" />
+                <filter string="Last 7 days" name="last_week" domain="[('punch_time','&gt;=',(context_today() + datetime.timedelta(days=-7)))]"/>
+                <filter string="This Month"     name="last_month"       domain="[('punch_time','&lt;',(context_today()+relativedelta(months=1)).strftime('%%Y-%%m-01')), ('punch_time','&gt;=',time.strftime('%%Y-%%m-01'))]"/>
+            
+            <group>
+                <filter string="Punch Time" name="punch_time_group" context="{'group_by': 'punch_time'}" />
+                <separator/>
+                <filter string="Punch State"  name="punch_state_group" context="{'group_by': 'punch_state'}" />
+                <separator/>
+                <filter string="Check In/Check Out" name="in_out_group" context="{'group_by': 'check_in_check_out'}" />
+                <separator/>
+                <filter string="Employee"  name="by_employee" context="{'group_by': 'employee_id'}" />
+                <filter string="EMP Code"  name="by_employee_code"  context="{'group_by': 'code'}" />
+                <filter string="Location"  name="by_employee_location"  context="{'group_by': 'location_id'}" />
+            </group>
+        </search>
+
+        </field>
+    </record>
+    <record id="action_sa_attendance_log" model="ir.actions.act_window">
+        <field name="name">Attendance Logs</field>
+        <field name="res_model">sa.attendance.log</field>
+        <field name="view_mode">list,kanban</field>
+        <field name="context">{'create': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            </p>
+        </field>
+    </record>
+
+
+</odoo>

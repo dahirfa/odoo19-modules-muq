@@ -1,0 +1,93 @@
+<odoo>
+    <record id="action_late_check_in_report" model="ir.actions.report">
+        <field name="name">late check ins</field>
+        <field name="model">hr.payslip</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">employee_late_check_in_ent.report_late_check_in</field>
+        <field name="report_file">employee_late_check_in_ent.report_late_check_in</field>
+        <field name="binding_model_id" ref="hr_payroll.model_hr_payslip"/>
+        <field name="binding_type">report</field>
+    </record>
+        <template id="report_late_check_in">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                        <t t-call="web.external_layout">
+                            <div class="page">
+                            <style>
+
+                                table {
+                                font-family: Arial, Helvetica, sans-serif;
+                                border-collapse: collapse;
+                                width: 60%;
+                                }
+
+                                table td, table th {
+                                border: 1px solid #ddd;
+                                padding: 8px;
+                                }
+
+                                table tr:nth-child(even){background-color: #f2f2f2;}
+
+                                table tr:hover {background-color: #ddd;}
+
+                                table th {
+                                padding-top: 12px;
+                                padding-bottom: 12px;
+                                text-align: left;
+                                background-color: #04AA6D;
+                                color: white;}
+                        </style>
+                                <div class="oe_structure"/>
+
+                                    <h2>Late Check-ins</h2>
+                                        <table class="table table-condensed table-sm">
+                                                <tr>
+                                                    <td>Employee : <t t-esc="o.employee_id.name"/></td>
+                                                    <td>From : <t t-esc="o.date_from"/></td>
+                                                    <td>To : <t t-esc="o.date_to"/></td>
+                                                </tr>
+                                        </table>
+                                    
+                                    <table class="table table-condensed table-sm">
+                                            <thead>
+                                                <th nowrap="nowrap">Date</th>
+                                                <th nowrap="nowrap">Check-in time</th>
+                                                <th nowrap="nowrap">Latency</th>
+                                                <th nowrap="nowrap">Status</th>
+                                                <th nowrap="nowrap">Penalty Amount</th>
+
+                                            </thead>
+
+                                        <t t-set="total_amount" t-value="0"/>
+                                        <t t-foreach="o.late_check_in_ids" t-as="line">
+                                            <tr t-if="line.amount > 0.0 or line.state != 'deducted'">
+                                                <t t-set="hours" t-value="line.late_minutes // 60"/>
+                                                <t t-set="minutes" t-value="line.late_minutes % 60"/>
+
+                                                <td><span t-esc="line.date"></span></td>
+                                                <td><span t-esc="context_timestamp(line.attendance_id.check_in).time().strftime('%H:%M')"></span></td>
+
+                                                <td><span t-esc="'{}:{}'.format(hours, minutes)"></span></td>
+
+                                                <td><span t-esc="line.state"></span></td>
+                                                <td class="text-right"><span t-esc="line.amount"></span></td>
+
+                                            </tr>
+                                            <t t-set="total_amount" t-value="total_amount+line.amount"/>
+                                        </t>
+
+                                            <tr style="font-weight:BOLD;">
+                                                <td>Total:</td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td nowrap="nowrap" class="text-right"><span t-esc="'{0:,.2f}'.format(total_amount)"></span></td>
+                                            </tr>
+
+                                    </table>
+                            </div>
+                        </t>
+                </t>
+            </t>
+        </template>
+</odoo>

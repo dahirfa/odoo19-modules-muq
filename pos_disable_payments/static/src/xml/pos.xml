@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="pos_template" inherit_id="point_of_sale.template" xml:space="preserve">
+
+	<t t-name ="SelectPartnerButton" t-inherit="point_of_sale.SelectPartnerButton" t-inherit-mode="extension" owl="1">
+		<xpath expr="//button[hasclass('set-partner')]" position="replace">
+			<t t-if="this.pos.getCashier().is_allow_customer_selection">
+				<button class="set-partner btn btn-light btn-lg lh-lg text-truncate w-auto" t-on-click="() => this.pos.selectPartner()">
+					<div t-if="props.partner" t-esc="props.partner.name" class="text-truncate text-action" />
+					<t t-else="">Customer</t>
+				</button>
+			</t>
+			<t t-else="">
+				<button class="set-partner btn btn-light btn-lg lh-lg text-truncate w-auto" t-on-click="() => this.pos.selectPartner()" disabled="true">
+					<div t-if="props.partner" t-esc="props.partner.name" class="text-truncate text-action" />
+					<t t-else="">Customer</t>
+				</button>
+			</t>
+		</xpath>
+	</t>
+
+	<t t-name="ActionpadWidget" t-inherit="point_of_sale.ActionpadWidget" t-inherit-mode="extension" owl="1">
+		<xpath expr="//button[hasclass('pay')]" position="replace">
+			<t t-if="pos.getCashier().is_allow_payments and !this.swapButton">
+				<button class="pay pay-order-button button btn btn-primary btn-lg py-3 d-flex align-items-center justify-content-center flex-fill" t-on-click="props.actionToTrigger" t-esc="props.actionName" />
+			</t>
+			<t t-else="">
+				<t t-if="!this.swapButton">
+					<button class="pay pay-order-button button btn btn-primary btn-lg py-3 d-flex align-items-center justify-content-center flex-fill" t-on-click="props.actionToTrigger" t-esc="props.actionName" disabled="true" />
+				</t>
+			</t>
+		</xpath>
+	</t>
+
+	<t t-name="PaymentScreenButtons" t-inherit="point_of_sale.PaymentScreenButtons" t-inherit-mode="extension" owl="1">
+		<xpath expr="//button[hasclass('partner-button')]" position="replace">
+			<t t-if="env.services.pos.getCashier().is_allow_customer_selection">
+				<button class="button partner-button btn btn-light btn-lg w-100 w-md-50 lh-lg text-truncate" t-att-class="{ 'highlight text-action': currentOrder.getPartner() }" t-on-click="() => this.pos.selectPartner()">
+					<i class="fa fa-user me-2" role="img" title="Customer" />
+					<span class="partner-name">
+						<t t-if="currentOrder.getPartner()" t-esc="currentOrder.getPartner().name"/>
+						<t t-else="">Customer</t>
+					</span>
+				</button>
+			</t>
+		</xpath>
+	</t>
+	
+	
+
+	
+</templates>

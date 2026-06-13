@@ -1,0 +1,48 @@
+<odoo>
+	<data>
+		<record id="job_cost_by_detail_wizard_form" model="ir.ui.view">
+			<field name="name">project_invoice_bill.job_cost_by_detail_wizard.form</field>
+			<field name="model">project_invoice_bill.job_cost_by_detail_wizard</field>
+			<field name="arch" type="xml">
+			   <form>
+					<group>
+
+						<group>
+							<field name="project_id" options="{'no_create': True, 'no_quick_create': True, 'no_create_edit':True}" />
+							<field name="date_from" />
+							<field name="debit_or_credit" widget="radio" />
+						</group>
+
+
+						<group>
+							<field name="partner_id" options="{'no_create': True, 'no_quick_create': True, 'no_create_edit':True}" />
+							<field name="date_to" />
+							<field name="summary_or_detail" widget="radio" />
+							<field name="sort" widget="radio" />
+						</group>
+					</group>
+
+					<footer>
+						<button name="get_report" string="Get Report" type="object" class="oe_highlight"/>
+						<button string="Cancel" special="cancel"/>
+					</footer>
+
+			   </form>
+			</field>
+		</record>
+
+		<record id="action_job_cost_by_detail_form" model="ir.actions.act_window">
+			<field name="name">Job Cost By Detail Wizard</field>
+			<field name="res_model">project_invoice_bill.job_cost_by_detail_wizard</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="job_cost_by_detail_wizard_form"/>
+			<field name="target">new</field>
+		</record>
+
+
+		<!-- MenuItem For Job Cost -->
+		<!-- <menuitem id="menu_working_days" name="Job Cost By Detail" parent="project.menu_project_report" action="action_job_cost_by_detail_form" /> -->
+
+	</data>
+</odoo>

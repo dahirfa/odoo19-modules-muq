@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_attendance_shift_kanban" model="ir.ui.view">
+        <field name="name">resource.calendar.kanban</field>
+        <field name="model">resource.calendar</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_record_details">
+                                <div class="row mb-2">
+                                  <strong> <field name="name" /></strong>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col 10">
+                                     <field name="hours_per_day" /> Hours per day
+                                     </div>
+                                </div>
+                                <div class="row mb-2">
+                                   <strong> <field name="tz" /> </strong>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+
+    
+<record id="sa_inherit_view_resource_calendar_attendance_tree" model="ir.ui.view">
+    <field name="name"></field>
+    <field name="model">resource.calendar.attendance</field>
+    <field name="inherit_id" ref="resource.view_resource_calendar_attendance_tree" />
+    <field name="arch" type="xml">
+        
+        <!-- <field name="sequence" position="replace">
+            <field name="sequence"/>
+        </field>     -->
+        <field name="week_type" position="after">
+            <field name="next_dayofweek" invisible="1"/>
+        </field>
+        <field name="hour_from" position="attributes">
+            <attribute name="string">From</attribute>
+        </field>
+        <field name="hour_to" position="attributes">
+            <attribute name="string">To</attribute>
+        </field>
+
+    </field>
+</record>
+
+
+    <record id="sa_resource_calendar_periods_tree_view" model="ir.ui.view">
+        <field name="name">sa.resource.calendar.periods.tree</field>
+        <field name="model">sa.resource.calendar.periods</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" create="true">
+                <field name="name"/>
+                <field name="dayofweek"/>
+                <field name="hour_from" widget="float_time"/>
+                <field name="hour_to" widget="float_time"/>
+                <field name="punch_type"/>
+            </list>
+        </field>
+    </record>
+    
+
+    <record id="action_sa_periods" model="ir.actions.act_window">
+        <field name="name">In/Out Hours</field>
+        <field name="res_model">sa.resource.calendar.periods</field>
+        <field name="view_mode">list</field>
+        <field name="target">current</field>
+        <field name="domain">[('calender_id', '=', active_id)]</field>
+        <field name="context">{'default_calender_id': active_id, 'create':True}</field>
+    </record>
+
+
+    <record id="sa_calendar_tag_tree_view" model="ir.ui.view">
+        <field name="name">sa.calendar.tag.tree</field>
+        <field name="model">sa.calendar.tag</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="name"/>
+                <field name="dayofweek"/>
+                <field name="hour_from" widget="float_time"/>
+                <field name="hour_to"   widget="float_time"/>
+                <field name="color"     widget="color_picker"/>
+            </list>
+        </field>
+    </record>
+    
+
+    <record id="action_sa_att_tag" model="ir.actions.act_window">
+        <field name="name">Attendance Tags</field>
+        <field name="res_model">sa.calendar.tag</field>
+        <field name="view_mode">list</field>
+        <field name="target">current</field>
+        <field name="domain">[('calendar_id', '=', active_id)]</field>
+        <field name="context">{'default_calendar_id': active_id, 'create':True}</field>
+    </record>
+    
+
+
+    <record id="inherit_resource_calendar_form" model="ir.ui.view">
+        <field name="name">resource.form</field>
+        <field name="model">resource.calendar</field>
+        <field name="inherit_id" ref="resource.resource_calendar_form" />
+        <field name="arch" type="xml">
+
+            <xpath expr="//div[@class='oe_button_box']" position="inside">
+                <button name="%(action_sa_periods)d"
+                        string="In/Out Hours"
+                        type="action"
+                        class="btn-primary oe_stat_button"
+                        icon="fa-clock-o" />
+                        
+                <button name="%(action_sa_att_tag)d"
+                        string="Tags"
+                        type="action"
+                        class="btn-primary oe_stat_button"
+                        icon="fa-star-half-o" />
+            </xpath>
+
+            <xpath expr="//sheet/group[@name = 'resource_details']" position="inside">
+                <group>
+                    <field name="overnight_shift" />
+                </group>
+            </xpath>
+        </field>
+
+        
+    </record>
+    <record id="resource.action_resource_calendar_form" model="ir.actions.act_window">
+        <field name="name">Shift</field>
+        <field name="view_mode">list,kanban,form</field>
+    </record>
+
+
+
+</odoo>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Qweb Report Action -->
+    <record id="action_report_gross_profit" model="ir.actions.report">
+        <field name="name">Gross Profit Report</field>
+        <field name="model">mgs_account.gross_profit</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">mgs_account.gross_profit_report</field>
+        <field name="print_report_name">'Gross Profit Report'</field>
+    </record>
+
+    <template id="gross_profit_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.internal_layout">
+                    <div class="page">
+                        <!-- Report Header -->
+                        <div class="row mb-4">
+                            <div class="col-12 text-center">
+                                <h2>Gross Profit Report</h2>
+                                <h4 t-esc="company_id.name"/>
+                            </div>
+                        </div>
+
+                        <!-- Filters -->
+                        <div class="row mb-3">
+                            <div class="col-4">
+                                <strong>Date Range:</strong>
+                                <p class="m-0" t-esc="date_from"/>
+                                <p class="m-0" t-esc="'to ' + date_to"/>
+                            </div>
+                            <div class="col-4">
+                                <strong>Group By:</strong>
+                                <p class="m-0" t-esc="report_by"/>
+                            </div>
+                            <div class="col-4">
+                                <strong>Target Moves:</strong>
+                                <p class="m-0" t-esc="target_moves"/>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-4">
+                                <strong>Product Type:</strong>
+                                <p class="m-0" t-esc="product_type"/>
+                            </div>
+                            <div class="col-4" t-if="product_id and product_id[0]">
+                                <strong>Product:</strong>
+                                <p class="m-0" t-esc="product_id[1]"/>
+                            </div>
+                            <div class="col-4" t-if="partner_id and partner_id[0]">
+                                <strong>Partner:</strong>
+                                <p class="m-0" t-esc="partner_id[1]"/>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-4" t-if="categ_id and categ_id[0]">
+                                <strong>Category:</strong>
+                                <p class="m-0" t-esc="categ_id[1]"/>
+                            </div>
+                            <div class="col-4" t-if="parent_categ_id and parent_categ_id[0]">
+                                <strong>Parent Category:</strong>
+                                <p class="m-0" t-esc="parent_categ_id[1]"/>
+                            </div>
+                            <div class="col-4" t-if="analytic_account_id and analytic_account_id[0]">
+                                <strong>Analytic Account:</strong>
+                                <p class="m-0" t-esc="analytic_account_id[1]"/>
+                            </div>
+                        </div>
+
+                        <!-- Report Table -->
+                        <table class="table table-bordered table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th t-if="report_by == 'Product'">Product Name</th>
+                                    <th t-if="report_by == 'Partner'">Partner Name</th>
+                                    <th t-if="report_by == 'Category'">Category Name</th>
+                                    <th class="text-end">Cost Total</th>
+                                    <th class="text-end">Revenue Total</th>
+                                    <th class="text-end">Gross Profit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="total_cost" t-value="0"/>
+                                <t t-set="total_revenue" t-value="0"/>
+                                <t t-set="total_profit" t-value="0"/>
+                                
+                                <t t-foreach="lines(company_id.id, date_from, date_to, partner_id and partner_id[0] or False, product_id and product_id[0] or False, categ_id and categ_id[0] or False, parent_categ_id and parent_categ_id[0] or False, analytic_account_id and analytic_account_id[0] or False, target_moves, product_type, report_by)" t-as="line">
+                                    <t t-set="cost" t-value="line.get('act_cost', 0)"/>
+                                    <t t-set="revenue" t-value="line.get('act_revenue', 0)"/>
+                                    <t t-set="profit" t-value="line.get('gross_profit', 0)"/>
+                                    <t t-set="total_cost" t-value="total_cost + cost"/>
+                                    <t t-set="total_revenue" t-value="total_revenue + revenue"/>
+                                    <t t-set="total_profit" t-value="total_profit + profit"/>
+                                    
+                                    <!-- Conditional row styling for cost >= revenue -->
+                                    <tr>
+                                        <!-- Group Name Column -->
+                                        <td t-if="report_by == 'Product'">
+                                            <t t-esc="line.get('group_name', '')"/>
+                                        </td>
+                                        <td t-if="report_by == 'Partner'">
+                                            <t t-esc="line.get('group_name', '')"/>
+                                        </td>
+                                        <td t-if="report_by == 'Category'">
+                                            <t t-esc="line.get('group_name', '')"/>
+                                        </td>
+                                        
+                                        <!-- Numeric Columns -->
+                                        <td class="text-end">
+                                            <t t-esc="'{0:,.2f}'.format(cost)"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-esc="'{0:,.2f}'.format(revenue)"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-esc="'{0:,.2f}'.format(profit)"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                                
+                                <!-- Overall Total Row -->
+                                <tr>
+                                    <td t-if="report_by == 'Product'" class="text-right" t-att-style="'background-color: #85ace7ff;'">
+                                        <strong>Overall Total</strong>
+                                    </td>
+                                    <td t-if="report_by == 'Partner'" class="text-right" t-att-style="'background-color: #85ace7ff;'">
+                                        <strong>Overall Total</strong>
+                                    </td>
+                                    <td t-if="report_by == 'Category'" class="text-right" t-att-style="'background-color: #85ace7ff;'">
+                                        <strong>Overall Total</strong>
+                                    </td>
+                                    <td class="text-end" t-att-style="'background-color: #85ace7ff;'">
+                                        <strong>
+                                            <t t-esc="'{0:,.2f}'.format(total_cost)"/>
+                                        </strong>
+                                    </td>
+                                    <td class="text-end" t-att-style="'background-color: #85ace7ff;'">
+                                        <strong>
+                                            <t t-esc="'{0:,.2f}'.format(total_revenue)"/>
+                                        </strong>
+                                    </td>
+                                    <td class="text-end" t-att-style="'background-color: #85ace7ff;'">
+                                        <strong>
+                                            <t t-esc="'{0:,.2f}'.format(total_profit)"/>
+                                        </strong>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

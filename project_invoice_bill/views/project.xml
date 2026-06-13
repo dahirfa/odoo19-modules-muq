@@ -1,0 +1,96 @@
+<odoo>
+    <!--INHERIT PROJECT.PROJECT FORM VIEW-->
+	<record model="ir.ui.view" id="inherit_project_form_view">
+		<field name="name">project.form</field>
+		<field name="model">project.project</field>
+		<field name="inherit_id" ref="project.edit_project"/>
+		<field name="arch" type="xml">
+
+
+
+			<div class="oe_button_box" position="inside">
+				<button type="object"  name="cost_and_revenue"
+					class="oe_stat_button"
+					groups="account.group_account_invoice,account.group_account_manager"
+					icon="fa-usd" string="Cost &amp; Revenue">
+				</button>
+
+
+				<button type="object"  name="action_view_bills"
+					class="oe_stat_button"
+					groups="account.group_account_invoice,account.group_account_manager"
+					icon="fa-pencil-square-o">
+					<field name="bill_count" widget="statinfo" string="Supplier Bills" />
+				</button>
+
+
+
+				<button type="object"  name="action_view_invoices"
+					class="oe_stat_button"
+					groups="account.group_account_invoice,account.group_account_manager"
+					icon="fa-pencil-square-o">
+					<field name="invoice_count" widget="statinfo" string="Customer Invoices" />
+				</button>
+
+				<button type="object"  name="action_view_journals"
+					class="oe_stat_button"
+					groups="account.group_account_invoice,account.group_account_manager"
+					icon="fa-book">
+					<field name="journal_count" groups="account.group_account_invoice,account.group_account_manager"
+ 							widget="statinfo" string="Journal Entries" />
+				</button>
+
+			</div>
+
+
+			<field name="partner_id" position="attributes">
+				<attribute name="required">True</attribute>
+				<attribute name="options">{'no_create':True,'no_quick_create':True,'no_create_edit':True}</attribute>
+			</field>
+
+			<xpath expr="//field[@name='partner_id']" position="after">
+				<field name="proj_date"/>
+			</xpath>
+
+
+
+
+</field>
+</record>
+
+	<record id="project_kanban_view_extened1" model="ir.ui.view">
+		<field name="name">res.project.kanban.view.extened</field>
+		<field name="model">project.project</field>
+		<field name="inherit_id" ref="project.view_project_kanban"/>
+		<field name="arch" type="xml">
+	
+			<xpath expr="//div[contains(@class, 'd-flex') and .//field[@name='display_name']]" position="after">
+				<div groups="account.group_account_invoice,account.group_account_manager">
+					<ul>
+						<li>
+							<strong>Total Invoices: </strong>
+							<field name="total_invoices" widget="monetary"
+								   options="{'currency_field': 'currency_id'}"/>
+							
+							<strong># Invoices: </strong>
+							<field name="invoice_count"/>
+						</li>
+						<li>
+							<strong>Total Bills: </strong>
+							<field name="total_bills" widget="monetary"
+								   options="{'currency_field': 'currency_id'}"/>
+							
+							<strong># Bills: </strong>
+							<field name="bill_count"/>
+						</li>
+					</ul>
+				</div>
+			</xpath>
+	
+		</field>
+	</record>
+
+
+
+
+</odoo>

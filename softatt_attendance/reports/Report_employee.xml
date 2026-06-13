@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_employee_report" model="ir.actions.report">
+        <field name="name">Employee Report</field>
+        <field name="model">softatt_attendance.employee_report</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">softatt_attendance.employee_report</field>
+        <field name="report_file">softatt_attendance.employee_report</field>
+        <field name="print_report_name">Employee Report</field>
+    </record>
+
+    <template id="employee_report" name="employee_report">
+        <t t-call="web.html_container">
+            <t t-foreach="employee_ids" t-as="employee">
+                <t t-call="web.external_layout" t-lang="en_US">
+                    <div class="page">
+                        <h1>Attendance Report</h1>
+                        <h3>Employee: <t t-esc="employee['name']"/></h3>
+                        <h4>Title: <t i-if="employee['job_title']" t-esc="employee['job_title']"/></h4>
+                        <h4>Shift: <t i-if="employee['resource_calendar_id']" t-esc="employee['resource_calendar_id'][1]"/></h4>
+                        <table class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Check In</th>
+                                    <th>Check Out</th>
+                                    <th>Worked Hours</th>
+                                    <th>Late Minutes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="lines(employee['id'], data).items()" t-as="item">
+                                    <tr>
+                                        <td nowrap='nowrap'><t t-esc="item[0]"/> - <t t-esc="dayofweek(item[0])"/></td>
+                                        
+                                        <t t-if="item[1].get('employee_id',False)"> <!-- Check if there is attendance data for this date -->
+                                            <td nowrap='nowrap'><t t-esc="item[1].get('check_in', '-')"/></td>
+                                            <td nowrap='nowrap'><t t-esc="item[1].get('check_out', '-')"/></td>
+                                            <td nowrap='nowrap'><t t-esc="item[1].get('worked_hours', 0.0)" t-options="{'widget': 'float_time'}"/></td>
+                                            <td nowrap='nowrap'><t t-esc="item[1].get('late_minutes', 0)"/></td>
+                                        </t>
+                                        <t t-else="">
+                                            <td colspan="4" class="text-center"><t t-esc="absence_str(employee['id'], item[0])"/></td>
+                                        </t>
+                                    </tr>
+                                </t>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+    
+</odoo>

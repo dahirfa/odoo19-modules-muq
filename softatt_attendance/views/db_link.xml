@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sa_db_link_server_form" model="ir.ui.view">
+        <field name="name">sa.server.form</field>
+        <field name="model">sa.db_link.server</field>
+        <field name="arch" type="xml">
+            <form string="Server Details">
+                <header>
+                    <button name="register_server"
+                            confirm="Are you sure you want to register this server?"
+                            
+                            invisible="registered == True"
+                            string="Register"
+                            type="object"
+                            class="oe_highlight"/>
+                </header>
+                <sheet>
+
+                    <group>
+                        <group string="Remote Server Settings">
+                            <field name="db_name"   readonly="registered == True"      help="The Databse Name of the remote server."/>
+                            <field name="name"      readonly="registered == True"     help="Set a Short name or Alias for the database. (In lower case, Must be unique)"/>
+                            <field name="ip_address"  readonly="registered == True"
+                            placeholder="201.101.101.101"       
+                            help="The IP address of the remote server."/>
+
+                            <field name="port" readonly="registered == True"
+                                placeholder="5432"       
+                                help="The port used to connect to the remote server." 
+                                string ="DB port"/>
+
+                            <field name="user_name" readonly="registered == True"     help="PostgreSQL user of the remote server."/>
+                            <field name="password" readonly="registered == True" password="1" help="PostgreSQL user password of the remote server."/>
+                        </group>
+
+                        <group string="Current Server Settings">
+                            <field string="The PostgreSQL User for this server" name="current_user" readonly="registered == True" help="The PostgreSQL User for this server. Usually The Value Is 'odoo'"/>
+                            <field name="registered" help="Indicates whether this server has been registered."/>
+                        </group>
+                    </group>
+                    
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="sa_db_link_server_tree" model="ir.ui.view">
+        <field name="name">sa.db_link.server.tree</field>
+        <field name="model">sa.db_link.server</field>
+        <field name="arch" type="xml">
+            <list>
+                    <field name="db_name"/>
+                <field name="name"/>
+                <field name="ip_address"/>
+                <field name="port"/>
+                <field name="user_name"/>
+                <field name="registered"/>
+                <button name="register_server" 
+                 confirm="Are you Sure?" 
+                 invisible="registered == True"
+                 string="Register" type="object" class="oe_highlight"/>
+            </list>
+        </field>
+    </record>
+
+
+    <record id="sa_server_conf_action" model="ir.actions.act_window">
+        <field name="name">DB-Link Server Configuration</field>
+        <field name="res_model">sa.db_link.server</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+
+
+</odoo>

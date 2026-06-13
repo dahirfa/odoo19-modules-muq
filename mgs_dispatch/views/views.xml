@@ -1,0 +1,415 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record model="ir.ui.view" id="truck_form_view">
+        <field name="name">truck.form</field>
+        <field name="model">truck.dispatch</field>
+        <field name="arch" type="xml">
+            <form string="Trucks Form">
+                <sheet>
+                    <!-- <button name="create_tag" string="CREATE TAG" type="object" attrs="{'invisible': [('tag_id','!=',False)]}" class="oe_highlight"/> -->
+
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="eld"/>
+                            <field name="make_id"/>
+                            <field name="plate"/>
+                            <field name="trailer_id"/>
+                            <field name="type_id"/>
+                            <field name="trucking_no"/>
+                            <field name="country"/>
+                            <field name="state"/>
+                            <field name="is_working"/>
+                            <field name="company_id" readonly="1" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="vin"/>
+                            <field name="driver_id" context="{'default_is_driver':True}"/>
+                            <field name="ifta_id"/>
+                            <field name="rpm_loaded"/>
+                            <field name="rpm_empty"/>
+                            <field name="rph"/>
+                            <field name="Weight"/>
+                            <field name="truck_owner"/>
+                            <field name="partner_id" string="Sub Contractor" invisible="truck_owner != 'type2'"/>
+                            <field name="vendor_pays_for_expenses" invisible="truck_owner != 'type2'"/>
+                            <field name="commission" force_save="1" widget="percentage" invisible="truck_owner != 'type2'"/>
+                            <!-- <field name="tag_id"/> -->
+                        </group>
+                    </group>
+                    <group>
+                    <field name="note"/>
+                    </group>
+                </sheet>
+                <chatter />
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="truck_tree_view">
+        <field name="name">truck.list</field>
+        <field name="model">truck.dispatch</field>
+        <field name="arch" type="xml">
+            <list string="Trucks">
+                <field name="name"/>
+                <field name="plate"/>
+                <field name="driver_id" context="{'default_is_driver':True}"/>
+                <field name="trailer_id"/>
+                <field name="truck_owner"/>
+                <field name="partner_id" string="Sub Contractor"/>
+
+            </list>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="truck_list_action">
+        <field name="name">Trucks</field>
+        <field name="res_model">truck.dispatch</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Enter the first Truck
+            </p>
+        </field>
+    </record>
+
+
+
+
+
+
+
+
+
+
+    <record model="ir.ui.view" id="trailer_form_view">
+        <field name="name">trailer.form</field>
+        <field name="model">trailer.dispatch</field>
+        <field name="arch" type="xml">
+            <form string="Trailers Form">
+                <sheet>
+                    <group>
+                        <group>
+                          <field name="name"/>
+                          <field name="make_id"/>
+                          <field name="plate"/>
+                          <field name="country"/>
+                          <field name="state"/>
+                          <field name="is_third_party_trailer"/>
+                        </group>
+                        <group>
+                          <field name="type_id"/>
+                          <field name="trucking_no"/>
+                          <field name="vin"/>
+                          <field name="Weight"/>
+                          <field name="equipment"/>
+                          <field name="is_working"/>
+                          <field name="company_id" readonly="1" groups="base.group_multi_company"/>
+
+                        </group>
+                    </group>
+                    <group>
+                    <field name="note"/>
+                    </group>
+                </sheet>
+                <chatter />
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="trailer_tree_view">
+        <field name="name">trailer.list</field>
+        <field name="model">trailer.dispatch</field>
+        <field name="arch" type="xml">
+            <list string="Trailers">
+                <field name="name"/>
+                <field name="trucking_no"/>
+                <field name="vin"/>
+                <field name="make_id"/>
+                <field name="plate"/>
+                <field name="type_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="trailer_list_action">
+        <field name="name">Trailer</field>
+        <field name="res_model">trailer.dispatch</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Enter the first Trailer
+            </p>
+        </field>
+    </record>
+
+
+
+
+    <!-- <record id="view_res_partner_form_inherit" model="ir.ui.view">
+        <field name="name">driver.form</field>
+        <field name="model">res.partner</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            
+        </field>
+    </record> -->
+
+    <record model="ir.actions.act_window" id="driver_list_action">
+        <field name="name">Driver</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'default_is_driver':True}</field>
+        <field name="domain">[('is_driver','=',True)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Enter the first Driver
+            </p>
+            
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="make_form_view">
+        <field name="name">Make.form</field>
+        <field name="model">make.dispatch</field>
+        <field name="arch" type="xml">
+            <form string="Make Form">
+                <sheet>
+                    <group>
+                        <field name="name" placeholder="Name"/>
+                        <field name="code" placeholder="Short Code"/>
+                        <field name="company_id" readonly="1" groups="base.group_multi_company"/>
+                    </group>
+
+                </sheet>
+                <chatter />
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="make_tree_view">
+        <field name="name">Make.form</field>
+        <field name="model">make.dispatch</field>
+        <field name="arch" type="xml">
+            <list string="Makers">
+                <field name="name"/>
+                <field name="code"/>
+            </list>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="make_list_action">
+        <field name="name">Make</field>
+        <field name="res_model">make.dispatch</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Enter the first Maker
+            </p>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="truck_type_form_view">
+        <field name="name">Truck Type.form</field>
+        <field name="model">truck_type.dispatch</field>
+        <field name="arch" type="xml">
+            <form string="Truck Type Form">
+                <sheet>
+                    <group>
+                        <field name="name" placeholder="Name"/>
+                        <field name="code" placeholder="Short Code"/>
+                          <field name="company_id" readonly="1" groups="base.group_multi_company"/>
+
+                    </group>
+
+                </sheet>
+                <chatter />
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="truck_type_tree_view">
+        <field name="name">truck_type.list</field>
+        <field name="model">truck_type.dispatch</field>
+        <field name="arch" type="xml">
+            <list string="Makers">
+                <field name="name"/>
+                <field name="code"/>
+            </list>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="truck_type_list_action">
+        <field name="name">Truck Type</field>
+        <field name="res_model">truck_type.dispatch</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Enter the first Type
+            </p>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="trailer_type_form_view">
+        <field name="name">Trailer Type.form</field>
+        <field name="model">trailer_type.dispatch</field>
+        <field name="arch" type="xml">
+            <form string="Trailer Type Form">
+                <sheet>
+                    <group>
+                        <field name="name" placeholder="Name"/>
+                        <field name="code" placeholder="Short Code"/>
+                        <field name="company_id" readonly="1" groups="base.group_multi_company"/>  
+                    </group>
+
+                </sheet>
+                <chatter />
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="trailer_type_tree_view">
+        <field name="name">trailer_type.list</field>
+        <field name="model">trailer_type.dispatch</field>
+        <field name="arch" type="xml">
+            <list string="Makers">
+                <field name="name"/>
+                <field name="code"/>
+            </list>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="trailer_type_list_action">
+        <field name="name">Trailer Type</field>
+        <field name="res_model">trailer_type.dispatch</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Enter the first Type
+            </p>
+        </field>
+    </record>
+
+
+
+    <record model="ir.ui.view" id="ifta_form_view">
+        <field name="name">ifta.form</field>
+        <field name="model">ifta.dispatch</field>
+        <field name="arch" type="xml">
+            <form string="IFTA Group Form">
+                <sheet>
+                    <group>
+                        <field name="name" placeholder="Name"/>
+                        <field name="code" placeholder="Short Code"/>
+                        <field name="company_id" readonly="1" groups="base.group_multi_company"/>
+                    </group>
+
+                </sheet>
+                <chatter />
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="ifta_tree_view">
+        <field name="name">ifta.list</field>
+        <field name="model">ifta.dispatch</field>
+        <field name="arch" type="xml">
+            <list string="IFTA Group">
+                <field name="name"/>
+                <field name="code"/>
+            </list>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="ifta_list_action">
+        <field name="name">IFTA Group</field>
+        <field name="res_model">ifta.dispatch</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Enter the first IFTA Group
+            </p>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="city_form_view">
+        <field name="name">city.form</field>
+        <field name="model">city.dispatch</field>
+        <field name="arch" type="xml">
+            <form string="Citties Form">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" placeholder="Name"/>
+                        </group>
+                        <group>
+                            <field name="state_id" placeholder="State"/>
+                            <field name="company_id" readonly="1" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+
+                </sheet>
+                <chatter />
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="city_tree_view">
+        <field name="name">city.list</field>
+        <field name="model">city.dispatch</field>
+        <field name="arch" type="xml">
+            <list string=" Citties">
+                <field name="name"/>
+                <field name="state_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="city_list_action">
+        <field name="name">Citties</field>
+        <field name="res_model">city.dispatch</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Enter the first City
+            </p>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="state_list_action">
+        <field name="name">States</field>
+        <field name="res_model">res.country.state</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Enter the first City
+            </p>
+        </field>
+    </record>
+    
+
+
+    <!-- <record id="view_account_analytic_account_tree_inherit" model="ir.ui.view">
+        <field name="name">driver.form</field>
+        <field name="model">account.analytic.account</field>
+        <field name="type">list</field>
+        <field name="inherit_id" ref="analytic.view_account_analytic_account_list"/>
+        <field name="arch" type="xml">
+				<field name="debit"/>                
+        </field>
+    </record>
+ -->
+
+
+
+
+    
+    <menuitem id="dispatch_main" name="Dispatching" action="load_list_action" web_icon="mgs_dispatch,static/description/icon.png"/>
+
+    <menuitem id="load_menu" name="Batches" parent="dispatch_main" action="load_list_action" sequence="1"/>
+    <menuitem id="dispatch_config_menu" name="Configuration" parent="dispatch_main" sequence="3"/>
+    <menuitem id="truck_menu" name="Trucks" parent="dispatch_config_menu" action="truck_list_action"/>
+    <menuitem id="make_menu" name="Make" parent="dispatch_config_menu" action="make_list_action"/>
+    <menuitem id="trailer_menu" name="Trailers" parent="dispatch_config_menu" action="trailer_list_action"/>
+    <menuitem id="dispatch_city_menu" name="Citties" parent="dispatch_config_menu" action="city_list_action"/>
+    <menuitem id="dispatch_state_menu" name="States" parent="dispatch_config_menu" action="state_list_action"/>
+    <menuitem id="truck_type_menu" name="Truck type" parent="dispatch_config_menu" action="truck_type_list_action"/>
+    <menuitem id="trailer_type_menu" name="Trailer Type" parent="dispatch_config_menu" action="trailer_type_list_action"/>
+    <menuitem id="ifta_menu" name="IFTA Group" parent="dispatch_config_menu" action="ifta_list_action"/>
+    <menuitem id="driver_menu" name="Driver" parent="dispatch_config_menu" action="driver_list_action"/>
+
+</odoo>

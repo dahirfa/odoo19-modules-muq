@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="approval_category_data_request_items" model="approval.category">
+            <field name="name">Request Items</field>
+            <field name="approval_type">request_items</field>
+            <field name="sequence">90</field>
+            <field name="has_date">required</field>
+            <field name="has_quantity">required</field>
+            <field name="has_product">required</field>
+        </record>
+    </data>
+</odoo>

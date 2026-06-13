@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    
+    <record id="hr_attendance.view_hr_attendance_kanban" model="ir.ui.view">
+        <field name="name">hr_attendance.kanban</field>
+        <field name="model">hr.attendance</field>
+        <field name="arch" type="xml">
+
+            <kanban class="o_kanban_mobile" sample="1">
+                <field name="employee_id"/>
+                <field name="check_in"/>
+                <field name="check_out"/>
+                <field name="late_minutes"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div>
+                                <img t-att-src="kanban_image('hr.employee', 'avatar_128', record.employee_id.raw_value)" 
+                                     t-att-title="record.employee_id.value" 
+                                     t-att-alt="record.employee_id.value" 
+                                     class="oe_kanban_avatar o_image_24_cover mr4"/>
+                                <span class="o_kanban_record_title">
+                                    <strong><t t-esc="record.employee_id.value"/></strong>
+                                </span>
+                            </div>
+                            <hr class="mt4 mb8"/>
+                            <div class="o_kanban_record_subtitle">
+                                <div class="o_kanban_side_by_side">
+                                    <div class="box green-box">
+                                        <span><t t-esc="record.check_in.value"/></span>
+                                    </div>
+                                    <div class="box red-box">
+                                        <span><t t-esc="record.check_out.value"/></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="mt4 mb8"/>
+                            <div class="o_kanban_record_subtitle">
+                                <div>
+                                    <div>
+                                        <span><t t-esc="record.late_minutes.value"/> Minutes Late</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>   
+        </field>
+    </record>
+
+    
+    <record id="softatt_inheirt_hr_attendance_tree" model="ir.ui.view">
+        <field name="name">hr_attendance.tree</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.view_attendance_tree" />
+        <field name="arch" type="xml">
+            <field name="check_out" position="after">
+                <field name="location_id"  optional="hide" readonly="1"/>
+                <!-- <field name="late_minutes" optional="show"  force_save="1" /> -->
+            </field>
+        </field>
+    </record>
+
+    <record id="softatt_inherit_hr_attendance_view_filter" model="ir.ui.view">
+        <field name="name">hr_attendance.search</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_filter" />
+        <field name="arch" type="xml">
+
+            <field name="department_id" position="after">
+                <searchpanel>
+                    <field name="location_id" icon="fa-building" enable_counters="1"/>
+                    <field name="department_id" icon="fa-users" enable_counters="1"/>
+                </searchpanel>
+
+                <field name="location_id" />
+            </field>
+        </field>
+    </record>
+    
+</odoo>

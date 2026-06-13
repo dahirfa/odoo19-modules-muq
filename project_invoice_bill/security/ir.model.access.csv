@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_project_invoice_bill_project_invoice_bill,project_invoice_bill.project_invoice_bill,model_project_invoice_bill_project_invoice_bill,,1,0,0,0

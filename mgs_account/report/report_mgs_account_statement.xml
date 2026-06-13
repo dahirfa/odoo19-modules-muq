@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Qweb Report Action -->
+    <record id="action_account_statement_report" model="ir.actions.report">
+        <field name="name">Account Statement</field>
+        <field name="model">mgs_account.account_statement</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">mgs_account.account_statement_report</field>
+        <field name="print_report_name">'Account Statement - ' + object.date_from + ' to ' + object.date_to</field>
+        <field name="binding_model_id" ref="model_mgs_account_account_statement"/>
+        <field name="binding_type">report</field>
+    </record>
+
+   <template id="account_statement_report_detail">
+    <div class="page">
+        <div class="row">
+            <!-- Date Range -->
+            <div class="col-3" t-if="date_from or date_to">
+                <strong>Date Range:</strong>
+                <p t-if="date_from" t-esc="date_from" class="m-0"/>
+                <p t-if="date_to" t-esc="date_to" class="m-0"/>
+            </div>
+            <!-- Account -->
+            <div class="col-3" t-if="account_id and account_id[0]">
+                <strong>Account:</strong>
+                <p class="m-0" t-esc="account_id[1]"/>
+            </div>
+            <!-- Partner -->
+            <div class="col-3" t-if="partner_id and partner_id[0]">
+                <strong>Partner:</strong>
+                <p class="m-0" t-esc="partner_id[1]"/>
+            </div>
+            <!-- Analytic Account -->
+            <div class="col-3" t-if="analytic_account_id and analytic_account_id[0]">
+                <strong>Analytic Account:</strong>
+                <p class="m-0" t-esc="analytic_account_id[1]"/>
+            </div>
+            <!-- Company -->
+            <div class="col-3" t-if="company_id">
+                <strong>Company:</strong>
+                <p class="m-0" t-esc="company_id.name"/>
+            </div>
+            <!-- Target Moves -->
+            <div class="col-3">
+                <strong>Target Moves:</strong>
+                <p class="m-0" t-esc="'All Entries' if target_moves == 'all' else 'Posted Entries'"/>
+            </div>
+        </div>
+        <table class="table table-bordered table-sm table-hover">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Voucher Type</th>
+                    <th>Voucher No</th>
+                    <th>Partner</th>
+                    <th>Reference</th>
+                    <th class="text-end">Debit</th>
+                    <th class="text-end">Credit</th>
+                    <th class="text-end">Balance</th>
+                    <th class="text-end">Currency Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <t t-set="total_opening" t-value="0"/>
+                <t t-set="total_debit" t-value="0"/>
+                <t t-set="total_credit" t-value="0"/>
+                <t t-set="total_closing" t-value="0"/>
+                <t t-set="total_currency" t-value="0"/>
+                <t t-foreach="lines" t-as="account_group">
+                    <t t-set="account_name" t-value="account_group['name']"/>
+                    <!-- Account Header Row -->
+                    <tr class="table-active">
+                        <td colspan="9">
+                            <strong>
+                                <t t-esc="account_name"/>
+                            </strong>
+                        </td>
+                    </tr>
+                    <!-- Opening Balance Row - FIXED: Opening balance in Balance column -->
+                    <tr class="table-secondary">
+                        <td>
+                            <strong>Opening Balance</strong>
+                        </td>
+                        <td colspan="4"></td> <!-- Voucher Type, Voucher No, Partner, Reference -->
+                        <td class="text-end"></td> <!-- Debit -->
+                        <td class="text-end"></td> <!-- Credit -->
+                        <td class="text-end">
+                            <strong>
+                                <t t-esc="'{0:,.2f}'.format(account_group.get('open_balance', 0))"/>
+                            </strong>
+                        </td>
+                        <td class="text-end"></td> <!-- Currency Amount -->
+                    </tr>
+                    <!-- Transaction Lines under Account -->
+                    <t t-set="running_balance" t-value="account_group.get('open_balance', 0)"/>
+                    <t t-foreach="account_group['lines']" t-as="line">
+                        <tr>
+                            <td>
+                                <t t-esc="line['date']"/>
+                            </td>
+                            <td>
+                                <t t-esc="line['voucher_type']"/>
+                            </td>
+                            <td>
+                                <t t-esc="line['voucher_no']"/>
+                            </td>
+                            <td>
+                                <t t-esc="line['partner_name']"/>
+                            </td>
+                            <td>
+                                <t t-set="label" t-value="line.get('label', '')"/>
+                                <t t-set="ref" t-value="line.get('ref', '')"/>
+                                <t t-if="label and ref">
+                                    <t t-esc="label"/> (<t t-esc="ref"/>)
+                                </t>
+                                <t t-elif="label">
+                                    <t t-esc="label"/>
+                                </t>
+                                <t t-elif="ref">
+                                    <t t-esc="ref"/>
+                                </t>
+                            </td>
+                            <td class="text-end">
+                                <t t-esc="'{0:,.2f}'.format(line.get('debit', 0))"/>
+                            </td>
+                            <td class="text-end">
+                                <t t-esc="'{0:,.2f}'.format(line.get('credit', 0))"/>
+                            </td>
+                            <td class="text-end">
+                                <t t-set="running_balance" t-value="running_balance + line.get('debit', 0) - line.get('credit', 0)"/>
+                                <t t-esc="'{0:,.2f}'.format(running_balance)"/>
+                            </td>
+                            <td class="text-end">
+                                <t t-esc="'{0:,.2f}'.format(line.get('amount_currency', 0))"/>
+                            </td>
+                        </tr>
+                    </t>
+                    <t t-set="total_opening" t-value="total_opening + account_group.get('open_balance', 0)"/>
+                    <t t-set="total_debit" t-value="total_debit + account_group.get('total_debit', 0)"/>
+                    <t t-set="total_credit" t-value="total_credit + account_group.get('total_credit', 0)"/>
+                    <t t-set="total_closing" t-value="total_closing + account_group.get('balance', 0)"/>
+                    <t t-set="total_currency" t-value="total_currency + account_group.get('balance_fc', 0)"/>
+                    <!-- Account Total Row -->
+                    <tr class="table-warning">
+                        <td class="text-right" colspan="5">
+                            <strong>Total <t t-esc="account_name"/>:</strong>
+                        </td>
+                        <td class="text-end">
+                            <strong>
+                                <t t-esc="'{0:,.2f}'.format(account_group.get('total_debit', 0))"/>
+                            </strong>
+                        </td>
+                        <td class="text-end">
+                            <strong>
+                                <t t-esc="'{0:,.2f}'.format(account_group.get('total_credit', 0))"/>
+                            </strong>
+                        </td>
+                        <td class="text-end">
+                            <strong>
+                                <t t-esc="'{0:,.2f}'.format(account_group.get('balance', 0))"/>
+                            </strong>
+                        </td>
+                        <td class="text-end">
+                            <strong>
+                                <t t-esc="'{0:,.2f}'.format(account_group.get('balance_fc', 0))"/>
+                            </strong>
+                        </td>
+                    </tr>
+                    <!-- Empty row between account groups -->
+                    <tr>
+                        <td colspan="9" style="height: 10px;"></td>
+                    </tr>
+                </t>
+                <!-- Overall Total Row -->
+                <tr class="table-primary">
+                    <td class="text-right" colspan="5">
+                        <strong>Overall Total</strong>
+                    </td>
+                    <td class="text-end">
+                        <strong>
+                            <t t-esc="'{0:,.2f}'.format(total_debit)"/>
+                        </strong>
+                    </td>
+                    <td class="text-end">
+                        <strong>
+                            <t t-esc="'{0:,.2f}'.format(total_credit)"/>
+                        </strong>
+                    </td>
+                    <td class="text-end">
+                        <strong>
+                            <t t-esc="'{0:,.2f}'.format(total_closing)"/>
+                        </strong>
+                    </td>
+                    <td class="text-end">
+                        <strong>
+                            <t t-esc="'{0:,.2f}'.format(total_currency)"/>
+                        </strong>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</template>
+
+    <template id="account_statement_report_summary">
+        <div class="page">
+            <div class="row">
+                <!-- Date Range -->
+                <div class="col-3" t-if="date_from or date_to">
+                    <strong>Date Range:</strong>
+                    <p t-if="date_from" t-esc="date_from" class="m-0"/>
+                    <p t-if="date_to" t-esc="date_to" class="m-0"/>
+                </div>
+                <!-- Account -->
+                <div class="col-3" t-if="account_id and account_id[0]">
+                    <strong>Account:</strong>
+                    <p class="m-0" t-esc="account_id[1]"/>
+                </div>
+                <!-- Partner -->
+                <div class="col-3" t-if="partner_id and partner_id[0]">
+                    <strong>Partner:</strong>
+                    <p class="m-0" t-esc="partner_id[1]"/>
+                </div>
+                <!-- Analytic Account -->
+                <div class="col-3" t-if="analytic_account_id and analytic_account_id[0]">
+                    <strong>Analytic Account:</strong>
+                    <p class="m-0" t-esc="analytic_account_id[1]"/>
+                </div>
+                <!-- Company -->
+                <div class="col-3" t-if="company_id">
+                    <strong>Company:</strong>
+                    <p class="m-0" t-esc="company_id.name"/>
+                </div>
+                <!-- Target Moves -->
+                <div class="col-3">
+                    <strong>Target Moves:</strong>
+                    <p class="m-0" t-esc="'All Entries' if target_moves == 'all' else 'Posted Entries'"/>
+                </div>
+            </div>
+            <table class="table table-bordered table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th>Account</th>
+                        <th class="text-end">Opening Balance</th>
+                        <th class="text-end">Total Debit</th>
+                        <th class="text-end">Total Credit</th>
+                        <th class="text-end">Closing Balance</th>
+                        <th class="text-end">Currency Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-set="total_opening" t-value="0"/>
+                    <t t-set="total_debit" t-value="0"/>
+                    <t t-set="total_credit" t-value="0"/>
+                    <t t-set="total_closing" t-value="0"/>
+                    <t t-set="total_currency" t-value="0"/>
+                    <t t-foreach="lines" t-as="account_group">
+                        <t t-set="account_name" t-value="account_group['name']"/>
+                        <t t-set="total_opening" t-value="total_opening + account_group.get('open_balance', 0)"/>
+                        <t t-set="total_debit" t-value="total_debit + account_group.get('total_debit', 0)"/>
+                        <t t-set="total_credit" t-value="total_credit + account_group.get('total_credit', 0)"/>
+                        <t t-set="total_closing" t-value="total_closing + account_group.get('balance', 0)"/>
+                        <t t-set="total_currency" t-value="total_currency + account_group.get('balance_fc', 0)"/>
+                        <!-- Summary Row -->
+                        <tr class="table-secondary">
+                            <td>
+                                <t t-esc="account_name"/>
+                            </td>
+                            <td class="text-end">
+                                <t t-esc="'{0:,.2f}'.format(account_group.get('open_balance', 0))"/>
+                            </td>
+                            <td class="text-end">
+                                <t t-esc="'{0:,.2f}'.format(account_group.get('total_debit', 0))"/>
+                            </td>
+                            <td class="text-end">
+                                <t t-esc="'{0:,.2f}'.format(account_group.get('total_credit', 0))"/>
+                            </td>
+                            <td class="text-end">
+                                <t t-esc="'{0:,.2f}'.format(account_group.get('balance', 0))"/>
+                            </td>
+                            <td class="text-end">
+                                <t t-esc="'{0:,.2f}'.format(account_group.get('balance_fc', 0))"/>
+                            </td>
+                        </tr>
+                    </t>
+                    <!-- Overall Total Row -->
+                    <tr class="table-primary">
+                        <td class="text-right">
+                            <strong>Overall Total</strong>
+                        </td>
+                        <td class="text-end">
+                            <strong>
+                                <t t-esc="'{0:,.2f}'.format(total_opening)"/>
+                            </strong>
+                        </td>
+                        <td class="text-end">
+                            <strong>
+                                <t t-esc="'{0:,.2f}'.format(total_debit)"/>
+                            </strong>
+                        </td>
+                        <td class="text-end">
+                            <strong>
+                                <t t-esc="'{0:,.2f}'.format(total_credit)"/>
+                            </strong>
+                        </td>
+                        <td class="text-end">
+                            <strong>
+                                <t t-esc="'{0:,.2f}'.format(total_closing)"/>
+                            </strong>
+                        </td>
+                        <td class="text-end">
+                            <strong>
+                                <t t-esc="'{0:,.2f}'.format(total_currency)"/>
+                            </strong>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </template>
+
+    <!-- Main report template -->
+    <template id="account_statement_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.internal_layout">
+                    <t t-if="report_by == 'detail'">
+                        <t t-call="mgs_account.account_statement_report_detail"/>
+                    </t>
+                    <t t-elif="report_by == 'summary'">
+                        <t t-call="mgs_account.account_statement_report_summary"/>
+                    </t>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

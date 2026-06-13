@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+    <record id="group_dispatching_user" model="res.groups">
+        <field name="name">Dispatching user</field>
+    </record>
+    <record id="group_dispatching_manager" model="res.groups">
+        <field name="name">Dispatching Manager</field>
+    </record>
+
+
+
+    <record model="ir.rule" id="_model_truck_dispatch">
+        <field name="name">Only company can see it.</field>
+        <field name="model_id" ref="model_truck_dispatch"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">
+            [('company_id', 'in', company_ids)]
+        </field>
+    </record>
+
+
+    <record model="ir.rule" id="company_id_rule_truck_type_dispatch">
+        <field name="name">Only company can see it.</field>
+        <field name="model_id" ref="model_truck_type_dispatch"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">
+            [('company_id', 'in', company_ids)]
+        </field>
+    </record>
+
+        <record model="ir.rule" id="company_id_rule_make_dispatch">
+        <field name="name">Only company can see it.</field>
+        <field name="model_id" ref="model_make_dispatch"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">
+            [('company_id', 'in', company_ids)]
+        </field>
+    </record>
+
+        <record model="ir.rule" id="company_id_rule_ifta_dispatch">
+        <field name="name">Only company can see it.</field>
+        <field name="model_id" ref="model_ifta_dispatch"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">
+            [('company_id', 'in', company_ids)]
+        </field>
+    </record>
+
+        <record model="ir.rule" id="company_id_rule_city_dispatch">
+        <field name="name">Only company can see it.</field>
+        <field name="model_id" ref="model_city_dispatch"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">
+            [('company_id', 'in', company_ids)]
+        </field>
+    </record>
+
+        <record model="ir.rule" id="company_id_rule_load_dispatch">
+        <field name="name">Only company can see it.</field>
+        <field name="model_id" ref="model_load_dispatch"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">
+            [('company_id', 'in', company_ids)]
+        </field>
+    </record>
+
+        <record model="ir.rule" id="company_id_rule_trailer_dispatch">
+        <field name="name">Only company can see it.</field>
+        <field name="model_id" ref="model_trailer_dispatch"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">
+            [('company_id', 'in', company_ids)]
+        </field>
+    </record>
+
+
+        <record model="ir.rule" id="company_id_rule_trailer_type_dispatch">
+        <field name="name">Only company can see it.</field>
+        <field name="model_id" ref="model_trailer_type_dispatch"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">
+            [('company_id', 'in', company_ids)]
+        </field>
+    </record>
+
+
+        <record model="ir.rule" id="company_id_rule_load_line_dispatch">
+        <field name="name">Only company can see it.</field>
+        <field name="model_id" ref="model_load_line_dispatch"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">
+            [('company_id', 'in', company_ids)]
+        </field>
+    </record>
+</odoo>

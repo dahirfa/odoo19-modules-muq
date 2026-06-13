@@ -1,0 +1,29 @@
+<odoo>
+      <record id="inherit_waafipay_payment_provider_form" model="ir.ui.view">
+        <field name="name">Waafipay Provider Form</field>
+        <field name="model">payment.provider</field>
+        <field name="inherit_id" ref="payment.payment_provider_form"/>
+        <field name="arch" type="xml">
+            <group name="provider_credentials" position="inside">
+                <group invisible="code != 'waafipay_evc'">
+                    <field name="merchant_uid" required="code == 'waafipay_evc' and state != 'disabled'" password="1"/>
+                    <field name="api_userid" required="code == 'waafipay_evc' and state != 'disabled'" password="1"/>
+                    <field name="api_key" required="code == 'waafipay_evc' and state != 'disabled'" password="1"/>
+                </group>
+            </group>
+        </field>
+    </record>
+
+
+  <record id="waafipay_payment_transaction_form" model="ir.ui.view">
+        <field name="name">waafipay_evc Transaction Form</field>
+        <field name="model">payment.transaction</field>
+        <field name="inherit_id" ref="payment.payment_transaction_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='provider_reference']" position="after">
+                <field name="waafipay_type" readonly="1" invisible="waafipay_type != 'waafipay_evc'" groups="base.group_no_one"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

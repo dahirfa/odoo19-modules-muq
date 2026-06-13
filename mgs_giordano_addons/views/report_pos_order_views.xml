@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+  <odoo>
+      
+    <!-- View report.pos.order list -->
+    <record id="view_report_pos_order_list" model="ir.ui.view">
+        <field name="name">view.report.pos.order.list</field>
+        <field name="model">report.pos.order</field>
+        <field name="inherit_id" ref="point_of_sale.report_pos_order_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']">
+              <field name="product_barcode" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="pos_order_report_search_group_inherit" model="ir.ui.view">
+        <field name="name">pos.order.report.search.group.inherit</field>
+        <field name="model">report.pos.order</field>
+        <field name="inherit_id" ref="point_of_sale.view_report_pos_order_search"/>
+        <field name="arch" type="xml">
+    
+            <xpath expr="//group" position="inside">
+                <filter string="Product (Barcode)"
+                        name="product_barcode"
+                        context="{'group_by':'product_barcode'}"/>
+            </xpath>
+    
+        </field>
+    </record>
+  
+  
+
+  </odoo>

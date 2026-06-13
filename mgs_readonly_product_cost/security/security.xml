@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id = "hide_cost_group" model = "res.groups">
+        <field name = "name">Product Cost Readonly</field>
+    </record>
+</odoo>

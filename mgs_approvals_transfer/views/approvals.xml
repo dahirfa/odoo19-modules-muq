@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="approval_request_view_form_inherit" model="ir.ui.view">
+        <field name="name">approvals.approval_request_view_form.form</field>
+        <field name="model">approval.request</field>
+        <field name="inherit_id" ref="approvals.approval_request_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group[1]" position="after">
+                <group invisible="approval_type != 'request_items'">
+                    <field name="operation_type_id"/>
+                    <field name="source_location_id" domain="[('usage', '=', 'internal')]"/>
+                    <field name="destination_location_id" domain="[('usage', '=', 'internal')]"/>
+                    
+                </group>
+            </xpath>
+            <field name="date" position="after">
+                
+            </field>
+
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_picking" type="object" class="oe_stat_button" icon="fa-truck" invisible="picking_count == 0">
+                    <field name="picking_count" widget="statinfo" string="Transfer"/>
+                </button>
+            </xpath>
+
+        </field>
+    </record>
+
+  
+</odoo>

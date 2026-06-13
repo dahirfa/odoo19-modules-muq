@@ -1,0 +1,259 @@
+<odoo>
+<data>
+
+<!-- 
+    <report
+        id="action_job_cost_by_detail_wizard"
+        name="project_invoice_bill.job_cost_by_detail_wizard_report"
+        model="project_invoice_bill.job_cost_by_detail_wizard_report"
+        string="Job Cost by Detail"
+        report_type="qweb-pdf"
+        /> -->
+
+    <template id="job_cost_by_detail_wizard_report">
+        <t t-call="web.html_container">
+
+                <t t-call="web.external_layout">
+                    <div class="page" >
+                        <div class="row mt0 mb4">
+
+                        	<div class="col-md-12">
+                        		<div class="">
+
+									<table class="table table-condensed" style="font-size: 12px;">
+                                        <tbody>
+											<tr>
+												<td colspan="4"><h3 class="text-center">Job Cost by Detail</h3></td>
+											</tr>
+                                            <tr>
+												<td><strong>Project:</strong></td>
+												<td><span t-esc="project_name"/></td>
+												<td><strong>Partner:</strong></td>
+												<td><span t-esc="partner_name"/></td>
+											</tr>
+
+											<tr>
+												<td><strong>From:</strong></td>
+												<td><span t-esc="date_from"/></td>
+												<td><strong>To:</strong></td>
+												<td><span t-esc="date_to"/></td>
+											</tr>
+
+											<tr>
+												<td><strong>Debit/Credit:</strong></td>
+												<td><span t-esc="debit_or_credit"/></td>
+												<td><strong>Type:</strong></td>
+												<td><span t-esc="summary_or_detail"/></td>
+
+											</tr>
+
+											<tr>
+												<td><strong>Sort by:</strong></td>
+												<td><span t-esc="sort"/></td>
+
+												<td></td>
+											</tr>
+										</tbody>
+									</table>
+
+									<t t-if="summary_or_detail == 'summary'">
+
+										 <table class="table table-condensed" style="font-size: 12px;border:1px solid #444">
+											<tbody>
+												<tr>
+													<td><strong>Job</strong></td>
+													<td><strong>Partner</strong></td>
+													<!--Debit conditions-->
+													<t t-if="debit_or_credit == 'all'">
+														<td><strong>MTN</strong></td>
+														<td><strong>Rate</strong></td>
+														<td><strong>Total Invoiced</strong></td>
+														<td><strong>Total Billed</strong></td>
+														<td><strong>Subtotal</strong></td>
+													</t>
+
+													<t t-if="debit_or_credit == 'debit'">
+														<td><strong>LTI Cost</strong></td>
+													</t>
+
+													<t t-if="debit_or_credit == 'credit'">
+														<td><strong>Total Invoiced</strong></td>
+													</t>
+													<!--End condition-->
+
+												</tr>
+
+												<t t-foreach="project" t-as="line">
+													<tr>
+														<td><span t-field="line.project_id.name"/></td>
+														<td><span t-field="line.project_id.partner_id.name"/></td>
+														<!--Debit & Credit conditions-->
+														<t t-if="debit_or_credit == 'all'">
+															<td><span t-field="line.project_id.total_qty"/></td>
+															<td><span t-field="line.project_id.total_price_unit"/></td>
+															<td><span t-field="line.project_id.credit_total"/></td>
+                              <td><span t-field="line.project_id.debit_total"/></td>
+															<td><span t-field="line.project_id.total_debit_credit"/></td>
+														</t>
+
+														<t t-if="debit_or_credit == 'debit'">
+															<td><span t-field="line.project_id.debit_total"/></td>
+														</t>
+
+
+														<t t-if="debit_or_credit == 'credit'">
+															<td><span t-field="line.project_id.credit_total"/></td>
+														</t>
+														<!--End condition-->
+
+
+													</tr>
+												</t>
+
+											</tbody>
+										 </table>
+
+                     <div>
+                       <div style="width:20%;border-top:1px solid;float:right">
+                         <strong>Total : </strong>$<span t-esc="total" t-options='{"widget": "float", "precision": 2}'/>
+                       </div>
+                     </div>
+
+									</t>
+
+
+									<t t-if="summary_or_detail == 'detail'">
+
+										 <table class="table table-condensed" style="font-size: 12px;border: 1px solid #444">
+											<tbody>
+
+												<t t-foreach="project" t-as="line">
+													<h3><span t-field="line.project_id.name" /></h3>
+													<h5><strong>Analytic Acc: </strong><span t-field="line.project_id.analytic_account_id" /></h5>
+													<h5><strong>Partner: </strong><span t-field="line.project_id.partner_id" /></h5>
+													<table class="table table-condensed" style="font-size: 12px">
+														<tbody>
+															<tr>
+																<td><strong>Date</strong></td>
+																<td><strong>JNL</strong></td>
+																<td><strong>Journal Entry</strong></td>
+																<td><strong>Account</strong></td>
+																<td colspan="3"><strong>Label</strong></td>
+																<!--Debit conditions-->
+																<t t-if="debit_or_credit == 'all'">
+																	<td><strong>Debit</strong></td>
+																	<td><strong>Credit</strong></td>
+																</t>
+
+																<t t-if="debit_or_credit == 'debit'">
+																	<td><strong>LTI Cost</strong></td>
+																</t>
+
+																<t t-if="debit_or_credit == 'credit'">
+																	<td><strong>Total Invoiced</strong></td>
+																</t>
+																<!--End condition-->
+															</tr>
+
+															<t t-foreach="line.project_id.account_move_line" t-as="move">
+																<tr>
+																	<td><span t-field="move.date" /></td>
+																	<td><span t-field="move.journal_id.code" /></td>
+																	<td style="color:red"><span t-field="move.move_id" /></td>
+																	<td><span t-field="move.account_id" /></td>
+																	<td colspan="3"><span t-field="move.name" /></td>
+																	<t t-if="debit_or_credit == 'all'">
+																		<td><span t-field="move.debit" /></td>
+																		<td><span t-field="move.credit" /></td>
+																	</t>
+
+																	<t t-if="debit_or_credit == 'debit'">
+																		<td><span t-field="move.debit" /></td>
+																	</t>
+
+																	<t t-if="debit_or_credit == 'credit'">
+																		<td><span t-field="move.credit" /></td>
+																	</t>
+																</tr>
+															</t>
+															<tr>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<!--Debit & Credit conditions-->
+																<t t-if="debit_or_credit == 'all'">
+																	<td><strong><span t-field="line.project_id.currency_id.symbol" /><span t-field="line.project_id.debit_total"/></strong></td>
+																	<td><strong><span t-field="line.project_id.currency_id.symbol" /><span t-field="line.project_id.credit_total"/></strong></td>
+																</t>
+
+																<t t-if="debit_or_credit == 'debit'">
+																	<td><strong><span t-field="line.project_id.currency_id.symbol" /><span t-field="line.project_id.debit_total"/></strong></td>
+																</t>
+
+																<t t-if="debit_or_credit == 'credit'">
+																	<td><strong><span t-field="line.project_id.currency_id.symbol" /><span t-field="line.project_id.credit_total"/></strong></td>
+																</t>
+																<!--End condition-->
+															</tr>
+
+															<tr>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td>
+																	<t t-if="debit_or_credit == 'all'">
+																		<t t-if="line.project_id.debit_total &gt; line.project_id.credit_total">
+																			<strong>Loss</strong>
+																		</t>
+																		<t t-if="line.project_id.debit_total &lt; line.project_id.credit_total">
+																			<strong>Profit</strong>
+																		</t>
+																	</t>
+
+																</td>
+																<td>
+																	<t t-if="debit_or_credit == 'all'">
+																		<span t-field="line.project_id.currency_id.symbol" /><span t-field="line.project_id.total_debit_credit" />
+																	</t>
+																</td>
+
+															</tr>
+
+														</tbody>
+													</table>
+
+												</t>
+
+											</tbody>
+										 </table>
+
+                     <div>
+                       <div style="width:20%;border-top:1px solid;float:right">
+                         <strong>Total : </strong>$<span t-esc="total" t-options='{"widget": "float", "precision": 2}'/>
+                       </div>
+                     </div>
+
+									</t>
+
+
+
+                        		</div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+
+
+    </template>
+
+</data>
+</odoo>

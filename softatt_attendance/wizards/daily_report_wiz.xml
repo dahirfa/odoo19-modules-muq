@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sa_attendance_monthly_form" model="ir.ui.view">
+        <field name="name">monthly.wiz.form</field>
+        <field name="model">sa.monthly.report</field>
+        <field name="arch" type="xml">
+            <form string="Monthly Attendance" class="oe_form_configuration">
+                <sheet>
+                    <group string="Period">
+                        <group>
+                            <field name="date_from" required="1==1"/>
+                        </group>
+                        <group>
+                            <field name="date_to" required="1==1"/>
+                        </group>                        
+                    </group>
+                    <group string="Filters">
+                        <group>
+                            <field name="location_ids" widget="many2many_tags"/>
+                            <field name="department_ids" widget="many2many_tags"/>
+
+                        </group>
+                        <group>
+                            <field name="resource_calendar_ids" widget="many2many_tags"/>
+                            <field name="employee_ids" widget="many2many_tags"/>                        
+                        </group>                        
+                    </group>
+
+                    <group string="Columns">
+                        <group>
+                            <field name="include_absence" widget="boolean_toggle"/>
+                        </group>
+                        
+                        <group>
+                            <field name="include_deductions" widget="boolean_toggle"/>
+                            <field name="include_late_minutes" widget="boolean_toggle"/>
+                        </group>                     
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_confirm" string="View" type="object" class="btn-primary"/>
+                    <button string="Cancel" special="cancel" class="btn-danger"/>
+
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+
+
+    <record id="action_sa_attendance_monthly" model="ir.actions.act_window">
+        <field name="name">Monthly Report</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sa.monthly.report</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

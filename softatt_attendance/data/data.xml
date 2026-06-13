@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="latest_logs_cron" model="ir.cron">
+            <field name="name">Softatt : Download Logs</field>
+            <field name="model_id" ref="model_sa_attendance_log" />
+            <field name="interval_number">5</field>
+            <field name="interval_type">minutes</field>
+            <!-- <field name="numbercall">-1</field> -->
+            <!-- <field name="doall" eval="False" /> -->
+            <field name="state">code</field>
+            <field name="code">model.download_latest_logs()</field>
+        </record>
+        
+            <!-- Record 1: Check In -->
+            <record id="sa_punch_state_in" model="sa.punch.state">
+                <field name="code">0</field>
+                <field name="punch_type">in</field>
+                <field name="company_id" ref="base.main_company"/>
+            </record>
+    
+            <!-- Record 2: Check Out -->
+            <record id="sa_punch_state_out" model="sa.punch.state">
+                <field name="code">1</field>
+                <field name="punch_type">out</field>
+                <field name="company_id" ref="base.main_company"/>
+            </record>
+
+    </data>
+    
+
+    
+</odoo>

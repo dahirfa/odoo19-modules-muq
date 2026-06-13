@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="view_mgs_gross_profit_report_wizard_form" model="ir.ui.view">
+        <field name="name">mgs.gross.profit.report.wizard.form</field>
+        <field name="model">mgs_account.gross_profit</field>
+        <field name="arch" type="xml">
+            <form string="Gross Profit Report Wizard">
+                <sheet>
+                    <group>
+                        <group string="Date Range">
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+                        <group string="Filters">
+                            <field name="partner_id"/>
+                            <field name="product_id"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group string="Category Filters">
+                            <field name="categ_id"/>
+                            <field name="parent_categ_id"/>
+                            <field name="analytic_account_id"/>
+                        </group>
+                        <group string="Report Options">
+                            <field name="product_type"/>
+                            <field name="report_by"/>
+                            <field name="target_moves"/>
+                            <field name="company_id"/>
+                        </group>
+                    </group>
+                    
+                    <footer>
+                        <button name="check_report" type="object" string="Generate Report" class="btn btn-primary"/>
+                        <button name="export_to_excel" type="object" string="Export to Excel" class="btn btn-success"/>
+                        <button string="Cancel" class="btn btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_mgs_gross_profit_report" model="ir.actions.act_window">
+        <field name="name">MGS Gross Profit Report</field>
+        <field name="res_model">mgs_account.gross_profit</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_id" ref="view_mgs_gross_profit_report_wizard_form"/>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Menu Item -->
+    <menuitem id="menu_gross_profit_report" name="Gross Profit" parent="account.menu_finance_reports" action="action_mgs_gross_profit_report" sequence="56"/>
+</odoo>

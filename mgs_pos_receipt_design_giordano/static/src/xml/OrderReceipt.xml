@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    
+    <t t-name="mgs_pos_receipt_design_giordano.OrderReceipt" t-inherit="point_of_sale.OrderReceipt" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('pos-receipt')]" position="replace">
+            <div class="pos-receipt" style="font-size:12px; width: 280px; margin: 0 auto; padding: 5px; text-align: center;">
+
+                <img t-attf-src="/web/image?model=res.company&amp;id={{order.company.id}}&amp;field=logo"
+                         alt="Logo" class="pos-receipt-logo"/>
+          
+               
+                <div style="line-height: 1.3; margin-bottom: 5px; margin-top:10px; text-align:center;white-space:pre-line">
+                 
+                    <div t-if="order.config_id.receipt_header" style="white-space:pre-line" t-esc="order.config_id.receipt_header" />
+                </div>
+                <div style="margin-bottom: 8px; text-align: center">
+                    User ID: <t t-if="order?.getCashierName() and (!order.preset_id or order.preset_id.identification === 'name')" t-out="order.getCashierName()"/><br/>
+                    Invoice:<t t-out="order.pos_reference"/>
+
+                    <t t-if="order.date_order">
+                        <div>Date: <t t-out="order.formatDateOrTime('date_order')" /></div>
+                    </t>
+                    <t t-if="order.partner_id">
+                        <div >Customer: <t t-out="order.partner_id.name"/></div>
+                    </t>
+                </div>
+                <div>
+                  
+                </div>
+            
+                
+                <div style="display: flex; justify-content:space-around; border-bottom: 1px solid #000;  ">
+                    <div style="width: 5%; text-align: left;">#</div>
+                    <div style="width: 50%; text-align: left;">Description</div>
+                    <div style="width: 15%; text-align: center;">Qty</div>
+                    <div style="width: 15%; text-align: right;">Amount</div>
+                </div>
+
+                <!-- Order lines -->
+                <t t-set="sn" t-value="1"/>
+                <t t-set="total_qty" t-value="0"/>
+                <t t-foreach="order.lines" t-as="line" t-key="line.id">
+                   
+                    <div style="display: flex; justify-content: space-around; padding: 3px 0;">
+                        <div style="width: 5%; text-align: left;font-size:11px;"><span t-out="sn"/></div>
+                        <div style="width: 50%; text-align: left;font-size:11px;"><t t-esc="line.product_id.name"/></div>
+                        <div style="width: 15%; text-align: center;font-size:11px;"><t t-esc="line.qty"/></div>
+                        <div style="width: 15%; text-align: right;font-size:11px;"><t t-esc="formatCurrency(line.price_subtotal_incl)"/></div>
+                    </div>
+                   
+                    <div style="display: flex; justify-content: space-around; padding: 3px 0;">
+                        <div style="width: 5%; text-align: left;font-size:11px;"></div>
+                        
+                        <div style="width: 50%;white-space:nowrap; font-size:11px; text-align:left;">
+                            <span t-esc="line.product_id.barcode" />
+                            1
+                            <span style="margin-right:6px;">@</span>
+                            <span t-esc="line.price_subtotal_incl"/>
+                        </div>
+
+                        
+                        <div style="width: 15%; text-align: left;font-size:11px;"></div>
+                        <div style="width: 15%; text-align: left;font-size:11px;"></div>
+                        
+                    </div>
+                
+                    <t t-if="line.price_subtotal_incl > 0">
+                        <t t-set="total_qty" t-value="total_qty + line.qty" />
+                    </t>
+                   
+                    <t t-set="sn" t-value="sn + 1"/>
+                </t>
+
+
+                
+                <div style="margin-top: 15px;">
+                    
+                    <div style="border-top: 1px dashed #000; margin: 5px 0;">
+                        
+                    </div>
+                    
+                   
+                   
+                    <div class="row">
+                        <div class="col-5"> <div style="text-align: left;">Total Qty: <t t-out="total_qty"/></div></div>
+                        <div class="col-7"><div style="text-align: right;">SubTotal: <t t-esc="formatCurrency(order.amount_total - order.amount_tax)"/></div></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-5"> </div>
+                        <div class="col-7"> <div style="text-align: right;">VAT: <t t-esc="formatCurrency(order.amount_tax)"/></div></div>
+                    </div>
+                   
+                    <div style="border-top: 1px dashed #000; margin: 5px 0;"></div>
+                  
+                    <div style="display: flex; justify-content: space-between; font-weight: bold; margin-top: 5px; padding-top: 5px;">
+                        <div style="width: 50%; text-align: left;font-size:12px;">TOTAL</div>
+                        <div style="width: 50%; text-align: right; padding-right: 10px;font-size:12px;">
+                            <t t-esc="formatCurrency(order.amount_total)"/>
+                        </div>
+                    </div>
+                    <!-- <tr  class="receipt-change" t-if="props.data.change">
+                        <td >CHANGE: </td>
+                        <td ><t t-esc='props.formatCurrency(props.data.change)'/></td>
+                    </tr> -->
+                    <t t-foreach="order.payment_ids" t-as="line" t-key="line.cid">
+                        <div style="display: flex; justify-content: space-between; font-weight: bold; margin-top: 3px;">
+                            <div style="width: 50%; text-align: left;font-size:12px;">
+                                <t t-esc="line.payment_method_id.name"/>
+                            </div>
+                            <div style="width: 50%; text-align: right; padding-right: 10px;font-size:12px;">
+                                <t t-esc="formatCurrency(line.amount)"/> 
+                            </div>
+                        </div>
+                    </t>
+
+                    <!-- <div style="display: flex; justify-content: space-between; font-weight: bold; margin-top: 5px; padding-top: 5px;" t-if="props.data.change">
+                        <div style="width: 50%; text-align: left;">CHANGE</div>
+                        <div style="width: 50%; text-align: right; padding-right: 10px;">
+                            <t t-esc="props.formatCurrency(props.data.change)"/>
+                        </div>
+                    </div> -->
+                    
+                </div>
+
+                
+                <div style="margin-top: 10px;font-size:9px;white-space:pre-line">
+                    <t t-out="order.config_id.receipt_footer"/>
+                </div>
+                <svg id="barcode" style="box-shadow: 0 0 20px rgba(0,139,253,0.25); max-width: 15%; margin: 40px 0px 0px 0px"/>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.3/JsBarcode.all.min.js" onload="generateBarcode()"/>
+                <script>
+                    
+                    function generateBarcode() {
+                        
+                        JsBarcode("#barcode", "<t t-esc='order.pos_reference'/>", {
+                            format: "CODE128",
+                            width: 1,
+                            height: 50,
+                            displayValue: true,
+                            fontSize: 12,
+                            margin: 0
+                        });
+                    }
+                </script>
+                
+                
+                
+            </div>
+        </xpath>
+    </t>
+</templates>

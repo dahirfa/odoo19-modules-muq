@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_daily_report" model="ir.actions.report">
+        <field name="name">Daily Report</field>
+        <field name="model">softatt_attendance.sa_daily_report</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">softatt_attendance.sa_daily_report</field>
+        <field name="report_file">softatt_attendance.sa_daily_report</field>
+        <field name="print_report_name">Daily Report</field>
+    </record>
+
+    <template id="att_report_content" name="att_report_content">
+        <table class="table table-sm table-responsive">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Employee</th>
+                    <th>Employee ID</th>
+                    <th>Check-In</th>
+                    <th>Check-Out</th>
+                    <th>Late(M)</th>
+                    <th>Location</th>
+                    <th>Department</th>
+                    <th>Job Position</th>
+                </tr>
+            </thead>
+    
+            <tbody>
+                <t t-set="num" t-value="0"/>     
+    
+                    <t t-foreach="_lines" t-as="line">
+                        <tr>
+                            <td>
+                                <t t-set="num" t-value="num+1"/>
+                                <t t-esc="num" />
+                            </td>
+
+                            <td><t t-if="line.employee_id" t-esc="line.employee_id.name" /></td>
+                            <td><t t-if="line.employee_id.code_ids" t-esc="line.employee_id.code_ids.code" /></td>
+                            <td><t t-if="line.check_in" t-esc="localize(line.check_in, tz).strftime('%H:%M')" /></td>
+                            <td><t t-if="line.check_out" t-esc="localize(line.check_out, tz).strftime('%H:%M')" /></td>
+                            <td><t t-if="line.late_minutes" t-esc="line.late_minutes" /></td>
+                            <td><t t-if="line.location_id" t-esc="line.location_id.name" /></td>
+                            <td><t t-if="line.department_id" t-esc="line.department_id.name" /></td>
+                            <td><t t-if="line.employee_id.job_id" t-esc="line.employee_id.job_id.name" /></td>
+                        </tr>
+                    </t>
+            </tbody>
+        </table>
+    </template>
+
+    
+    <template id="sa_daily_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout" t-lang="en_US">
+                    <div class="page">
+                        <style>
+                            th, td {
+                            padding: 0.30rem !important;
+                            border-top: 1px solid #212529 !important;
+                            border-bottom: 1px solid #212529 !important;
+                            }
+                            body {
+                            font-family: Arial, sans-serif;
+                            margin: 0;
+                            padding: 0;
+                            }
+
+                            .row {
+                            display: flex;
+                            flex-direction: row;
+                            justify-content: space-between;
+                            width: 100%;
+                            box-sizing: border-box;
+                            page-break-inside: avoid;
+                            margin: 20px 0;
+                            }
+
+                            .column {
+                            flex: 1;
+                            max-width: 24%;
+                            margin: 0 0.5%;
+                            box-sizing: border-box;
+                            }
+
+                            .card {
+                            padding: 20px;
+                            border: 1px solid #ddd;
+                            border-radius: 8px;
+                            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                            text-align: center;
+                            transition: transform 0.3s, box-shadow 0.3s;
+                            }
+
+                            h3 {
+                            margin: 10px 0;
+                            color: #333;
+                            }
+
+                            h4 {
+                            margin: 5px 0;
+                            color: #666;
+                            }
+
+                            .card:nth-child(1) {
+                            background-color: #ffefef; /* Light pastel red */
+                            }
+
+                            .card:nth-child(2) {
+                            background-color: #e7ffe7; /* Light pastel green */
+                            }
+
+                            .card:nth-child(3) {
+                            background-color: #fff5e6; /* Light pastel orange */
+                            }
+
+                            .card:nth-child(4) {
+                            background-color: #e6f7ff; /* Light pastel blue */
+                            }
+
+                            .card:nth-child(1) h3 {
+                            color: #CB4335;
+                            }
+
+                            .card:nth-child(2) h3 {
+                            color: #28B463;
+                            }
+
+                            .card:nth-child(3) h3 {
+                            color: #E67E22;
+                            }
+
+                            .card:nth-child(4) h3 {
+                            color: #2E86C1;
+                            }
+                        </style>
+                        <h2>Daily Report</h2>
+
+                        <div class="row" style="margin-top: 32px; margin-bottom: 15px !important;font-size: 1.2em; font-family: 'Lato-Reg'">
+                            <div class="col-3" t-if="_from">
+                                <strong>Date:</strong>
+                                <p class="m-0" t-esc="_from" />
+                            </div>
+                       </div>
+
+                       <br />
+                    
+                       <div class="row">
+                           <div class="column">
+                               <div class="card">
+                                   <h3>Employees</h3>
+                                   <h4>
+                                       <t t-esc="dashboard[0]" />
+                                   </h4>
+                               </div>
+                           </div>
+
+                           <div class="column">
+                               <div class="card">
+                                   <h3>Attended</h3>
+                                   <h4>
+                                       <t t-esc="dashboard[1]" />
+                                   </h4>
+                               </div>
+                           </div>
+
+                           <div class="column">
+                               <div class="card">
+                                   <h3>Absent</h3>
+                                   <h4>
+                                       <t t-esc="dashboard[2]" />
+                                   </h4>
+                               </div>
+                           </div>
+
+                           <div class="column">
+                               <div class="card">
+                                   <h3>Late</h3>
+                                   <h4>
+                                       <t t-esc="dashboard[3]" />
+                                   </h4>
+                               </div>
+                           </div>
+                       </div>
+
+                       <br />
+                       <h3>Absent</h3>
+                       <t t-set="lines" t-value="absence_lines"/>
+                       <t t-call="softatt_attendance.absence_report_content"/>
+                       
+                       <h3>Attendance</h3>
+                       <t t-set="_lines" t-value="att_lines(date_from, date_to, location_ids, department_ids, shift_ids, employee_ids)"/>
+                       <t t-call="softatt_attendance.att_report_content"/>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

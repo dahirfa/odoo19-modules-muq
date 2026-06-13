@@ -1,0 +1,23 @@
+.o_kanban_side_by_side {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px; /* Space between the boxes */
+}
+
+.box {
+    padding: 10px;
+    border-radius: 5px;
+    flex: 1; /* Ensures boxes take equal width */
+    text-align: center;
+    font-weight: bold;
+}
+
+.green-box {
+    background-color: #95dda6;
+    border: 1px solid #95dda6;
+}
+
+.red-box {
+    background-color: #f3949c;
+    border: 1px solid #f3949c;
+}

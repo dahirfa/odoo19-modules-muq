@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <!--ir.actions.client are actions that will be entierly handled by the client side (JSs)-->
+    <record id="action_attendance_dashboard" model="ir.actions.client">
+        <field name="name">Attendance Dashboard</field>
+        <field name="tag">softatt_attendance.attendance_dashboard</field> <!--This tag will be used in the js side to add to the registry-->
+    </record>
+</odoo>

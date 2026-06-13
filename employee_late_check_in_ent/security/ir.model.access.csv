@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_late_checkin_manager,access.late_check_in.manager,model_late_check_in,hr.group_hr_manager,1,1,1,1
+access_late_checkin_officer,access.late_check_in.officer,model_late_check_in,hr.group_hr_user,1,1,0,0
+access_late_checkin_user,access.late_check_in.user,model_late_check_in,base.group_user,1,0,0,0
+
+access_latency_rule,access.latency_rule.manager,model_latency_rule,hr.group_hr_manager,1,1,1,1
+access_latency_rule_line,access.latency_rule_line.manager,model_latency_rule_line,hr.group_hr_manager,1,1,1,1
+
+access_mgs_attendance_checker_wizard,access.mgs_attendance_checker_wizard,model_mgs_attendance_checker_wizard,hr.group_hr_manager,1,1,1,1

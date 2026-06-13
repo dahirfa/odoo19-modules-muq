@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    
+
+
+    <record id="view_report_sale_order_list_barcode" model="ir.ui.view">
+        <field name="name">view.report.sale.order.list.barcode</field>
+        <field name="model">sale.report</field>
+        <field name="inherit_id" ref="sale.sale_report_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="product_barcode" optional="show"/>
+            </xpath>
+        </field>
+      </record>
+  
+      
+      <record id="sale_order_report_search_group_inherit" model="ir.ui.view">
+        <field name="name">sale.order.report.search.group.inherit</field>
+        <field name="model">sale.report</field>
+        <field name="inherit_id" ref="sale.view_order_product_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[2]" position="inside">
+                <filter string="Product (Barcode)"
+                        name="product_barcode"
+                        context="{'group_by':'product_barcode'}"/>
+            </xpath>
+        </field>
+      </record>
+</odoo>

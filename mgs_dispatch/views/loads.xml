@@ -1,0 +1,202 @@
+<odoo>
+  
+
+    <record model="ir.ui.view" id="inherit_anlytic_line_search_view">
+        <field name="name">account.analytic.line.search.inherit</field>
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="analytic.view_account_analytic_line_filter"/>
+        <field name="arch" type="xml">
+    
+            <xpath expr="//field[@name='date']" position="after">
+                <field name="truck_id"/>
+                <field name="load_id"/>
+                <field name="trip_id"/>
+            </xpath>
+    
+            <xpath expr="//group[@name='groupby']" position="inside">
+                <filter string="Batch" name="group_load_id" context="{'group_by': 'load_id'}"/>
+                <filter string="Trip" name="group_trip_id" context="{'group_by': 'trip_id'}"/>
+                <filter string="Truck" name="group_truck_id" context="{'group_by': 'truck_id'}"/>
+            </xpath>
+    
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="inherit_anlytic_line_tree_view">
+        <field name="name">account.analytic.line</field>
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="analytic.view_account_analytic_line_tree"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='name']" position="after">
+                    <field name="trip_id"/>
+                    <!-- <field name="load_id" /> -->
+                    <field name="truck_id"/>
+			</xpath>
+
+        </field>
+    </record>
+
+
+
+
+    <record model="ir.ui.view" id="inherit_hr_expense_view_form_form_view">
+        <field name="name">hr.expense.inherit.transpo</field>
+        <field name="model">hr.expense</field>
+        <field name="inherit_id" ref="hr_expense.hr_expense_view_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='analytic_distribution']" position="after">
+                    <field name="trip_id" domain="[('load_id','=',load_id)]"/>
+                    <field name="load_id"/>
+			</xpath>
+
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="inherit_move_form_view">
+        <field name="name">account.move.load</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='ref']" position="after">
+                    
+                    <field name="load_id" invisible="move_type != 'entry'"/>
+                    <field name="trip_id" invisible="move_type != 'entry'"/> 
+
+			</xpath>
+
+
+            <xpath expr="//notebook/page[@name='other_info']" position="inside">
+				<group>
+                    <group>
+                        
+                        <field name="load_id"/>
+                        <field name="trip_id" readonly="1"/>  
+
+                    </group>
+                </group>
+			</xpath>
+
+            <xpath expr="//field[@name='invoice_line_ids']/list/field[@name='quantity']" position="before">
+                    <field name="load_id" invisible="1"/>
+                    <field name="trip_id" domain="[('load_id','=',load_id)]"/>
+			</xpath>
+
+
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="load_tree_view">
+        <field name="name">load.list</field>
+        <field name="model">load.dispatch</field>
+        <field name="arch" type="xml">
+            <list string="Loads">
+                <field name="name"/>
+                <field name="customer_id"/>
+                <field name="date"/>
+                <field name="reference"/>
+                <field name="goods"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="rate" widget="monetary"/>
+                <field name="state" widget="badge" decoration-info="state == 'new'" decoration-warning="state=='running'" decoration-success="state=='closed'" decoration-danger="state=='canceled'"/>
+            </list>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="load_form_view">
+        <field name="name">load.form</field>
+        <field name="model">load.dispatch</field>
+        <field name="arch" type="xml">
+            <form string="Load Form">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="new,running"/>
+                    <!--TODO: Result from converting "states='new'" attribute into an 'invisible' attribute
+                         Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                    <button name="start_load" string="Start" type="object" invisible="state not in ['new']" class="oe_highlight"/>
+                    <button confirm="Are you sure you want to close this month?" string="Close" name="close_load" type="object" invisible="state not in ['running']" class="oe_highlight"/>
+
+                    <button confirm="Are you sure you want to cancel?" string="Cencel" name="cancel_load" type="object" invisible="state not in ['new', 'running']"/>
+
+                    <button confirm="Are you sure you want to Reset to New?" string="Reset to New" name="reset_to_new" type="object" invisible="state not in ['closed', 'canceled']"/>
+
+
+                    
+                    <button confirm="Are you sure you want to create invoice?" string="Create Expense Invoices" name="create_expense_invoices" type="object"/>
+                    
+                </header>
+                <sheet>
+                <widget name="web_ribbon" text="CLOSED" bg_color="bg-success" invisible="state != 'closed'"/>
+                <widget name="web_ribbon" text="CANCELED" bg_color="bg-danger" invisible="state != 'canceled'"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button type="object" name="trip_create" class="o_form_field o_stat_info" icon="fa-truck">
+                            <field string="Trips" name="trip_count" widget="statinfo"/>
+                        </button>
+
+
+                        <button type="object" name="expense_create" class="o_form_field o_stat_info" icon="fa-usd">
+                            <field string="Expenses" name="expense_count" widget="statinfo"/>
+                        </button>
+
+                        <button type="object" name="bill_create" class="o_form_field o_stat_info" icon="fa-pencil-square-o">
+                            <field string="Bills" name="bill_count" widget="statinfo"/>
+                        </button>
+                    
+                        <button type="object" name="invoice_create" class="o_form_field o_stat_info" icon="fa-pencil-square-o">
+                            <field string="Invoices" name="invoice_count" widget="statinfo"/>
+                        </button>
+
+
+                        <button type="object" name="open_inrefund_bills" class="o_form_field o_stat_info" width="160" icon="fa-usd">
+                        <field string="Deduction" name="rbill_count" widget="statinfo"/>
+                        </button>
+                    
+                        <button type="object" name="cost_and_revenue" class="o_form_field o_stat_info" width="160" icon="fa-usd" string="Cost &amp; Revenue">
+                        </button>
+
+
+
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Load No." readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="reference" readonly="state in ('closed', 'canceled')"/>
+                            <field name="customer_id" placeholder="Customer" readonly="state in ('closed', 'canceled')"/>
+                            
+                            <field name="currency_id" invisible="1"/>
+                            <field name="rate" widget="monetary" readonly="state == 'running'"/>
+                            <field name="analytic_acc_id" readonly="1"/>
+                            <field name="billed" invisible="1"/>
+                            <field name="invoice_id" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="date" readonly="state in ('closed', 'canceled')"/>
+                            <field name="company_id" readonly="1" groups="base.group_multi_company"/>
+                            <field name="goods" readonly="state in ('closed', 'canceled')"/>
+                        </group>
+                    </group>
+       
+                </sheet>
+                
+                <chatter />
+            </form>
+        </field>
+    </record>
+
+
+
+    <record model="ir.actions.act_window" id="load_list_action">
+        <field name="name">Batches</field>
+        <field name="res_model">load.dispatch</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Enter the first Batch
+            </p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,23 @@
+<odoo>
+    <record model="ir.ui.view" id="inherit_move_form_view">
+        <field name="name">account.move.project</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='ref']" position="after">
+                    <field name="analytic_account_id" invisible="move_type != 'entry'" />
+			</xpath>
+
+
+            <xpath expr="//notebook/page[@name='other_info']" position="inside">
+				<group>
+                  
+                    <group><field name="analytic_account_id"/></group>
+                </group>
+			</xpath>
+
+
+
+        </field>
+    </record>
+</odoo>

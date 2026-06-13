@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_users_form" model="ir.ui.view">
+            <field name="name">usability.default_warehouse.res.users.form</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name="arch" type="xml">
+                <sheet position="inside">
+                    <group string="Warehouse Restrictions" invisible="login == 'admin'">
+                        <field name="default_picking_type_ids" widget="many2many_tags" invisible="login == 'admin'"/>
+                        <field name="default_warehouse_ids" widget="many2many_tags" invisible="login == 'admin'"/>
+                        <field name="allowed_warehouse_ids" widget="many2many_tags" invisible="login == 'admin'"/>
+                    </group>
+                </sheet>
+            </field>
+        </record>
+
+        <record id="view_location_security_users_form" model="ir.ui.view">
+            <field name="name">location_security.users.form</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name="arch" type="xml">
+                <sheet position="inside">
+                    <group string="Locations" invisible="login == 'admin'">
+                        <field name="restrict_locations" invisible="login == 'admin'"/>
+                    </group>
+                </sheet>
+                <notebook position="inside">
+                    <page string="Allowed Stock Locations" invisible="restrict_locations != True">
+                        <field name="stock_location_ids" nolabel="1" colspan="2"/>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+    </data>
+</odoo>

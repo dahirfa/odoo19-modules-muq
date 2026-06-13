@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_absence_report" model="ir.actions.report">
+        <field name="name">Absence Report</field>
+        <field name="model">softatt_attendance.absence_report</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">softatt_attendance.absence_report</field>
+        <field name="report_file">softatt_attendance.absence_report</field>
+        <field name="print_report_name">Absence Report</field>
+    </record>
+
+<template id="absence_report_content" name="absence_report_content">
+    <table class="table table-sm table-responsive">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Employee</th>
+                <th>Employee ID</th>
+                <th>Location</th>
+                <th>Department</th>
+                <th>Job Position</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <t t-set="num" t-value="0"/>
+            <t t-foreach="dates" t-as="date">
+                <tr colspan='4'>
+                    <tr > <th colspan="4" class="text-bold"><span t-esc="date[1]" /></th> </tr>
+                </tr>
+                <t t-foreach="lines(date[0], location_ids, department_ids, shift_ids, employee_ids)" t-as="line">
+                    <tr>
+                        <td>
+                            <t t-set="num" t-value="num+1"/>
+                            <t t-esc="num" />
+                        </td>
+                        <td><t t-esc="line.name" /></td>
+                        <td><t t-if="line.code_ids" t-esc="line.code_ids.code" /></td>
+                        <td><t t-if="line.work_location_id" t-esc="line.work_location_id.name" /></td>
+                        <td><t t-if="line.department_id" t-esc="line.department_id.name" /></td>
+                        <td><t t-if="line.job_id" t-esc="line.job_id.name" /></td>
+                    </tr>
+                </t>
+            </t>
+        </tbody>
+    </table>
+</template>
+    
+    <template id="absence_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout" t-lang="en_US">
+                    <div class="page">
+                        <style>
+                            th, td {
+                            padding: 0.30rem !important;
+                            border-top: 1px solid #212529 !important;
+                            border-bottom: 1px solid #212529 !important;
+                            }
+                        </style>
+                        <h2>Absence Report</h2>
+
+                        <div class="row" style="margin-top: 32px; margin-bottom: 15px !important;font-size: 1.2em; font-family: 'Lato-Reg'">
+    
+                            <div class="col-3" t-if="_from">
+                                <strong>Date From:</strong>
+                                <p class="m-0" t-esc="_from" />
+                            </div>
+    
+                            <div class="col-3" t-if="_to">
+                                <strong>Date To:</strong>
+                                <p class="m-0" t-esc="_to" />
+                            </div>
+
+                       </div>
+                       <t t-call="softatt_attendance.absence_report_content"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

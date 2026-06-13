@@ -1,0 +1,116 @@
+<odoo>
+    <record id="view_cash_voucher_form" model="ir.ui.view">
+        <field name="name">cash.voucher.form</field>
+        <field name="model">mgs_cash_transfer.voucher</field>
+        <field name="arch" type="xml">
+            <form string="Voucher Form">
+                <header>
+                    <button string="Post" type="object" name="action_post"
+                class="oe_highlight" invisible="state != 'draft'"/>
+                    <button string="Cancel" type="object" name="action_cancel"
+                 invisible="state != 'posted'"/>
+                    <button string="Reset to Draft" type="object" name="action_reset_to_draft"
+               invisible="state != 'cancel'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,posted"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="button_open_journal_entry" type="object" class="oe_stat_button" icon="fa-bars" groups="account.group_account_user,account.group_account_readonly">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Journal Entry</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <!-- <field name="payment_date" readonly="state != 'draft'"/> -->
+                            <label for="amount"/>
+                            <div name="amount_div" class="o_row">
+                                <field name="amount" readonly="state != 'draft'"/>
+                                <field name="currency_id" options="{'no_create': True, 'no_open': True}" required="1" readonly="state != 'draft'" groups="base.group_multi_currency"/>
+                            </div>
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="company_id" readonly="state != 'draft'" options="{'no_create': True}" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="journal_id" readonly="state != 'draft'" options="{'no_create': True}"/>
+                            <field name="memo"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="lines" string="Lines">
+                            <field name="voucher_line_ids" context="{'default_voucher_id': id}" readonly="state != 'draft'">
+                                <list string="Cash Voucher" editable="bottom">
+                                    <field name="account_id" string="Account" options="{'no_create': True}"/>
+                                    <field name="partner_id" string="Partner" options="{'no_create': True}"/>
+                                    <field name="name" string="Description"/>
+                                    <field name="analytic_distribution" string="Analytic"/>
+                                    <field name="amount" sum="amount"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="view_cash_voucher_list" model="ir.ui.view">
+        <field name="name">cash.voucher.list</field>
+        <field name="model">mgs_cash_transfer.voucher</field>
+        <field name="arch" type="xml">
+            <list string="Cash Voucher">
+                <field name="name" string="Reference#"/>
+                <field name="date"/>
+                <field name="journal_id" string="Journal"/>
+                <field name="currency_id" string="Transfer Currency" optional="hide"/>
+                <field name="amount" sum="amount"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'posted'"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_cash_voucher_search" model="ir.ui.view">
+        <field name="name">cash.transfer.search</field>
+        <field name="model">mgs_cash_transfer.voucher</field>
+        <field name="arch" type="xml">
+            <search string="Cash Voucher">
+                <filter string="Today" name="today" domain="[('date', '=', context_today()), ('state', '=', 'posted')]"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Posted" name="posted" domain="[('state', '=', 'posted')]"/>
+                <filter string="Cancelled" name="cancelled" domain="[('state', '=', 'cancel')]"/>
+
+                <filter string="Date" name="group_by_date" context="{'group_by':'date'}"/>
+                <filter string="State" name="group_by_state" context="{'group_by':'state'}"/>
+                <filter string="Journal" name="group_by_journal" context="{'group_by':'journal_id'}"/>
+
+            </search>
+        </field>
+    </record>
+    <!-- Action for Cash Transfers -->
+    <record id="action_cash_voucher_in" model="ir.actions.act_window">
+        <field name="name">Receipt Voucher</field>
+        <field name="res_model">mgs_cash_transfer.voucher</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_cash_voucher_list"/>
+        <field name="search_view_id" ref="view_cash_voucher_search"/>
+        <field name="domain">[('voucher_type','=', 'in')]</field>
+        <field name="context">{'default_voucher_type': 'in'}</field>
+    </record>
+    <record id="action_cash_voucher_out" model="ir.actions.act_window">
+        <field name="name">Payment Voucher</field>
+        <field name="res_model">mgs_cash_transfer.voucher</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_cash_voucher_list"/>
+        <field name="search_view_id" ref="view_cash_voucher_search"/>
+        <field name="domain">[('voucher_type','=', 'out')]</field>
+        <field name="context">{'default_voucher_type': 'out'}</field>
+    </record>
+    <!-- Menu Item for Cash Transfers -->
+    <menuitem id="menu_cash_voucher_in" name="Receipt Voucher" parent="account.menu_finance_receivables" action="action_cash_voucher_in" sequence="1"/>
+    <menuitem id="menu_cash_voucher_out" name="Payment Voucher" parent="account.menu_finance_payables" action="action_cash_voucher_out" sequence="2"/>
+</odoo>

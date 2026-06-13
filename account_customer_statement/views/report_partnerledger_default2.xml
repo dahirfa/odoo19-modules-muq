@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		<template id="report_partnerledger_custom">
+			<t t-call="web.html_container">
+					<t t-set="data_report_margin_top" t-value="12"/>
+					<t t-set="data_report_header_spacing" t-value="9"/>
+					<t t-set="data_report_dpi" t-value="110"/>
+					<t t-foreach="docs" t-as="o">
+							<t t-call="web.internal_layout">
+									<div class="page">
+											<div style="font-weigh:bold;font-size:24px;text-align:center;font-style:underline">Statement</div>
+	
+	
+											<div class="row col">
+													<div class="col-6">
+													<strong>Name:</strong>
+													<p style="font-weigh:bold;font-size:20px" t-esc="o.name"/>
+													</div>
+	
+													<!--
+													<div class="col-3 hidden">
+															<strong>Company:</strong>
+															<p t-esc="res_company.name"/>
+													</div>
+													-->
+													<div class="col-3">
+															<t t-if="data['form']['date_from']"><strong>Date from :</strong> <span t-esc="data['form']['date_from']"/><br/></t>
+															<t t-if="data['form']['date_to']"><strong>Date to :</strong> <span t-esc="data['form']['date_to']"/></t>
+													</div>
+													<div class="col-3">
+															<strong>Target Moves:</strong>
+															<p t-if="data['form']['target_move'] == 'all'">All Entries</p>
+															<p t-if="data['form']['target_move'] == 'posted'">All Posted Entries</p>
+													</div>
+											</div>
+	
+	
+											<table class="table table-condensed mt32">
+													<thead>
+															<tr style="background-color:#D6EAF8">
+																	<th>Date</th>
+																	<th>Acc</th>
+																	<th>JRNL</th>
+																	<th>Description</th>
+																	<th class="text-right">Debit</th>
+																	<th class="text-right">Credit</th>
+																	<th class="text-right">Balance</th>
+																	<th t-if="data['form']['amount_currency']">Currency</th>
+															</tr>
+													</thead>
+													<tbody>
+														<t t-if="data['form']['date_from']">
+															<t t-set="balance_forward" t-value="sum_open_balance(data, o, 'debit - credit')"/>
+															<t t-set="current_balance" t-value="sum_partner(data, o, 'debit - credit')"/>
+	
+															<t t-set="total_balance" t-value="balance_forward+current_balance"/>
+	
+														</t>
+	
+														<!--
+														<tr>
+																<td colspan="4">
+																	<strong t-esc="o.ref"/>
+																	- <strong t-esc="o.name"/>
+																</td>
+																<td class="text-right">
+																		</td>
+																<td class="text-right">
+																		</td>
+																<td class="text-right">
+																		</td>
+														</tr>
+	
+														-->
+	
+														<tr t-if="data['form']['date_from']" style="color:red;font-style:italic">
+																<td colspan="4">
+																 <strong>Balance Forward</strong>
+																</td>
+																<td class="text-right">
+																	<!--
+																		<strong t-esc="'{0:,.2f}'.format(sum_open_balance(data, o, 'debit'))" t-esc-options='{"widget": "monetary", "display_currency": "res_company.currency_id"}'/>
+																	 -->
+																</td>
+																<td class="text-right">
+																	<!--
+																		<strong t-esc="'{0:,.2f}'.format(sum_open_balance(data, o, 'debit'))" t-esc-options='{"widget": "monetary", "display_currency": "res_company.currency_id"}'/>
+																	 -->
+																</td>
+																<td class="text-right">
+	
+																		<strong t-esc="'{0:,.2f}'.format(balance_forward)" t-esc-options='{"widget": "monetary", "display_currency": "res_company.currency_id"}'/>
+																</td>
+														</tr>
+	
+	
+	
+	
+	
+														<t t-set="printnew" t-value="1"/>
+														<t t-set="prevbal" t-value="0"/>
+														<t t-set="prevbal" t-value="balance_forward" t-if="balance_forward"/>
+														<t t-set="refe_odd" t-value="all"/>
+	
+														<t t-if="data['form']['report_type']=='detail'">
+															<tr t-foreach="lines(data, o)" t-as="line" style="font-weight:bold">
+	
+	
+																<t t-set="trdate" t-value="line['date']"/>
+																<t t-set="ref_memo" t-value="line['displayed_name']"/>
+																<t t-set="groupline" t-value="line['move_name']"/>
+																<t t-set="tdr" t-value="0"/>
+																<t t-set="tcred" t-value="0"/>
+																<t t-set="wcurr" t-value="0"/>
+																<t t-if="line_even">
+																	<t t-set="refe_even" t-value="line['move_name']"/>
+																</t>
+																<t t-if="line_odd">
+																	<t t-set="refe_odd" t-value="line['move_name']"/>
+																</t>
+																<t t-if="refe_odd==refe_even">
+																	<t t-set="printnew" t-value="0"/>
+																</t>
+																<t t-if="not refe_odd==refe_even">
+																	<t t-set="printnew" t-value="1"/>
+																</t>
+	
+																<t t-if="printnew==1">
+																	<tr t-foreach="lines(data, o)" t-as="intline">
+																		<t t-if="groupline==intline['move_name']">
+																			<t t-set="tdr" t-value="tdr + intline['debit']"/>
+																			<t t-set="tcred" t-value="tcred + intline['credit']"/>
+																			<t t-set="wcurr" t-value="wcurr + intline['amount_currency']"/>
+																		</t>
+																	</tr>
+																	<t t-set="prevbal" t-value="0"/>
+																	<t t-set="prevbal" t-value="tdr-tcred+prevbal"></t>
+	
+	
+	
+	
+																	<td nowrap='nowrap'>
+																			<span t-esc="trdate"/>
+																	</td>
+	
+																	<td nowrap='nowrap'>
+																			<span t-esc="line['a_code']"/>
+																	</td>
+	
+																	<td nowrap='nowrap'>
+																			<span t-esc="groupline"/>
+																	</td>
+	
+																	<td colospan="3" nowrap='nowrap'>
+																			<span t-esc="line['displayed_name']"/>
+																			<t t-foreach="get_invoice(line['move_name'])" t-as="invoice_line">
+																					<br></br><span t-esc="invoice_line.product_id.name"/> <span t-esc="invoice_line.quantity"/> <!--<span t-esc="invoice_line.uom_id.name"/>-->  @ <span t-esc="invoice_line.currency_id.symbol"/> <span t-esc="invoice_line.price_unit" t-esc-options='{"widget": "monetary"}'/> = <span t-esc="invoice_line.price_subtotal" t-esc-options='{"widget": "monetary", "display_currency": "res_company.currency_id"}'/>
+																			</t>
+																	</td>
+																	<td class="text-right" nowrap='nowrap'>
+																			<span t-esc="'{0:,.2f}'.format(tdr)" t-esc-options='{"widget": "monetary", "display_currency": "res_company.currency_id"}'/>
+																	</td>
+																	<td class="text-right" nowrap='nowrap'>
+																			<span t-esc="'{0:,.2f}'.format(tcred)" t-esc-options='{"widget": "monetary", "display_currency": "res_company.currency_id"}'/>
+																	</td>
+																	<td class="text-right" nowrap='nowrap'>
+																			<span t-esc="'{0:,.2f}'.format(prevbal)" t-esc-options='{"widget": "monetary", "display_currency": "res_company.currency_id"}'/>
+																	</td>
+									<td t-if="data['form']['amount_currency']" nowrap='nowrap'>
+										<span t-esc="'{0:,.2f}'.format(line['amount_currency'])" /> <span t-esc="line['currency_code']" />
+									</td>
+	
+																</t>
+															</tr>
+														</t>
+	
+	
+	
+	
+														<t t-if="data['form']['report_type']=='summary'">
+															<tr t-foreach="lines(data, o)" t-as="line" style="font-weight:bold">
+	
+																<t t-set="trdate" t-value="line['date']"/>
+																<t t-set="ref_memo" t-value="line['displayed_name']"/>
+																<t t-set="groupline" t-value="line['move_name']"/>
+																<t t-set="tdr" t-value="0"/>
+																<t t-set="tcred" t-value="0"/>
+																<t t-set="wcurr" t-value="0"/>
+																<t t-if="line_even">
+																	<t t-set="refe_even" t-value="line['move_name']"/>
+																</t>
+																<t t-if="line_odd">
+																	<t t-set="refe_odd" t-value="line['move_name']"/>
+																</t>
+																<t t-if="refe_odd==refe_even">
+																	<t t-set="printnew" t-value="0"/>
+																</t>
+																<t t-if="not refe_odd==refe_even">
+																	<t t-set="printnew" t-value="1"/>
+																</t>
+	
+																<t t-if="printnew==1">
+																	<tr t-foreach="lines(data, o)" t-as="intline">
+																		<t t-if="groupline==intline['move_name']">
+																			<t t-set="tdr" t-value="tdr + intline['debit']"/>
+																			<t t-set="tcred" t-value="tcred + intline['credit']"/>
+																			<t t-set="wcurr" t-value="wcurr + intline['amount_currency']"/>
+																		</t>
+																	</tr>
+	
+																	<t t-set="prevbal" t-value="tdr-tcred+prevbal"></t>
+	
+	
+	
+	
+																	<td nowrap='nowrap'>
+																			<span t-esc="trdate"/>
+																	</td>
+	
+																	<td nowrap='nowrap'>
+																			<span t-esc="line['a_code']"/>
+																	</td>
+	
+																	<td nowrap='nowrap'>
+																			<span t-esc="groupline"/>
+																	</td>
+	
+																	<td colospan="3" nowrap='nowrap'>
+																			<span t-esc="line['displayed_name']"/>
+	
+																	</td>
+																	<td class="text-right" nowrap='nowrap'>
+																			<span t-esc="'{0:,.2f}'.format(tdr)" t-esc-options='{"widget": "monetary", "display_currency": "res_company.currency_id"}'/>
+																	</td>
+																	<td class="text-right" nowrap='nowrap'>
+																			<span t-esc="'{0:,.2f}'.format(tcred)" t-esc-options='{"widget": "monetary", "display_currency": "res_company.currency_id"}'/>
+																	</td>
+																	<td class="text-right" nowrap='nowrap'>
+																			<span t-esc="'{0:,.2f}'.format(prevbal)" t-esc-options='{"widget": "monetary", "display_currency": "res_company.currency_id"}'/>
+																	</td>
+									<td t-if="data['form']['amount_currency']" nowrap='nowrap'>
+										<span t-esc="'{0:,.2f}'.format(line['amount_currency'])" /> <span t-esc="line['currency_code']" />
+									</td>
+	
+																</t>
+															</tr>
+														</t>
+	
+	
+	
+														<tr style="color:#D5D8DC;border-top:1px solid black">
+															<td class="text-right" colspan="4">
+																<strong>Balance on Date</strong>
+															</td>
+															<td class="text-right">
+																<strong t-esc="'{0:,.2f}'.format(sum_partner(data, o, 'debit'))" t-esc-options='{"widget": "monetary", "display_currency": "res_company.currency_id"}'/>
+															</td>
+															<td class="text-right">
+																<strong t-esc="'{0:,.2f}'.format(sum_partner(data, o, 'credit'))" t-esc-options='{"widget": "monetary", "display_currency": "res_company.currency_id"}'/>
+															</td>
+															<td class="text-right">
+																<strong t-esc="current_balance" t-esc-options='{"widget": "monetary", "display_currency": "res_company.currency_id"}'/>
+															</td>
+														</tr>
+	
+	
+	
+	
+	
+	
+	
+															<t t-if="data['form']['date_from']">
+																<tr>
+																	<td class="text-right" colspan="4">
+																			<strong>Total Amount Due</strong>
+																	</td>
+																	<td class="text-right">
+																		</td>
+																	<td class="text-right">
+																		</td>
+																	<td class="text-right">
+																		<strong><span t-esc="'{0:,.2f}'.format(total_balance)" t-esc-options='{"widget": "monetary", "display_currency": "res_company.currency_id"}'/></strong>
+																		</td>
+																</tr>
+															</t>
+													</tbody>
+	
+											</table>
+	
+											<br/>
+											<div class="row">
+											   <div class="col-4">
+												Printed By: <span t-esc="o.user_id.name"></span>
+											   </div>
+												<div class="col-4 text-center">
+												Approved by: _______________
+											   </div>
+											   <div class="col-4 text-right">
+												Partner Sign: ______________
+											   </div>
+											</div>
+									</div>
+							</t>
+					</t>
+			</t>
+		</template>
+	</data>
+</odoo>

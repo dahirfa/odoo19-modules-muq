@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="latency_rule_view_list" model="ir.ui.view">
+        <field name="name">latency.rule.view.list</field>
+        <field name="model">latency.rule</field>
+        <field name="arch" type="xml">
+            <list string="Latency Rule">
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="latency_rule_view_form" model="ir.ui.view">
+        <field name="name">latency.rule.view.form</field>
+        <field name="model">latency.rule</field>
+        <field name="arch" type="xml">
+            <form string="Latency Rule">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="company_id"/>
+                            <!-- attrs="{'invisible': [('letency_type', '!=', 'wage')]}" -->
+                            <field name="minutes"
+                                   
+                                   invisible="letency_type != 'wage'"
+                                   />
+                            <!-- attrs="{'invisible': [('letency_type', '!=', 'fixed')]}" -->
+                            <field name="fixed_amount"
+                                   
+                                   invisible="letency_type != 'fixed'"
+                                   />
+                            <field name="letency_type"/>
+                        </group>
+                    </group>
+                    <!-- attrs="{'invisible': [('letency_type', '!=', 'custom')]}" -->
+                    <notebook  invisible="letency_type != 'custom'">
+                        <page name="rule_lines" string="Rule Lines">
+                            <field name="latency_rule_lines">
+                                <list editable='bottom'>
+                                    <field name="check_in"/>
+                                    <field name="amount"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="latency_rule_view_search" model="ir.ui.view">
+        <field name="name">latency.rule.view.search</field>
+        <field name="model">latency.rule</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+
+
+    <record id="latency_rule_action" model="ir.actions.act_window">
+        <field name="name">latency rule Action</field>
+        <field name="res_model">latency.rule</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+
+    <menuitem
+            id="latency_rules"
+            name="Latency Rules"
+            action="latency_rule_action"
+            parent="hr.menu_human_resources_configuration"
+            sequence="10"/>
+</odoo>

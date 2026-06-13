@@ -1,0 +1,388 @@
+<odoo>
+    <!-- Qweb -->
+    <record id="action_report_mgs_purchase" model="ir.actions.report">
+        <field name="name">Purchase Report</field>
+        <field name="model">mgs_purchase.report_wizard</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">mgs_purchase.purchase_report</field>
+        <field name="report_file">mgs_purchase.purchase_report</field>
+    </record>
+
+    <template id="purchase_report_detail">
+        <div class="page">
+            <div class="mt-2 mb-2">
+                <h1 class="display-5 text-center">Purchase Report</h1>
+            </div>
+            <div class="row">
+                <!-- Date Range -->
+                <div class="col-3" t-if="date_from or date_to">
+                    <strong>From:</strong>
+                    <p t-if="date_from" class="m-0">
+                        <span t-esc="date_from"/>
+                    </p>
+                    <strong>To:</strong>
+                    <p t-if="date_to" class="m-0">
+                        <span t-esc="date_to"/>
+                    </p>
+                </div>
+                <!-- Vendor (Partner) -->
+                <div class="col-3" t-if="partner_id and partner_id[0]">
+                    <strong>Vendor:</strong>
+                    <p class="m-0" t-esc="partner_id[1]"/>
+                </div>
+                <!-- Product -->
+                <div class="col-3" t-if="product_id and product_id[0]">
+                    <strong>Product:</strong>
+                    <p class="m-0" t-esc="product_id[1]"/>
+                </div>
+                <!-- Parent Category -->
+                <div class="col-3" t-if="parent_categ_id and parent_categ_id[0]">
+                    <strong>Parent Category:</strong>
+                    <p class="m-0" t-esc="parent_categ_id[1]"/>
+                </div>
+                <!-- Category -->
+                <div class="col-3" t-if="categ_id and categ_id[0]">
+                    <strong>Category:</strong>
+                    <p class="m-0" t-esc="categ_id[1]"/>
+                </div>
+                <!-- Buyer -->
+                <div class="col-3" t-if="user_id and user_id[0]">
+                    <strong>Buyer:</strong>
+                    <p class="m-0" t-esc="user_id[1]"/>
+                </div>
+                <!-- Currency -->
+                <div class="col-3" t-if="currency_id and currency_id[0]">
+                    <strong>Currency:</strong>
+                    <p class="m-0" t-esc="currency_id[1]"/>
+                </div>
+            </div>
+            <table class="table table-sm table-hover" style="font-size: 0.85em; border: 1px solid #dee2e6; border-collapse: collapse;">
+                <thead style="border: none;">
+                    <tr>
+                        <th style="font-weight: bold;">
+                            <span t-if="group_by == 'vendor'">Vendor</span>
+                            <span t-if="group_by == 'item'">Product</span>
+                        </th>
+                        <th style="font-weight: bold;">Date</th>
+                        <th style="font-weight: bold;">Order#</th>
+                        <th style="font-weight: bold;">
+                            <span t-if="group_by == 'vendor'">Product</span>
+                            <span t-if="group_by == 'item'">Vendor</span>
+                        </th>
+                        <th style="font-weight: bold;" class="text-end">Qty Ordered</th>
+                        <th style="font-weight: bold;" class="text-end">Qty Received</th>
+                        <th style="font-weight: bold;" class="text-end">Qty Billed</th>
+                        <th style="font-weight: bold;" class="text-end" groups="account.group_account_manager">U.Cost</th>
+                        <th style="font-weight: bold;" class="text-end" groups="account.group_account_manager">Tax</th>
+                        <th style="font-weight: bold;" class="text-end">Amount</th>
+                    </tr>
+                </thead>
+                <tbody style="border-left: 1px solid #dee2e6; border-right: 1px solid #dee2e6;">
+                    <t t-set="total_product_uom_qty" t-value="0"/>
+                    <t t-set="total_qty_received" t-value="0"/>
+                    <t t-set="total_qty_billed" t-value="0"/>
+                    <t t-set="total_tax" t-value="0"/>
+                    <t t-set="total_amount" t-value="0"/>
+                    <t t-foreach="grouped_lines.items()" t-as="group">
+                        <t t-set="group_name" t-value="group[1]['partner_name'] if group_by == 'vendor' else group[1]['product_name']"/>
+                        <!-- Vendor Row -->
+                        <tr>
+                            <td style="border-right: 1px solid #dee2e6;" colspan="10">
+                                <strong class="text-danger" style="font-size: 1em;">
+                                    <t t-esc="group_name"/>
+                                </strong>
+                            </td>
+                        </tr>
+                        <!-- Orders under Vendor -->
+                        <t t-foreach="group[1]['lines']" t-as="line">
+                            <tr>
+                                <td></td>
+                                <!-- Empty cell for Vendor Name -->
+                                <td style="border-right: 1px solid #dee2e6;">
+                                    <span t-esc="line['date']" t-options='{"widget": "datetime", "format": "dd-MM-yyyy HH:mm"}'/>
+                                </td>
+                                <td style="border-right: 1px solid #dee2e6;">
+                                    <t t-esc="line['name']"/>
+                                    <t t-if="line['partner_ref']">
+                                        (                                        <span t-esc="line['partner_ref']"/>
+)
+                                    </t>
+                                </td>
+                                <td style="border-right: 1px solid #dee2e6;">
+                                    <t t-if="group_by == 'vendor'" t-esc="line['product_name']"/>
+                                    <t t-if="group_by == 'item'" t-esc="line['partner_name']"/>
+                                </td>
+                                <td style="border-right: 1px solid #dee2e6;" class="text-end">
+                                    <t t-esc="'{0:,.2f}'.format(line['product_uom_qty'])"/>
+                                </td>
+                                <td style="border-right: 1px solid #dee2e6;" class="text-end">
+                                    <t t-esc="'{0:,.2f}'.format(line['qty_received'])"/>
+                                </td>
+                                <td style="border-right: 1px solid #dee2e6;" class="text-end">
+                                    <t t-esc="'{0:,.2f}'.format(line['qty_billed'])"/>
+                                </td>
+                                <td style="border-right: 1px solid #dee2e6;" class="text-end" groups="account.group_account_manager">
+                                    <t t-esc="'{0:,.2f}'.format(line.get('unit_cost', 0))"/>
+                                </td>
+                                <td style="border-right: 1px solid #dee2e6;" class="text-end" groups="account.group_account_manager">
+                                    <t t-esc="'{0:,.2f}'.format(line.get('tax', 0))"/>
+                                </td>
+                                <td style="border-right: 1px solid #dee2e6;" class="text-end">
+                                    <t t-esc="'{0:,.2f}'.format(line.get('price_total', 0))"/>
+                                </td>
+                            </tr>
+                        </t>
+                        <t t-set="total_product_uom_qty" t-value="total_product_uom_qty+group[1]['product_uom_qty']"/>
+                        <t t-set="total_qty_received" t-value="total_qty_received+group[1]['qty_received']"/>
+                        <t t-set="total_qty_billed" t-value="total_qty_billed+group[1]['qty_billed']"/>
+                        <t t-set="total_tax" t-value="total_tax+group[1].get('tax', 0)"/>
+                        <t t-set="total_amount" t-value="total_amount+group[1]['subtotal']"/>
+                        <!-- Subtotal Row -->
+                        <tr class="table-secondary">
+                            <td style="border-right: 1px solid #dee2e6;" class="text-right" colspan="4">
+                                <strong class="text-danger" style="font-size: 1em;">Total <t t-esc="group_name"/>
+:</strong>
+                            </td>
+                            <td style="border-right: 1px solid #dee2e6;" class="text-end">
+                                <strong class="text-danger" style="font-size: 1em;">
+                                    <t t-esc="'{0:,.2f}'.format(group[1]['product_uom_qty'])"/>
+                                </strong>
+                            </td>
+                            <td style="border-right: 1px solid #dee2e6;" class="text-end">
+                                <strong class="text-danger" style="font-size: 1em;">
+                                    <t t-esc="'{0:,.2f}'.format(group[1]['qty_received'])"/>
+                                </strong>
+                            </td>
+                            <td style="border-right: 1px solid #dee2e6;" class="text-end">
+                                <strong class="text-danger" style="font-size: 1em;">
+                                    <t t-esc="'{0:,.2f}'.format(group[1]['qty_billed'])"/>
+                                </strong>
+                            </td>
+                            <td style="border-right: 1px solid #dee2e6;" class="text-end" groups="account.group_account_manager">
+                                <strong class="text-danger" style="font-size: 1em;">
+                                    <t t-esc="'{0:,.2f}'.format(group[1].get('unit_cost', 0))"/>
+                                </strong>
+                            </td>
+                            <td style="border-right: 1px solid #dee2e6;" class="text-end" groups="account.group_account_manager">
+                                <strong class="text-danger" style="font-size: 1em;">
+                                    <t t-esc="'{0:,.2f}'.format(group[1].get('tax', 0))"/>
+                                </strong>
+                            </td>
+                            <td style="border-right: 1px solid #dee2e6;" class="text-end">
+                                <strong class="text-danger" style="font-size: 1em;">
+                                    <t t-esc="'{0:,.2f}'.format(group[1]['subtotal'])"/>
+                                </strong>
+                            </td>
+                        </tr>
+                    </t>
+                    <!-- Overall Total Row -->
+                    <tr class="table-secondary">
+                        <td class="text-right" colspan="4">
+                            <strong class="text-danger" style="font-size: 1em;">Total</strong>
+                        </td>
+                        <td class="text-end">
+                            <strong class="text-danger" style="font-size: 1em;">
+                                <t t-esc="'{0:,.2f}'.format(total_product_uom_qty)"/>
+                            </strong>
+                        </td>
+                        <td class="text-end">
+                            <strong class="text-danger" style="font-size: 1em;">
+                                <t t-esc="'{0:,.2f}'.format(total_qty_received)"/>
+                            </strong>
+                        </td>
+                        <td class="text-end">
+                            <strong class="text-danger" style="font-size: 1em;">
+                                <t t-esc="'{0:,.2f}'.format(total_qty_billed)"/>
+                            </strong>
+                        </td>
+                        <td class="text-end" groups="account.group_account_manager">
+                            <strong class="text-danger" style="font-size: 1em;">
+                                <!-- Unit cost not totaled as it's per unit -->
+                                <t t-esc="'-'"/>
+                            </strong>
+                        </td>
+                        <td class="text-end" groups="account.group_account_manager">
+                            <strong class="text-danger" style="font-size: 1em;">
+                                <t t-esc="'{0:,.2f}'.format(total_tax)"/>
+                            </strong>
+                        </td>
+                        <td class="text-end">
+                            <strong class="text-danger" style="font-size: 1em;">
+                                <t t-esc="'{0:,.2f}'.format(total_amount)"/>
+                            </strong>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </template>
+
+    <template id="purchase_report_summary">
+        <div class="page">
+            <div class="mt-2 mb-2">
+                <h1 class="display-5 text-center">Purchase Report</h1>
+            </div>
+            <div class="row">
+                <!-- Date Range -->
+                <div class="col-3" t-if="date_from or date_to">
+                    <strong>From:</strong>
+                    <p t-if="date_from" class="m-0">
+                        <span t-esc="date_from"/>
+                    </p>
+                    <strong>To:</strong>
+                    <p t-if="date_to" class="m-0">
+                        <span t-esc="date_to"/>
+                    </p>
+                </div>
+                <!-- Vendor (Partner) -->
+                <div class="col-3" t-if="partner_id and partner_id[0]">
+                    <strong>Vendor:</strong>
+                    <p class="m-0" t-esc="partner_id[1]"/>
+                </div>
+                <!-- Product -->
+                <div class="col-3" t-if="product_id and product_id[0]">
+                    <strong>Product:</strong>
+                    <p class="m-0" t-esc="product_id[1]"/>
+                </div>
+                <!-- Parent Category -->
+                <div class="col-3" t-if="parent_categ_id and parent_categ_id[0]">
+                    <strong>Parent Category:</strong>
+                    <p class="m-0" t-esc="parent_categ_id[1]"/>
+                </div>
+                <!-- Category -->
+                <div class="col-3" t-if="categ_id and categ_id[0]">
+                    <strong>Category:</strong>
+                    <p class="m-0" t-esc="categ_id[1]"/>
+                </div>
+                <!-- Buyer -->
+                <div class="col-3" t-if="user_id and user_id[0]">
+                    <strong>Buyer:</strong>
+                    <p class="m-0" t-esc="user_id[1]"/>
+                </div>
+                <!-- Currency -->
+                <div class="col-3" t-if="currency_id and currency_id[0]">
+                    <strong>Currency:</strong>
+                    <p class="m-0" t-esc="currency_id[1]"/>
+                </div>
+            </div>
+            <table class="table table-sm table-hover" style="font-size: 0.85em; border: 1px solid #dee2e6; border-collapse: collapse;">
+                <thead style="border: none;">
+                    <tr>
+                        <th>
+                            <span style="font-weight:bold; font-size: 1em;" t-if="group_by == 'vendor'">Vendor</span>
+                            <span style="font-weight:bold; font-size: 1em;" t-if="group_by == 'item'">Product</span>
+                        </th>
+                        <th style="font-weight: bold;" class="text-end">Qty Ordered</th>
+                        <th style="font-weight: bold;" class="text-end">Qty Received</th>
+                        <th style="font-weight: bold;" class="text-end">Qty Billed</th>
+                        <!-- Show Unit Cost only when NOT grouping by vendor -->
+                        <t t-if="group_by != 'vendor'">
+                            <th style="font-weight: bold;" class="text-end" groups="account.group_account_manager">U.Cost</th>
+                        </t>
+                        <th style="font-weight: bold;" class="text-end" groups="account.group_account_manager">Tax</th>
+                        <th style="font-weight: bold;" class="text-end">Amount</th>
+                    </tr>
+                </thead>
+                <tbody style="border-left: 1px solid #dee2e6; border-right: 1px solid #dee2e6;">
+                    <t t-set="total_product_uom_qty" t-value="0"/>
+                    <t t-set="total_qty_received" t-value="0"/>
+                    <t t-set="total_qty_billed" t-value="0"/>
+                    <t t-set="total_tax" t-value="0"/>
+                    <t t-set="total_amount" t-value="0"/>
+                    <t t-foreach="grouped_lines.items()" t-as="group">
+                        <t t-set="group_name" t-value="group[1]['partner_name'] if group_by == 'vendor' else group[1]['product_name']"/>
+                        <t t-set="total_product_uom_qty" t-value="total_product_uom_qty+group[1]['product_uom_qty']"/>
+                        <t t-set="total_qty_received" t-value="total_qty_received+group[1]['qty_received']"/>
+                        <t t-set="total_qty_billed" t-value="total_qty_billed+group[1]['qty_billed']"/>
+                        <t t-set="total_tax" t-value="total_tax+group[1].get('tax', 0)"/>
+                        <t t-set="total_amount" t-value="total_amount+group[1]['subtotal']"/>
+                        <!-- Subtotal Row -->
+                        <tr class="table-secondary">
+                            <td style="border-right: 1px solid #dee2e6;" class="text-right">
+                                <t t-esc="group_name"/>
+                            </td>
+                            <td style="border-right: 1px solid #dee2e6;" class="text-end">
+                                <t t-esc="'{0:,.2f}'.format(group[1]['product_uom_qty'])"/>
+                            </td>
+                            <td style="border-right: 1px solid #dee2e6;" class="text-end">
+                                <t t-esc="'{0:,.2f}'.format(group[1]['qty_received'])"/>
+                            </td>
+                            <td style="border-right: 1px solid #dee2e6;" class="text-end">
+                                <t t-esc="'{0:,.2f}'.format(group[1]['qty_billed'])"/>
+                            </td>
+                            <!-- Show Unit Cost only when NOT grouping by vendor -->
+                            <t t-if="group_by != 'vendor'">
+                                <td style="border-right: 1px solid #dee2e6;" class="text-end" groups="account.group_account_manager">
+
+                                    <t t-esc="'{0:,.2f}'.format(group[1].get('unit_cost', 0))"/>
+
+                                </td>
+                            </t>
+                            <td style="border-right: 1px solid #dee2e6;" class="text-end" groups="account.group_account_manager">
+                                <t t-esc="'{0:,.2f}'.format(group[1].get('tax', 0))"/>
+                            </td>
+                            <td style="border-right: 1px solid #dee2e6;" class="text-end">
+                                <t t-esc="'{0:,.2f}'.format(group[1]['subtotal'])"/>
+                            </td>
+                        </tr>
+                    </t>
+                    <!-- Overall Total Row -->
+                    <tr class="table-secondary">
+                        <td style="border-right: 1px solid #dee2e6;" class="text-right">
+                            <strong class="text-danger" style="font-size: 1em;">Total</strong>
+                        </td>
+                        <td style="border-right: 1px solid #dee2e6;" class="text-end">
+                            <strong class="text-danger" style="font-size: 1em;">
+                                <t t-esc="'{0:,.2f}'.format(total_product_uom_qty)"/>
+                            </strong>
+                        </td>
+                        <td style="border-right: 1px solid #dee2e6;" class="text-end">
+                            <strong class="text-danger" style="font-size: 1em;">
+                                <t t-esc="'{0:,.2f}'.format(total_qty_received)"/>
+                            </strong>
+                        </td>
+                        <td style="border-right: 1px solid #dee2e6;" class="text-end">
+                            <strong class="text-danger" style="font-size: 1em;">
+                                <t t-esc="'{0:,.2f}'.format(total_qty_billed)"/>
+                            </strong>
+                        </td>
+                        <!-- Show Unit Cost column only when NOT grouping by vendor -->
+                        <t t-if="group_by != 'vendor'">
+                            <td style="border-right: 1px solid #dee2e6;" class="text-end" groups="account.group_account_manager">
+                                <strong class="text-danger" style="font-size: 1em;">
+                                    <!-- Unit cost not totaled -->
+                                    <t t-esc="'-'"/>
+                                </strong>
+                            </td>
+                        </t>
+                        <td style="border-right: 1px solid #dee2e6;" class="text-end" groups="account.group_account_manager">
+                            <strong class="text-danger" style="font-size: 1em;">
+                                <t t-esc="'{0:,.2f}'.format(total_tax)"/>
+                            </strong>
+                        </td>
+                        <td style="border-right: 1px solid #dee2e6;" class="text-end">
+                            <strong class="text-danger" style="font-size: 1em;">
+                                <t t-esc="'{0:,.2f}'.format(total_amount)"/>
+                            </strong>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </template>
+
+    <template id="purchase_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.internal_layout" t-lang="en_US">
+                    <t t-if="report_type == 'detail'">
+                        <t t-call="mgs_purchase.purchase_report_detail"/>
+                    </t>
+                    <t t-elif="report_type == 'summary'">
+                        <t t-call="mgs_purchase.purchase_report_summary"/>
+                    </t>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_sa_biometric_device_tree" model="ir.ui.view">
+        <field name="name">sa.biometric.device.tree</field>
+        <field name="model">sa.biometric.device</field>
+        <field name="arch" type="xml">
+            <list editable="top">
+                <field name="externalid" />
+                <field name="name" />
+                <field name="company_id"  groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_sa_biometric_device" model="ir.actions.act_window">
+        <field name="name">Biometric Devices</field>
+        <field name="res_model">sa.biometric.device</field>
+        <field name="view_mode">list</field>
+    </record>
+
+</odoo>

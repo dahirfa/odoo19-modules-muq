@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_monthly_report" model="ir.actions.report">
+        <field name="name">Monthly Report</field>
+        <field name="model">softatt_attendance.sa_monthly_report</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">softatt_attendance.sa_monthly_report</field>
+        <field name="report_file">softatt_attendance.sa_monthly_report</field>
+        <field name="print_report_name">Monthly Report</field>
+    </record>
+
+    <template id="sa_monthly_report" name="sa_monthly_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout" t-lang="en_US">
+                    <div class="page">
+                        <h2>Monthly Report</h2>
+                        <div class="row" style="margin-top: 32px; margin-bottom: 15px !important;font-size: 1.2em; font-family: 'Lato-Reg'">
+                            <div class="col-3" t-if="_from">
+                                <strong>From:</strong>
+                                <p class="m-0" t-esc="_from" />
+                            </div>
+                            <div class="col-3" t-if="_to">
+                                <strong>To:</strong>
+                                <p class="m-0" t-esc="_to" />
+                            </div>
+                       </div>
+                       <br/>
+                       <table class="table table-sm table-responsive">
+                        <thead>
+                            <tr>
+                                <th nowrap="nowrap">#</th>
+                                <th nowrap="nowrap">Employee</th>
+                                <th nowrap="nowrap">Employee ID</th>
+                                <th nowrap="nowrap">Job Position</th>
+                                <th nowrap="nowrap">Worked Hours</th>
+                                <th nowrap="nowrap" t-if="include_absence">Absence(D)</th>
+                                <th nowrap="nowrap" t-if="include_late_minutes">Late(M)</th>
+
+                                <th nowrap="nowrap" t-if="include_deductions">Wage</th>
+                                <th nowrap="nowrap" t-if="include_deductions">Deductions</th>
+                                <th nowrap="nowrap" t-if="include_deductions">Balance</th>
+                            </tr>
+                        </thead>
+                
+                        <tbody>
+                            <t t-set="num" t-value="0"/>     
+                                <t t-foreach="emp_lines(location_ids, department_ids, shift_ids, employee_ids)" t-as="employee">
+                                    <tr>
+                                        <td  nowrap="nowrap">
+                                            <t t-set="num" t-value="num+1"/>
+                                            <t t-esc="num" />
+                                        </td>
+                                        <t t-set="vals" t-value="emp_vals(employee.id, data)"/>
+
+                                        <td nowrap="nowrap">
+                                            <t t-esc="employee.name" />
+                                        </td>
+
+                                        <td nowrap="nowrap">
+                                            <t t-esc="employee.code_ids.code" />
+                                        </td>
+
+                                        <td nowrap="nowrap">
+                                            <t t-esc="employee.job_id.name" />
+                                        </td>
+
+                                        <td nowrap="nowrap">
+                                            <t t-esc="vals.get('worked_hours', 0)" t-options="{'widget': 'float_time'}"/>
+                                        </td>
+
+                                        <td nowrap="nowrap"  t-if="include_absence">
+                                            <t t-esc="vals.get('absence', 0)"/>
+                                        </td>
+
+
+                                        <td nowrap="nowrap"  t-if="include_late_minutes"><t  t-esc="vals.get('late_minutes', 0)"/> - Minutes</td>
+                                        <td nowrap="nowrap"  t-if="include_deductions" ><t   t-esc="employee.wage"/></td>
+                                        <td nowrap="nowrap"  t-if="include_deductions" ><t   t-esc="vals.get('deductions', 0)"/></td>
+                                        <td nowrap="nowrap"  t-if="include_deductions" ><t   t-esc="employee.wage - vals.get('deductions', 0)"/></td>
+                                    </tr>
+                                </t>
+                        </tbody>
+                    </table>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="load_line_dispatch_tree" model="ir.ui.view">
+        <field name="name">load.line.dispatch.list</field>
+        <field name="model">load.line.dispatch</field>
+        <field name="arch" type="xml">
+            <list string="" default_order="id desc">
+                <header>
+                    <!-- <button name="start_trip" string="Start The Trip" type="object" class="oe_highlight"/>
+                <button confirm="Are you sure you want to Mark as Finished?" string="Mark as Finished" name="mark_as_finished" type="object" class="oe_highlight"/>
+                <button confirm="Are you sure you want to cancel the Trip?" string="Cencel" name="cancel_load" type="object" />
+                <button confirm="Are you sure you want to Reset to New?" string="Reset to New" name="reset_to_new" type="object" />
+             -->
+
+                    <button confirm="Are you sure" name="dispatch_trip" string="Dispatch" type="object" class="oe_highlight"/>
+                    <button confirm="Are you sure" string="Mark as Loaded" name="mark_as_loaded" type="object" class="oe_highlight"/>
+                    <button confirm="Are you sure" name="start_trip" string="Start The Trip" type="object" class="oe_highlight"/>
+                    <button confirm="Are you sure" string="Mark as Arrived" name="mark_as_arrived" type="object" class="oe_highlight"/>
+                    <button confirm="Are you sure" string="Mark as Finished" name="mark_as_finished" type="object" class="oe_highlight"/>
+                    <button confirm="Are you sure" string="Complete" name="complete_load" type="object" class="oe_highlight"/>
+                    <button confirm="Are you sure" string="Cencel" name="cancel_load" type="object"/>
+                    <button confirm="Are you sure" string="Reset to New" name="reset_to_new" type="object"/>
+                    <!-- <button confirm="Are you Ok" string="Compute" name="compute_amount_total" type="object" /> -->
+
+                </header>
+                <field name="load_id"/>
+                <field name="name"/>
+                <field name="truck_id"/>
+                <field name="vendor_id" optional="hide"/>
+                <field name="partner_id"/>
+                <field name="pickup_city"/>
+                <field name="pickup_address"/>
+                <field name="dispatched_time" optional="hide"/>
+                <field name="loaded_on_time" optional="hide"/>
+                <field name="delivery_state"/>
+                <field name="delivery_city"/>
+                <field name="arrived_on_time" optional="hide"/>
+                <field name="finished_on_time" optional="hide"/>
+                <field name="tons" sum="Total"/>
+                <field name="rate"/>
+                <field name="active" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="amount_total" sum="Total"/>
+                <field name="state" widget="badge" decoration-success="state in ('finished','invoiced')" decoration-info="state in ('new','dispatched')" decoration-warning="state in ('on_road', 'loaded', 'arrived')" decoration-danger="state == 'cancel'"/>
+            </list>
+        </field>
+    </record>
+
+
+    <record id="dispatch_trips_search_view" model="ir.ui.view">
+        <field name="name">load.line.dispatch.search</field>
+        <field name="model">load.line.dispatch</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <field name="name"/>
+                <field name="load_id"/>
+                <field name="truck_id"/>
+                <field name="tons"/>
+                <field name="driver_id"/>
+                <field name="vendor_id"/>
+                <filter string="Offloaded" name="finished" domain="[('state','=','finished')]"/>
+                <filter string="Arrived" name="arrived" domain="[('state','=','arrived')]"/>
+                <filter string="On Road" name="on_road" domain="[('state','=','on_road')]"/>
+                <filter string="Loaded" name="loaded" domain="[('state','=','loaded')]"/>
+                <filter string="Dispatched" name="dispatched" domain="[('state','=','dispatched')]"/>
+                <filter string="Draft" name="new" domain="[('state','=','new')]"/>
+                <filter string="Archived" name="inactive" domain="[('active','=',False)]"/>
+                <filter string="Unarchived" name="active" domain="[('active','=',True)]"/>
+                <group >
+                    <filter name="group_by_partner_id" string="Customer" context="{'group_by':'partner_id'}"/>
+                    <filter name="group_by_vendor_id" string="Sub-Contractor" context="{'group_by':'vendor_id'}"/>
+                    <filter name="group_by_truck_id" string="Truck" context="{'group_by':'truck_id'}"/>
+                    <filter name="group_by_load_id" string="Load" context="{'group_by':'load_id'}"/>
+                    <filter name="group_by_state" string="Status" context="{'group_by':'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    
+
+
+    <record id="load_line_dispatch_form" model="ir.ui.view">
+        <field name="name">load.line.dispatch.form</field>
+        <field name="model">load.line.dispatch</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="new,dispatched,loaded,on_road,arrived,finished,invoiced" statusbar_colors="{&quot;on_road&quot;:&quot;blue&quot;,&quot;finished&quot;:&quot;green&quot;,&quot;cancel&quot;:&quot;red&quot;}"/>
+                    <!--TODO: Result from converting "states='new'" attribute into an 'invisible' attribute
+                                     Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                    <button confirm="Are you sure" name="dispatch_trip" string="Dispatch" type="object" invisible="state not in ['new']" class="oe_highlight"/>
+                    <!--TODO: Result from converting "states='dispatched'" attribute into an 'invisible' attribute
+                                     Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                    <button confirm="Are you sure" string="Mark as Loaded" name="mark_as_loaded" type="object" invisible="state not in ['dispatched']" class="oe_highlight"/>
+                    <!--TODO: Result from converting "states='loaded'" attribute into an 'invisible' attribute
+                                     Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                    <button confirm="Are you sure" name="start_trip" string="Start The Trip" type="object" invisible="state not in ['loaded']" class="oe_highlight"/>
+                    <!--TODO: Result from converting "states='on_road'" attribute into an 'invisible' attribute
+                                     Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                    <button confirm="Are you sure" string="Mark as Arrived" name="mark_as_arrived" type="object" invisible="state not in ['on_road']" class="oe_highlight"/>
+                    <!--TODO: Result from converting "states='arrived'" attribute into an 'invisible' attribute
+                                     Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                    <button confirm="Are you sure" string="Mark as Finished" name="mark_as_finished" type="object" invisible="state not in ['arrived']" class="oe_highlight"/>
+                    <!--TODO: Result from converting "states='finished'" attribute into an 'invisible' attribute
+                                     Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                    <button confirm="Are you sure" string="Complete" name="complete_load" type="object" invisible="state not in ['finished']" class="oe_highlight"/>
+                    <!--TODO: Result from converting "states='new,dispatched,loaded,on_road,arrived'" attribute into an 'invisible' attribute
+                                     Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                    <button confirm="Are you sure" string="Cencel" name="cancel_load" type="object" invisible="state not in ['new', 'dispatched', 'loaded', 'on_road', 'arrived']"/>
+                    <!--TODO: Result from converting "states='finished,cancel'" attribute into an 'invisible' attribute
+                                     Manually combine states condition into any 'invisible' overrides in inheriting views as well-->
+                    <button confirm="Are you sure" string="Reset to New" name="reset_to_new" type="object" invisible="state not in ['finished', 'cancel']"/>
+
+                </header>
+
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button type="object" name="view_trip_bill" class="o_form_field o_stat_info" icon="fa-pencil-square-o">
+                            <field string="Bills" name="bill_count" widget="statinfo"/>
+                        </button>
+
+                        <button type="object" name="view_trip_invoice" class="o_form_field o_stat_info" icon="fa-pencil-square-o">
+                            <field string="Invoices" name="invoice_count" widget="statinfo"/>
+                        </button>
+                    </div>
+
+
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="/" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+
+                        <group>
+                            <field name="date" readonly="state not in 'new'"/>
+                        </group>
+                        <group>
+                            <field name="tons" required="1" readonly="state not in 'new'"/>
+                        </group>
+
+                    </group>
+
+                    <group string="Pick-up Info" readonly="state == 'dispatched'">
+                        <group>
+                            <field name="pickup_state" options="{'no_create': True, 'no_create_edit':True}" readonly="state in ('finished', 'dispatched')"/>
+                            <field name="pickup_address" readonly="state in ('finished', 'dispatched')"/>
+                            <field name="pickup_contact_Name" readonly="state in ('finished', 'dispatched')"/>
+                            <field name="dispatched_time" readonly="state in ('finished', 'dispatched')"/>
+                            <field name="notes_for_pickup" readonly="state in ('finished', 'dispatched')"/>
+                        </group>
+                        <group>
+                            <field name="pickup_city" options="{'no_create': True, 'no_create_edit':True}" readonly="state in ('finished', 'dispatched')" domain="[('state_id','=', pickup_state)]"/>
+                            <field name="pickup_address2" readonly="state in ('finished', 'dispatched')"/>
+                            <field name="pickup_contact_Phone" readonly="state in ('finished', 'dispatched')"/>
+                            <field name="loaded_on_time" readonly="state in ('finished', 'dispatched')"/>
+                            <field name="pickup_master_Note" readonly="state in ('finished', 'dispatched')"/>
+                        </group>
+                    </group>
+                    <group string="Delivery Info">
+                        <group>
+                            <field name="delivery_state" options="{'no_create': True, 'no_create_edit':True}" readonly="state == 'finished'"/>
+                            <field name="delivery_address" readonly="state == 'finished'"/>
+                            <field name="delivery_contact_Name" readonly="state == 'finished'"/>
+                            <field name="arrived_on_time" readonly="state == 'finished'"/>
+                            <field name="notes_for_delivery" readonly="state == 'finished'"/>
+                        </group>
+                        <group>
+                            <field name="delivery_city" readonly="state == 'finished'" options="{'no_create': True, 'no_create_edit':True}" domain="[('state_id','=', delivery_state)]"/>
+                            <field name="delivery_address2" readonly="state == 'finished'"/>
+                            <field name="delivery_contact_Phone" readonly="state == 'finished'"/>
+                            <field name="finished_on_time" readonly="state == 'finished'"/>
+                            <field name="delivery_master_Note" readonly="state == 'finished'"/>
+                        </group>
+                    </group>
+                    <group string="Truck Info">
+                        <group>
+                            <field name="active" invisible="1"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="truck_id" required="1" readonly="state not in 'new'"/>
+                            <field name="trailer_id" readonly="state in ('finished', 'dispatched')"/>
+                            <field name="vendor_id" invisible="1"/>
+                            <field name="commission" force_save="1" widget="percentage" readonly="state in ('finished', 'dispatched')" invisible="not vendor_id"/>
+
+                        </group>
+                        <group>
+                            <field name="driver_id" readonly="1"/>
+                            <field name="bill_id" readonly="1"/>
+                            <field name="load_id" readonly="1" required="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+
+                    <!--<notebook>
+                                        <page name="analytic_line_ids" string="Lines">
+                                            <field name="analytic_line_ids">
+                                                <list>
+                                                    <field name="date"/>
+                                                    <field name="name"/>
+                                                    <field name="truck_id"/>
+                                                    <field name="amount"/>
+                                                </list>
+                                            </field>
+                                        </page>
+                                    </notebook> -->
+                </sheet>
+
+                <chatter />
+            </form>
+        </field>
+    </record>
+
+
+
+    <record model="ir.actions.act_window" id="trip_list_action">
+        <field name="name">Trips</field>
+        <field name="res_model">load.line.dispatch</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Enter the first Trip
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="trip_main_menu" name="Trips" action="trip_list_action" parent="dispatch_main" sequence="2"/>
+
+</odoo>

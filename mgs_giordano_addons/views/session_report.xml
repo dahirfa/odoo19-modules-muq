@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <template id="pos_session_sales_details_inherit_qty"
+          inherit_id="point_of_sale.pos_session_sales_details">
+
+        <xpath expr="//tr[@t-foreach=&quot;category['products']&quot;]//td[@class='text-end'][1]"
+            position="replace">
+            <td class="text-end">
+                <t t-if="line['base_amount'] &gt;= 0">
+                    <span t-out="line['quantity']"/>
+                    <t t-if="line['uom'] != 'Units'">
+                        <span t-out="line['uom']"/>
+                    </t>
+                </t>
+            </td>
+        </xpath>
+
+</template>
+</odoo>

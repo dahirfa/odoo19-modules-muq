@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_att_report" model="ir.actions.report">
+        <field name="name">Attendance Report</field>
+        <field name="model">softatt_attendance.sa_att_report</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">softatt_attendance.sa_att_report</field>
+        <field name="report_file">softatt_attendance.sa_att_report</field>
+        <field name="print_report_name">Attendance Report</field>
+    </record>
+
+    <template id="attendance_report_content" name="attendance_report_content">
+        <table class="table table-sm table-responsive">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Employee</th>
+                    <th>Employee ID</th>
+                    <th>Check-In</th>
+                    <th>Check-Out</th>
+                    <th>Late(M)</th>
+                    <th>Hours</th>
+                    <th>Job Position</th>
+                    <th>Location</th>
+                </tr>
+            </thead>
+    
+            <tbody>
+                <t t-set="num" t-value="0"/>     
+    
+                    <t t-foreach="_lines" t-as="line">
+                        <tr>
+                            <td>
+                                <t t-set="num" t-value="num+1"/>
+                                <t t-esc="num" />
+                            </td>
+                            <td><t nowrap='nowrap' t-if="line.employee_id" t-esc="line.employee_id.name" /></td>
+                            <td><t nowrap='nowrap' t-if="line.employee_id.code_ids" t-esc="line.employee_id.code_ids.code" /></td>
+                            <td><t nowrap='nowrap' t-if="line.check_in" t-esc="localize(line.check_in, tz)" /></td>
+                            <td><t nowrap='nowrap' t-if="line.check_out" t-esc="localize(line.check_out, tz)" /></td>
+                            <td><t nowrap='nowrap' t-if="line.late_minutes" t-esc="line.late_minutes" /></td>
+                            <td><t nowrap='nowrap' t-if="line.worked_hours" t-esc="line.worked_hours"  t-options="{'widget': 'float_time'}"/></td>
+                            <td><t nowrap='nowrap' t-if="line.employee_id.job_id" t-esc="line.employee_id.job_id.name" /></td>
+                            <td><t nowrap='nowrap' t-if="line.location_id" t-esc="line.location_id.name" /></td>
+                        </tr>
+                    </t>
+            </tbody>
+        </table>
+    </template>
+
+    
+    <template id="sa_att_report" >
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout" t-lang="en_US">
+                    <div class="page">
+                        <style>
+                            th, td {
+                            padding: 0.30rem !important;
+                            border-top: 1px solid #212529 !important;
+                            border-bottom: 1px solid #212529 !important;
+                            }
+                        </style>
+                        <h2>Attendance Report</h2>
+
+                        <div class="row" style="margin-top: 32px; margin-bottom: 15px !important;font-size: 1.2em; font-family: 'Lato-Reg'">
+                            <div class="col-3" t-if="date_from">
+                                <strong>From:</strong>
+                                <p class="m-0" t-esc="date_from" />
+                            </div>
+                            <div class="col-3" t-if="date_to">
+                                <strong>To:</strong>
+                                <p class="m-0" t-esc="date_to" />
+                            </div>
+                       </div>
+
+                       <t t-set="_lines" t-value="att_lines(date_from, date_to, location_ids, department_ids, shift_ids, employee_ids)"/>
+                       <t t-call="softatt_attendance.attendance_report_content"/>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

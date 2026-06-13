@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='utf-8'?>
+
+<template xml:space='preserve'>
+
+    <t t-name="softatt_attendance.LateToday" owl = '1'>
+        <table class="table table-striped  ">
+            <thead>
+                <tr>
+                    <th scope="col">Punch Time</th>
+                    <th scope="col">Employee</th>
+                    <th scope="col">Department</th>
+                </tr>
+            </thead>
+            <tbody>
+                <t t-foreach="state.late_today" t-as="line" t-key="line.id">
+                    <tr >
+                        <td>
+                            <span class='badge text-bg-warning' style='font-size: 13px;' t-esc="line.check_in"/>  <b/> <t t-esc="line.late_minutes"/>
+                        </td>
+
+                        <td>
+                            <t t-esc="line.employee"/>
+                        </td>
+
+                        <td>
+                            <t t-esc="line.department"/>
+                        </td>
+                    </tr>
+                </t>
+
+
+            </tbody>
+        </table>
+    </t>
+
+</template>

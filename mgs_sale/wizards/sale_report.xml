@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="view_mgs_sale_report_wizard_form" model="ir.ui.view">
+        <field name="name">mgs.sale.report.wizard.form</field>
+        <field name="model">mgs.sale.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Sales Report Wizard">
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="user_id"/>
+                        <field name="team_id"/>
+                        <field name="pricelist_id"/>
+                    </group>
+                    <group>
+                        <field name="partner_id"/>
+                        <field name="product_id"/>
+                        <field name="categ_id"/>
+                        <field name="parent_categ_id"/>
+                        <field name="sales_tag_ids" widget="many2many_tags"/>
+                    </group>
+                    <group>
+                        <field name="report_type" widget="radio" class="o_horizontal_radio"/>
+                        <field name="group_by" invisible="1"/>
+                        <field name="company_id"/>
+                        <field name="currency_id"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="check_report" type="object" string="Generate Report" class="btn-primary"/>
+                    <button name="export_to_excel" type="object" string="EXCEL" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_mgs_sale_report_by_product" model="ir.actions.act_window">
+        <field name="name">MGS Sale Report BY PRODUCT</field>
+        <field name="res_model">mgs.sale.report.wizard</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_id" ref="view_mgs_sale_report_wizard_form"/>
+        <field name="context">{'default_group_by': 'item'}</field>
+        <field name="target">new</field>
+    </record>
+    <record id="action_mgs_sale_report_by_customer" model="ir.actions.act_window">
+        <field name="name">MGS Sale Report BY CUSTOMER</field>
+        <field name="res_model">mgs.sale.report.wizard</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_id" ref="view_mgs_sale_report_wizard_form"/>
+        <field name="context">{'default_group_by': 'customer'}</field>
+        <field name="target">new</field>
+    </record>
+    <menuitem id="menu_mgs_sale_report" name="MGS-Sale Reports" parent="sale.menu_sale_report" sequence="42"/>
+    <menuitem id="menu_sale_by_customer_report" name="By Customer" parent="menu_mgs_sale_report" action="action_mgs_sale_report_by_customer" sequence="1" />
+    <menuitem id="menu_sale_by_item_report" name="By Item" parent="menu_mgs_sale_report" action="action_mgs_sale_report_by_product" sequence="2" />
+</odoo>

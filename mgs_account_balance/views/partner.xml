@@ -1,0 +1,13 @@
+<odoo>
+    <record id="mgs_partner_balance_view_id" model="ir.ui.view">
+        <field name="name">res.partner.mgs.balance.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="mgs_debit" sum="mgs_debit"   optional="show"/>
+                <field name="mgs_credit" sum="mgs_credit" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

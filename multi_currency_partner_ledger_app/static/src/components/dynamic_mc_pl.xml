@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+    
+    <t t-name="multi_currency_partner_ledger_app.dynamic_mc_pl_template" owl="1">
+       HELLO
+    </t>
+    
+</templates>

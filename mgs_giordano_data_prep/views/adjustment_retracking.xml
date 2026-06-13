@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Access Rules -->
+    <record id="access_stock_serial_conversion_wizard_manager" model="ir.model.access">
+        <field name="name">stock.serial.conversion.wizard manager</field>
+        <field name="model_id" ref="model_stock_serial_conversion_wizard"/>
+        <field name="group_id" ref="stock.group_stock_manager"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="1"/>
+    </record>
+
+    <!-- Wizard Form View -->
+    <record id="stock_serial_conversion_wizard_view_form" model="ir.ui.view">
+        <field name="name">stock.serial.conversion.wizard.form</field>
+        <field name="model">stock.serial.conversion.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Convert to Serial Number Tracking">
+                <field name="state" invisible="1"/>
+
+                <div invisible="state != 'confirm'">
+                    <div class="alert alert-warning mb-3" role="alert">
+                        <strong>This action will:</strong>
+                        <ul class="mb-0 mt-1">
+                            <li>Create a <strong>draft inventory adjustment</strong> zeroing on-hand stock for each eligible product.</li>
+                            <li>Change product tracking to <strong>Serial Number</strong>.
+                            </li>
+                            <li>Generate an <strong>Excel file</strong> for re-entry of stock with serial numbers.</li>
+                        </ul>
+                        <div class="mt-2">
+                            Services, consumables, combos, and products already tracked by lot or serial will be silently ignored.
+                        </div>
+                    </div>
+                    <group>
+                        <field name="product_ids" widget="many2many_tags" readonly="1" string="Selected Products"/>
+                    </group>
+                </div>
+
+                <div invisible="state != 'done'">
+                    <div class="alert alert-success" role="alert" invisible="processed_count == 0">
+                        <i class="fa fa-check-circle me-1"/>
+                        <strong>
+                            <field name="processed_count" nolabel="1"/>
+                        </strong> product(s) successfully converted to serial number tracking.
+                    </div>
+                    <div class="alert alert-info" role="alert" invisible="ignored_count == 0">
+                        <i class="fa fa-info-circle me-1"/>
+                        <strong>
+                            <field name="ignored_count" nolabel="1"/>
+                        </strong> product(s) ignored (service, consumable, combo, lot-tracked, or already serial-tracked).
+                    </div>
+                    <div class="alert alert-danger" role="alert" invisible="failed_count == 0">
+                        <i class="fa fa-times-circle me-1"/>
+                        <strong>
+                            <field name="failed_count" nolabel="1"/>
+                        </strong> product(s) failed — their changes were rolled back:
+                        <pre class="mb-0 mt-1">
+                            <field name="failed_details" nolabel="1"/>
+                        </pre>
+                    </div>
+                    <div class="alert alert-warning" role="alert" invisible="fractional_count == 0">
+                        <i class="fa fa-exclamation-triangle me-1"/>
+                        <strong>
+                            <field name="fractional_count" nolabel="1"/>
+                        </strong> product(s) had fractional on-hand quantities — these were floored to the nearest whole unit:
+                        <pre class="mb-0 mt-1">
+                            <field name="fractional_details" nolabel="1"/>
+                        </pre>
+                    </div>
+                    <div class="mt-3" invisible="not excel_file">
+                        <field name="excel_file" widget="binary" filename="excel_filename" string="Download Serial Number Adjustment Sheet"/>
+                        <field name="excel_filename" invisible="1"/>
+                    </div>
+                </div>
+
+                <footer>
+                    <button string="Convert Products" name="action_convert" type="object" class="btn-primary" invisible="state != 'confirm'" confirm="Are you sure? This will zero out on-hand stock and switch tracking to Serial Number. This cannot be undone."/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Server Action bound to product.template list view -->
+    <record id="action_stock_serial_conversion" model="ir.actions.server">
+    <field name="name">Convert to Serial Number Tracking</field>
+    <field name="model_id" ref="product.model_product_template"/>
+    <field name="binding_model_id" ref="product.model_product_template"/>
+    <field name="binding_view_types">list</field>
+    <field name="group_ids" eval="[(4, ref('stock.group_stock_manager'))]"/>
+    <field name="state">code</field>
+    <field name="code">
+active_ids = env.context.get('active_ids', [])
+wizard = env['stock.serial.conversion.wizard'].create({
+    'product_ids': [(6, 0, active_ids)],
+})
+
+action = {
+    'type': 'ir.actions.act_window',
+    'res_model': 'stock.serial.conversion.wizard',
+    'view_mode': 'form',
+    'res_id': wizard.id,
+    'target': 'new',
+}
+    </field>
+</record>
+
+</odoo>

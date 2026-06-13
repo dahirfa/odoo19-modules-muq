@@ -1,0 +1,16 @@
+<odoo>
+    <data>
+        <!-- Inherit the account move form view -->
+        <record id="view_move_form_inherit" model="ir.ui.view">
+            <field name="name">account.move.form.inherit</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <!-- Add the new field after partner_id -->
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="mgs_partner_balance" invisible="partner_id == False" style="background-color:#03fefa;border:15px;border-radius:10px;width:40%;padding-left:10px;"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

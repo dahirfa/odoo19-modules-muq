@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_mct" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.mgs_cash_transfer</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="95"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="MGS Cash Transfer" string="MGS Cash Transfer" name="mgs_cash_transfer" groups="mgs_cash_transfer.group_mgs_cash_transfer_admin">
+                    <block title="Cash Transfer Settings" name="mgs_cash_transfer_config">
+                        <setting id="mgs_transfer_journal_id" string="Transfer Journal" company_dependent="0" help="Cash Internal Transfer Journal" title="Journal">
+                            <div class="content-group">
+                                <div class="row mt16">
+                                    <label for="mgs_transfer_journal_id" class="col-lg-3 o_light_label" string="Journal"/>
+                                    <field name="mgs_transfer_journal_id" options="{'no_create': True}"/>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+    <record id="res_config_settings_action_mct" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="context">{'module' : 'mgs_cash_transfer', 'bin_size': False}</field>
+    </record>
+</odoo>

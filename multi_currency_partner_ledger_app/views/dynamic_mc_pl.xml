@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    
+    <record id="action_dynamic_mc_pl" model="ir.actions.client">
+        <field name="name">Dynamic Multicurrency Partner Ledger</field>
+        <field name="tag">multi_currency_partner_ledger_app.dynamic_mc_pl_tag</field>
+    </record>
+
+
+
+
+
+
+    <menuitem name="Dynamic MultiCurrency Partner Ledger" action="action_dynamic_mc_pl" id="dynamic_mc_pl_id" parent="account.account_reports_management_menu" sequence="3"/>
+
+</odoo>

@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_mgs_invoice_report_wizard,mgs.invoice.report.wizard.access,model_mgs_account_invoice_report,account.group_account_manager,1,1,1,1
+access_mgs_gross_profit,mgs.gross_profit.access,model_mgs_account_gross_profit,account.group_account_manager,1,1,1,1
+access_mgs_account_statement,mgs.account_statement.access,model_mgs_account_account_statement,account.group_account_manager,1,1,1,1

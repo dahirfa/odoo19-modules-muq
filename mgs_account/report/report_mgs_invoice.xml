@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Qweb Report Action -->
+    <record id="action_report_mgs_invoice" model="ir.actions.report">
+        <field name="name">Invoice Report</field>
+        <field name="model">mgs_account.invoice_report</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">mgs_account.invoice_report</field>
+        <field name="print_report_name">'Invoice Report - ' + object.date_from + ' to ' + object.date_to</field>
+        <field name="binding_model_id" ref="model_mgs_account_invoice_report"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="invoice_report_detail">
+        <div class="page">
+            <div class="row">
+                <!-- Date Range -->
+                <div class="col-3" t-if="date_from or date_to">
+                    <strong>Date Range:</strong>
+                    <p t-if="date_from" t-esc="date_from" class="m-0"/>
+                    <p t-if="date_to" t-esc="date_to" class="m-0"/>
+                </div>
+                <!-- Report Type -->
+                <div class="col-3">
+                    <strong>Report Type:</strong>
+                    <p class="m-0" t-esc="'Invoices' if invoice_or_bill == 'invoice' else 'Bills'"/>
+                </div>
+                <!-- Partner -->
+                <div class="col-3" t-if="partner_id and partner_id[0]">
+                    <strong>Partner:</strong>
+                    <p class="m-0" t-esc="partner_id[1]"/>
+                </div>
+                <!-- Product -->
+                <div class="col-3" t-if="product_id and product_id[0]">
+                    <strong>Product:</strong>
+                    <p class="m-0" t-esc="product_id[1]"/>
+                </div>
+                <!-- Parent Category -->
+                <div class="col-3" t-if="parent_categ_id and parent_categ_id[0]">
+                    <strong>Parent Category:</strong>
+                    <p class="m-0" t-esc="parent_categ_id[1]"/>
+                </div>
+                <!-- Category -->
+                <div class="col-3" t-if="categ_id and categ_id[0]">
+                    <strong>Category:</strong>
+                    <p class="m-0" t-esc="categ_id[1]"/>
+                </div>
+                <!-- Salesperson -->
+                <div class="col-3" t-if="user_id and user_id[0]">
+                    <strong>Salesperson:</strong>
+                    <p class="m-0" t-esc="user_id[1]"/>
+                </div>
+                <!-- Sales Team -->
+                <div class="col-3" t-if="team_id and team_id[0]">
+                    <strong>Sales Team:</strong>
+                    <p class="m-0" t-esc="team_id[1]"/>
+                </div>
+                <!-- Company -->
+                <div class="col-3" t-if="company_id">
+                    <strong>Company:</strong>
+                    <p class="m-0" t-esc="company_id.name"/>
+                </div>
+            </div>
+            <table class="table table-bordered table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            <span t-if="group_by == 'partner'">Partner</span>
+                            <span t-if="group_by == 'item'">Product</span>
+                        </th>
+                        <th>Date</th>
+                        <th>Invoice Ref</th>
+                        <th class="text-end">Quantity</th>
+                        <th class="text-end">Total Without Tax</th>
+                        <th class="text-end">Tax Amount</th>
+                        <th class="text-end">Total Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-set="total_quantity" t-value="0"/>
+                    <t t-set="total_subtotal" t-value="0"/>
+                    <t t-set="total_tax" t-value="0"/>
+                    <t t-set="total_amount" t-value="0"/>
+                    <t t-foreach="grouped_lines.values()" t-as="group">
+                        <t t-set="group_name" t-value="group['partner_name'] if group_by == 'partner' else group['product_name']"/>
+                        <!-- Group Header Row -->
+                        <tr>
+                            <td colspan="7">
+                                <strong>
+                                    <t t-esc="group_name"/>
+                                </strong>
+                            </td>
+                        </tr>
+                        <!-- Invoice Lines under Group -->
+                        <t t-foreach="group['lines']" t-as="line">
+                            <tr>
+                                <td></td>
+                                <!-- Empty cell for Group Name -->
+                                <td>
+                                    <t t-esc="line['invoice_date']"/>
+                                </td>
+                                <td>
+                                    <t t-esc="line['invoice_number']"/>
+                                </td>
+                                <td class="text-end">
+                                    <t t-esc="'{0:,.2f}'.format(line['quantity'])"/>
+                                </td>
+                                <td class="text-end">
+                                    <t t-esc="'{0:,.2f}'.format(line.get('price_subtotal', 0))"/>
+                                </td>
+                                <td class="text-end">
+                                    <t t-esc="'{0:,.2f}'.format(line.get('tax_amount', 0))"/>
+                                </td>
+                                <td class="text-end">
+                                    <t t-esc="'{0:,.2f}'.format(line['price_total'])"/>
+                                </td>
+                            </tr>
+                        </t>
+                        <t t-set="total_quantity" t-value="total_quantity + group['quantity']"/>
+                        <t t-set="total_subtotal" t-value="total_subtotal + group['price_subtotal']"/>
+                        <t t-set="total_tax" t-value="total_tax + group['tax_amount']"/>
+                        <t t-set="total_amount" t-value="total_amount + group['price_total']"/>
+                        <!-- Subtotal Row -->
+                        <tr class="table-secondary">
+                            <td class="text-right" colspan="3">
+                                <strong>Total
+                                    <t t-esc="group_name"/>:
+                                </strong>
+                            </td>
+                            <td class="text-end">
+                                <strong>
+                                    <t t-esc="'{0:,.2f}'.format(group['quantity'])"/>
+                                </strong>
+                            </td>
+                            <td class="text-end">
+                                <strong>
+                                    <t t-esc="'{0:,.2f}'.format(group['price_subtotal'])"/>
+                                </strong>
+                            </td>
+                            <td class="text-end">
+                                <strong>
+                                    <t t-esc="'{0:,.2f}'.format(group['tax_amount'])"/>
+                                </strong>
+                            </td>
+                            <td class="text-end">
+                                <strong>
+                                    <t t-esc="'{0:,.2f}'.format(group['price_total'])"/>
+                                </strong>
+                            </td>
+                        </tr>
+                    </t>
+                    <!-- Overall Total Row -->
+                    <tr class="table-primary">
+                        <td class="text-right" colspan="3">
+                            <strong>Overall Total</strong>
+                        </td>
+                        <td class="text-end">
+                            <strong>
+                                <t t-esc="'{0:,.2f}'.format(total_quantity)"/>
+                            </strong>
+                        </td>
+                        <td class="text-end">
+                            <strong>
+                                <t t-esc="'{0:,.2f}'.format(total_subtotal)"/>
+                            </strong>
+                        </td>
+                        <td class="text-end">
+                            <strong>
+                                <t t-esc="'{0:,.2f}'.format(total_tax)"/>
+                            </strong>
+                        </td>
+                        <td class="text-end">
+                            <strong>
+                                <t t-esc="'{0:,.2f}'.format(total_amount)"/>
+                            </strong>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </template>
+
+    <template id="invoice_report_summary">
+        <div class="page">
+            <div class="row">
+                <!-- Date Range -->
+                <div class="col-3" t-if="date_from or date_to">
+                    <strong>Date Range:</strong>
+                    <p t-if="date_from" t-esc="date_from" class="m-0"/>
+                    <p t-if="date_to" t-esc="date_to" class="m-0"/>
+                </div>
+                <!-- Report Type -->
+                <div class="col-3">
+                    <strong>Report Type:</strong>
+                    <p class="m-0" t-esc="'Invoices' if invoice_or_bill == 'invoice' else 'Bills'"/>
+                </div>
+                <!-- Partner -->
+                <div class="col-3" t-if="partner_id and partner_id[0]">
+                    <strong>Partner:</strong>
+                    <p class="m-0" t-esc="partner_id[1]"/>
+                </div>
+                <!-- Product -->
+                <div class="col-3" t-if="product_id and product_id[0]">
+                    <strong>Product:</strong>
+                    <p class="m-0" t-esc="product_id[1]"/>
+                </div>
+                <!-- Parent Category -->
+                <div class="col-3" t-if="parent_categ_id and parent_categ_id[0]">
+                    <strong>Parent Category:</strong>
+                    <p class="m-0" t-esc="parent_categ_id[1]"/>
+                </div>
+                <!-- Category -->
+                <div class="col-3" t-if="categ_id and categ_id[0]">
+                    <strong>Category:</strong>
+                    <p class="m-0" t-esc="categ_id[1]"/>
+                </div>
+                <!-- Salesperson -->
+                <div class="col-3" t-if="user_id and user_id[0]">
+                    <strong>Salesperson:</strong>
+                    <p class="m-0" t-esc="user_id[1]"/>
+                </div>
+                <!-- Sales Team -->
+                <div class="col-3" t-if="team_id and team_id[0]">
+                    <strong>Sales Team:</strong>
+                    <p class="m-0" t-esc="team_id[1]"/>
+                </div>
+                <!-- Company -->
+                <div class="col-3" t-if="company_id">
+                    <strong>Company:</strong>
+                    <p class="m-0" t-esc="company_id.name"/>
+                </div>
+            </div>
+            <table class="table table-bordered table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            <span t-if="group_by == 'partner'">Partner</span>
+                            <span t-if="group_by == 'item'">Product</span>
+                        </th>
+                        <th class="text-end">Quantity</th>
+                        <th class="text-end">Total Without Tax</th>
+                        <th class="text-end">Tax Amount</th>
+                        <th class="text-end">Total Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-set="total_quantity" t-value="0"/>
+                    <t t-set="total_subtotal" t-value="0"/>
+                    <t t-set="total_tax" t-value="0"/>
+                    <t t-set="total_amount" t-value="0"/>
+                    <t t-foreach="grouped_lines.values()" t-as="group">
+                        <t t-set="group_name" t-value="group['partner_name'] if group_by == 'partner' else group['product_name']"/>
+                        <t t-set="total_quantity" t-value="total_quantity + group['quantity']"/>
+                        <t t-set="total_subtotal" t-value="total_subtotal + group['price_subtotal']"/>
+                        <t t-set="total_tax" t-value="total_tax + group['tax_amount']"/>
+                        <t t-set="total_amount" t-value="total_amount + group['price_total']"/>
+                        <!-- Summary Row -->
+                        <tr class="table-secondary">
+                            <td class="text-right">
+                                <t t-esc="group_name"/>
+                            </td>
+                            <td class="text-end">
+                                <t t-esc="'{0:,.2f}'.format(group['quantity'])"/>
+                            </td>
+                            <td class="text-end">
+                                <t t-esc="'{0:,.2f}'.format(group['price_subtotal'])"/>
+                            </td>
+                            <td class="text-end">
+                                <t t-esc="'{0:,.2f}'.format(group['tax_amount'])"/>
+                            </td>
+                            <td class="text-end">
+                                <t t-esc="'{0:,.2f}'.format(group['price_total'])"/>
+                            </td>
+                        </tr>
+                    </t>
+                    <!-- Overall Total Row -->
+                    <tr class="table-primary">
+                        <td class="text-right">
+                            <strong>Overall Total</strong>
+                        </td>
+                        <td class="text-end">
+                            <strong>
+                                <t t-esc="'{0:,.2f}'.format(total_quantity)"/>
+                            </strong>
+                        </td>
+                        <td class="text-end">
+                            <strong>
+                                <t t-esc="'{0:,.2f}'.format(total_subtotal)"/>
+                            </strong>
+                        </td>
+                        <td class="text-end">
+                            <strong>
+                                <t t-esc="'{0:,.2f}'.format(total_tax)"/>
+                            </strong>
+                        </td>
+                        <td class="text-end">
+                            <strong>
+                                <t t-esc="'{0:,.2f}'.format(total_amount)"/>
+                            </strong>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </template>
+
+    <!-- Main report template -->
+    <template id="invoice_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.internal_layout">
+                    <t t-if="report_type == 'detail'">
+                        <t t-call="mgs_account.invoice_report_detail"/>
+                    </t>
+                    <t t-elif="report_type == 'summary'">
+                        <t t-call="mgs_account.invoice_report_summary"/>
+                    </t>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
+

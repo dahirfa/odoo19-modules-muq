@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+	<t t-name="mgs_display_product_price.ProductCard" t-inherit="point_of_sale.ProductCard"
+	t-inherit-mode="extension">
+	<xpath expr="//div[hasclass('product-content')]" position="after">
+		
+		<div class="price-tag text-primary fw-bolder d-flex flex-row px-2 justify-content-between rounded-bottom rounded-3 flex-shrink-1">
+			<t t-esc=" this.env.utils.formatCurrency(props.product.list_price)"/>
+		</div>
+	</xpath>
+	</t>
+</templates>

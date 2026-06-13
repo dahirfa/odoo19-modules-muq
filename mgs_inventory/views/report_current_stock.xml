@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<!-- <report
+		id="action_current_stock"
+		name="mgs_inventory.current_stock_report"
+		model="mgs_inventory.current_stock_report"
+		string="Quantity on Hand by Location"
+		report_type="qweb-html"
+		paperformat="mgs_inventory_paperformat"
+		/> -->
+
+	<record id="action_current_stock" model="ir.actions.report">
+		<field name="name">Quantity on Hand by Location</field>
+		<field name="model">mgs_inventory.current_stock</field>
+		<field name="report_type">qweb-html</field>
+		<field name="report_name">mgs_inventory.current_stock_report</field>
+		<field name="binding_model_id" ref="model_mgs_inventory_current_stock"/>
+		<field name="binding_type">report</field>
+		<field name="paperformat_id" ref="mgs_inventory_paperformat"/>
+	</record>
+
+		<!--  paperformat="paperformat_custom" -->
+
+
+		<template id="current_stock_report">
+			<t t-call="web.html_container">
+				<t t-foreach="docs" t-as="doc">
+					<t t-call="web.internal_layout" t-lang="en_US">
+						<div class="page">
+							<style>
+								.table-sm td, th {
+									border: 1.2px solid black !important;
+								}
+							</style>
+							<h2 class="text-center">Quantity on Hand by Location</h2>
+							<div id="informations" class="row mt2 mb2" style="width: 90%; margin: auto">
+								<div class="col-auto mw-100 mb-2" t-if="date" name="date" style="width: 20%; float: left;">
+									<strong>Date:</strong>
+									<p class="m-0" t-esc="date"/>
+								</div>
+
+								<div class="col-auto mw-100 mb-2" t-if="categ_id[0]" name="categ_id[0]" style="width: 20%; float: left;">
+									<strong>Category:</strong>
+									<p class="m-0" t-esc="categ_id[1]"/>
+								</div>
+
+								<div class="col-auto mw-100 mb-2" t-if="parent_categ_id[0]" name="parent_categ_id[0]" style="width: 20%; float: left;">
+									<strong>Parent Category:</strong>
+									<p class="m-0" t-esc="parent_categ_id[1]"/>
+								</div>
+
+								<div class="col-auto mw-100 mb-2" t-if="product_id[0]" name="product_id[0]" style="width: 20%; float: left;">
+									<strong>Item:</strong>
+									<p class="m-0" t-esc="product_id[1]"/>
+								</div>
+
+								<div class="col-auto mw-100 mb-2" t-if="company_id" name="due_date" style="width: 20%; float: left;" groups="base.group_multi_company">
+									<strong>Company:</strong>
+									<p class="m-0" t-esc="company_id.id"/>
+								</div>
+							</div>
+
+							<table class="table table-bordered table-sm">
+								<thead>
+									<tr>
+										<th>Product</th>
+										<t t-foreach="location_ids" t-as="location">
+											<th><span t-esc="location.name"/></th>
+										</t>
+										<th style="text-align: right">Total</th>
+									</tr>
+								</thead>
+								<tbody>
+									<t t-set="data" t-value="lines(date, categ_id[0], product_id[0], location_ids.ids, company_id.id, parent_categ_id[0])"/>
+									<tr t-foreach="group_data_by_product(data, location_ids)" t-as="line">
+										<t t-set="total_qty_product" t-value="0"/>
+										<td><span t-esc="line['product']"/></td>
+
+										<t t-foreach="line['qty']" t-as="qty_location">
+											<td style="text-align: right"><span t-esc="'{0:,.2f}'.format(qty_location)"/></td>
+											<t t-set="total_qty_product" t-value="total_qty_product+qty_location"/>
+										</t>
+										<td style="text-align: right"><span t-esc="'{0:,.2f}'.format(total_qty_product)"/></td>
+									</tr>
+									<!-- <tr style="font-weight: bold; border-top: 2px solid #212529">
+										<td></td>
+										<td></td>
+										<td></td>
+										<td class="text-right"><span t-esc="'{0:,.2f}'.format(tot_qty_all)"/></td>
+									</tr> -->
+								</tbody>
+							</table>
+						</div> <!--page-->
+					</t> <!--web.external_layout-->
+				</t>
+			</t> <!--web.html_container-->
+		</template>
+	</odoo>

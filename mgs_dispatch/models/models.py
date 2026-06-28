@@ -138,6 +138,17 @@ class HEXP(models.Model):
 
     load_id=fields.Many2one('load.dispatch')
     trip_id=fields.Many2one('load.line.dispatch')
+    
+    def create(self, vals_list):
+        records = super().create(vals_list)
+
+        for rec in records:
+            if rec.load_id and not rec.analytic_distribution:
+                rec.analytic_distribution = {
+                    rec.load_id.analytic_acc_id.id: 100
+                }
+
+        return records
 
 
 class AccountMoveLine(models.Model):

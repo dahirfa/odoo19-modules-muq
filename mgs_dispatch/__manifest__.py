@@ -9,7 +9,7 @@
     "website": "https://www.meisour.com",
     "category": "Dispatching",
     "version": "19.0.1.0.0",
-    "depends": ["base", "mail", "account", "hr_expense"],
+    "depends": ["base", "mail", "account", "hr_expense", "analytic"],
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="receipt_report_template">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <style>
+                        th, td {
+                            padding: 0.30rem !important;
+                            border-top: 1.5px solid #212529 !important;
+                            border-bottom: 1.5px solid #212529 !important;
+                        }
+                        th {
+                            font-weight: bold;
+                        }
+                        .table.table-bordered.table-sm tr:nth-child(odd) {
+                            background-color: white !important;
+                        }
+                    </style>
+                    <div class="container" style="font-size:14px;font-family:Arial;margin-top:1px;">
+                        <h2 style="text-align:center; font-weight:bold; color:#333;">Receipt Report
+                            <t t-if="customer_name">
+                                <br/>   Customer:
+                                <t  t-esc="customer_name or '-'" />  
+                            </t>
+                        </h2>
+                        <br />
+                        <p style="text-align:center;"><strong>From:</strong> <t t-esc="docs['date_from'] or '-'"/> 
+                            <strong>To:</strong> <t t-esc="docs['date_to'] or '-'"/></p>
+                       
+                        <br />
+
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr style=" text-align:center;">
+                                    <t t-if="not customer_name">
+                                        <th>Customers</th>
+                                    </t>
+                                    
+                                    <th>Refence</th>
+                                    <th>Date</th>
+                                    <th>Goods</th>
+                                    <th>Photo</th>
+                                    <th>Ctn</th>
+                                    <th>Qty/Ctn</th>
+                                    <th>T.Qty</th>
+                                    <th>Size/Ctn</th>
+                                    <th>CBM</th>
+                                    <th>T.CBM</th>
+                                    <th>Weight KG</th>
+                                    <th>T.Weight</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <t t-foreach="receipt_lines" t-as="line">
+                                    <tr>
+                                        <t t-if="not customer_name">
+                                            <td>
+                                                <t t-esc="line.receipt_id.customer_id.name or '-'" />
+                                            </td>
+                                        </t>
+                                        
+                                        <td>
+                                            <t t-esc="line.reference or '-'" />
+                                        </td>
+                                        <td>
+                                            <t t-esc="line.receiver_date or '-'" />
+                                        </td>
+                                        <td>
+                                            <t t-esc="line.product_id.name or '-'" />
+                                        </td>
+                                        <td>
+                                            <img t-attf-src="data:image/*;base64,#{line.item_image}"
+                                                style="max-width: 60px; height: auto; border: 2px solid black; margin: 0px;" />
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <t t-esc="'{:.2f}'.format(line.ctn or 0)" />
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <t t-esc="'{:.2f}'.format(line.pcs or 0)" />
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <t t-esc="'{:.2f}'.format(line.t_qty or 0)" />
+                                        </td>
+                                        <td>
+                                            <t t-if="line.length and line.width and line.height">
+                                                <t
+                                                    t-esc="str(int(line.length)) + '*' + str(int(line.width)) + '*' + str(int(line.height))" />
+                                            </t>
+                                            <t t-else="">-</t>
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <t t-esc="'{:.2f}'.format(line.cbm or 0)" />
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <t t-esc="'{:.2f}'.format(line.t_cmb or 0)" />
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <t t-esc="'{:.2f}'.format(line.weight_kg or 0)" />
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <t t-esc="'{:.2f}'.format(line.t_weight or 0)" />
+                                        </td>
+
+
+                                    </tr>
+                                </t>
+
+                                <tr
+                                    style="background-color:#f5f5f5; font-weight:bold; text-align:center;">
+                                    <t t-if="customer_name">
+                                        <td colspan="4">TOTALS</td>
+                                    </t>
+                                    <t t-else="">
+                                        <td colspan="5">TOTALS</td>
+                                    </t>
+                                    
+                                    <td>
+                                        <t t-esc="total_ctn" />
+                                    </td>
+                                    <td>
+                                        <t t-esc="total_pcs" />
+                                    </td>
+                                    <td>
+                                        <t t-esc="total_t_qty" />
+                                    </td>
+                                    <td></td>
+                                    <td>
+                                        <t t-esc="total_cbm" />
+                                    </td>
+                                    <td>
+                                        <t t-esc="total_t_cmb" />
+                                    </td>
+                                    <td>
+                                        <t t-esc="total_weight_kg" />
+                                    </td>
+                                    <td>
+                                        <t t-esc="total_t_weight" />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

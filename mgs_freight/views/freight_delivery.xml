@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="freight_delivery_view_tree" model="ir.ui.view">
+        <field name="name">freight.delivery view tree</field>
+        <field name="model">freight.delivery</field>
+        <field name="arch" type="xml">
+            <list default_order="order_date desc">
+                <field name="name" />
+                <field name="order_date" />
+                <field name="vendor_id" />
+                <field name="shipper_id" />
+                <field name="container_no" />
+                <field name="bl_no" />
+                <field name="state" widget="badge"
+                    decoration-info="state == 'draft'" decoration-primary="state == 'confirmed'"
+                    decoration-success="state == 'bill'"/>
+            </list>
+        </field>
+    </record>
+
+    <!--Freight
+    delivery form view-->
+    <record id="freight_delivery_view_form" model="ir.ui.view">
+        <field name="name">freight.delivery view form</field>
+        <field name="model">freight.delivery</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirm,bill" />
+                    <button name="create_bill" string="Create Bill"
+                        invisible="state != 'confirm' or bill_id != False" type="object"
+                        class="btn-primary" />
+                    <button name="create_invoice" string="Create Invoices"
+                        invisible="state != 'confirm' or invoice_count != 0" type="object"
+                        class="btn-primary" />
+                    <button name="action_confirm" invisible="state != 'draft'" type="object"
+                        string="Confirm Order" class="oe_highlight"
+                        confirm="Are you sure you want to deliver?" />
+                    <button name="reset_to_draft" invisible="state == 'draft'" type="object"
+                        string="Reset to draft" class="oe_highlight" />
+                </header>
+                <sheet>
+                    <field name="bill_id" invisible="1" />
+                    <field name="invoice_ids" invisible="1" />
+                    <div class="oe_button_box" name="button_box">
+
+                        <button name="action_view_bill"
+                            type="object"
+                            class="oe_stat_button"
+                            invisible="bill_id == False"
+                            icon="fa-credit-card">
+                            <field name="bill_count" widget="statinfo" string="Bill" />
+                        </button>
+                        <button name="action_view_invoices"
+                            type="object"
+                            class="oe_stat_button"
+                            invisible="invoice_count == 0"
+                            icon="fa-credit-card">
+                            <field name="invoice_count" widget="statinfo" string="Invoices" />
+                        </button>
+
+                    </div>
+                    <group>
+                        <group>
+                            <field name="vendor_id" readonly="state == 'confirm'" />
+                            <field name="container_no" readonly="state == 'confirm'" />
+                            <field name="bl_no" readonly="state == 'confirm'" />
+                            <field name="customer_rate" readonly="state == 'confirm'" />
+                            <field name="vendor_rate" readonly="state == 'confirm'" />
+                            <field name="analytic_account_id" />
+
+                        </group>
+
+                        <group>
+                            <field name="shipper_id" readonly="state == 'confirm'" />
+                            <field name="order_date" readonly="state == 'confirm'" />
+                            <field name="expected_date" readonly="state == 'bill'" />
+                            <field name="source_port_id" readonly="state == 'confirm'" />
+                            <field name="destination_port_id" readonly="state == 'confirm'"/>
+                            <field name="company_id" invisible="1" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Delivery">
+
+                            <field name="delivery_ids" readonly="state in ['confirm', 'bill']">
+                                <list string="Delivery Lines">
+                                    <field name="receipt_id" string="Customer" />
+                                    <field name="description" />
+                                    <field name="ctn" />
+                                    <field name="cbm" />
+                                    <field name="rate" />
+                                    <field name="shipper_rate" />
+                                    <field name="total_cbm" />
+                                </list>
+                                <form>
+                                    <group>
+                                        <field name="receipt_id" string="Customer" />
+
+
+                                        <field name="product_ids">
+                                            <list string="Products" editable="bottom"
+                                                create="false"
+                                            >
+                                                <field name="select"/>
+                                                <field name="product_id" />
+                                                <field name="reference" />
+                                                <field name="model" />
+                                                <field name="size_ctn" />
+                                                <field name="item_image" widget="image"
+                                                    class="oe_avatar" />
+                                                <field name="ctn" />
+                                                <field name="pcs" />
+                                                <field name="t_qty" />
+                                                <field name="cbm" />
+                                                <field name="total_cbm" />
+                                            </list>
+                                        </field>
+
+                                    </group>
+
+                                </form>
+                            </field>
+
+                        </page>
+                        <page string="Services">
+                            <field name="service_ids" readonly="state in ['confirm', 'bill']">
+                                <list string="Services" editable="bottom">
+                                    <field name="product_id" />
+                                    <field name="price" string="Price" />
+
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                    <group class="oe_subtotal_footer oe_right" colspan="2">
+                        <div class="oe_inline o_td_label">
+                            <label for="total_ctn" string="Total CTN" />
+                        </div>
+                        <div class="oe_inline">
+                            <field name="total_ctn" readonly="1" nolabel="1" />
+                        </div>
+                    </group>
+                    <group class="oe_subtotal_footer oe_right" colspan="2">
+                        <div class="oe_inline o_td_label">
+                            <label for="total_cbm" string="Total CBM" />
+                        </div>
+                        <div class="oe_inline">
+                            <field name="total_cbm" readonly="1" nolabel="1" />
+                        </div>
+                    </group>
+                    <group class="oe_subtotal_footer oe_right" colspan="2">
+                        <div class="oe_inline o_td_label">
+                            <label for="total_price" string="Total Price" />
+                        </div>
+                        <div class="oe_inline">
+                            <field name="total_price" readonly="1" nolabel="1" />
+                        </div>
+                    </group>
+
+
+                </sheet>
+                <chatter />
+
+            </form>
+        </field>
+    </record>
+
+    <record id="freight_delivery_view_search" model="ir.ui.view">
+        <field name="name">freight_delivery.view.search</field>
+        <field name="model">freight.delivery</field>
+        <field name="arch" type="xml">
+            <search string="">
+                <field name="container_no"></field>
+                <field name="bl_no"></field>
+
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"  />
+                <filter name="confirm" string="Confirmed" domain="[('state', '=', 'confirm')]"  />
+                <filter name="bill" string="Billed" domain="[('state', '=', 'bill')]"  />
+
+                <filter name="status" string="Status"  context="{'group_by': 'state'}" />
+                <filter name="vendor" string="Vendor"  context="{'group_by': 'vendor_id'}" />
+                <filter name="shipper" string="Shipper"  context="{'group_by': 'shipper_id'}" />
+                <filter name="date" string="Date"  context="{'group_by': 'order_date'}" />
+                <filter name="source_port_id" string="Source Port"  context="{'group_by': 'source_port_id'}" />
+                <filter name="destination_port_id" string="Destination Port"  context="{'group_by': 'destination_port_id'}" />
+            </search>
+        </field>
+    </record>
+
+
+    <record id="freight_delivery_action" model="ir.actions.act_window">
+        <field name="name">Delivery</field>
+        <field name="res_model">freight.delivery</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Define a new Delivery
+            </p>
+        </field>
+    </record>
+
+    <!-- Sequance -->
+    <record id="freight_delivery_sequence" model="ir.sequence">
+        <field name="name">Freight Delivery Sequence</field>
+        <field name="code">freight.delivery</field>
+        <field name="prefix">FD/%(year)s/</field>
+        <field name="padding">5</field>
+    </record>
+    <menuitem
+        id="freight_delivery_menu"
+        name="Delivery"
+        action="freight_delivery_action"
+        parent="freight_menu"
+        sequence="3" />
+</odoo>

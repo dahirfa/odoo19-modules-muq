@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="delivery_report_template">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <style>
+                        th, td {
+                            padding: 0.30rem !important;
+                            border-top: 1.5px solid #212529 !important;
+                            border-bottom: 1.5px solid #212529 !important;
+                        }
+                        th {
+                            font-weight: bold;
+                        }
+                        .table.table-bordered.table-sm tr:nth-child(odd) {
+                            background-color: white !important;
+                        }
+                    </style>
+                    <div class="container" style="font-size:14px;font-family:Arial;margin-top:1px;">
+                        <h2 style="text-align:center; font-weight:bold; color:#333;">
+                            Load Report<br/>
+                            <span t-if="customer_name">Customer: <t t-esc="customer_name or '-'" /></span>
+                        </h2>
+                        <br/>
+
+                        <t t-foreach="docs" t-as="doc" t-if="delivery_id  ">
+                            <div class="row" style="margin-top: 32px !important;font-size: 1.1em;">
+                                <div class="col-2">
+                                    <strong>Delivery Date:</strong>
+                                    <p t-esc="doc.order_date" t-options="{'widget': 'date'}"/>
+    
+                                </div>
+                                <div class="col-2">
+                                    <strong>Order Number:</strong>
+                                    <p class="m-0" t-esc="doc.name or '-'"/>
+                                </div>
+                                <div class="col-2">
+                                    <strong>Container Number:</strong>
+                                    <p class="m-0" t-esc="doc.container_no"/>
+                                </div>
+                                <div class="col-2">
+                                    <strong>Bill Number:</strong>
+                                    <p class="m-0" t-esc="doc.bl_no or '-' "/>
+                                </div>
+                                <div class="col-2">
+                                    <strong>Loading Port:</strong>
+                                    <p class="m-0" t-esc="doc.source_port_id.name or '-'"/>
+                                </div>
+                                <div class="col-2">
+                                    <strong>Destination Port:</strong>
+                                    <p class="m-0" t-esc="doc.destination_port_id.name or '-'"/>
+                                </div>
+                            </div>
+                            
+                            <br/>
+                        </t>
+
+                        <!-- Table headers appear ONCE -->
+                        <table class="table table-bordered table-sm" style="background: white;">
+                            <thead>
+                                <tr style=" text-align:center;">
+                                    <th t-if="not summary">Reference</th>
+                                    <th t-if="add_customer and summary">Customer</th>
+                                    <th t-if="not summary">Photo</th>
+                                    <th t-if="summary and customer_name and not delivery_id">Container</th>
+                                    <th t-if="summary and customer_name and not delivery_id">Deprature Date</th>
+                                    <th t-if="summary and customer_name and not delivery_id">Arrival Date</th>
+                                    <th>Goods</th>
+                                    <th>Carton</th>
+                                    <th t-if="not summary">Pcs/Ctn</th>
+                                    <th t-if="not summary">Quantities</th>
+                                    <th t-if="not summary">Size/Ctn</th>
+                                    <th>CBM Load</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <!-- Summary View -->
+                                <t t-if="summary">
+                                    <t t-foreach="delivery_lines" t-as="line">
+                                        <tr>
+                                            <td t-if="add_customer"><t t-esc="line.receipt_id.customer_id.name or '-'" /></td>
+                                            <td t-if="summary and customer_name and not delivery_id"><t t-esc="line.delivery_id.container_no or '-'" /></td>
+                                            <td t-if="summary and customer_name and not delivery_id"><t t-esc="line.delivery_id.order_date or '-'" /></td>
+                                            <td t-if="summary and customer_name and not delivery_id"><t t-esc="line.delivery_id.expected_date or '-'" /></td>
+                                            <td style="max-width: 70px"><t t-esc="line.description or '-'" /></td>
+                                            
+                                            <td style="text-align:center;"><t t-esc="'{:.2f}'.format(line.ctn or 0)" /></td>
+                                            <td style="text-align:center;"><t t-esc="'{:.2f}'.format(line.cbm or 0)" /></td>
+                                        </tr>
+                                    </t>
+                                    <tr style="background-color:#f5f5f5; font-weight:bold; text-align:center;">
+                                        <td>TOTALS</td>
+                                        <td t-if="add_customer"></td>
+                                        <td t-if="summary and customer_name and not delivery_id"></td>
+                                        <td t-if="summary and customer_name and not delivery_id"></td>
+                                        <td t-if="summary and customer_name and not delivery_id"></td>
+                                        <td><t t-esc="total_ctn" /></td>
+                                        <td><t t-esc="total_cbm" /></td>
+                                    </tr>
+                                </t>
+
+                                <!-- Detailed View -->
+                                <t t-if="not summary">
+                                    <t t-foreach="delivery_lines" t-as="product">
+                                        <tr>
+                                            <td><t t-esc="product.reference or '-'" /></td>
+                                            <td>
+                                                <img t-attf-src="data:image/*;base64,#{product.item_image}"
+                                                    style="max-width: 60px; height: auto; border: 1px solid #333;" />
+                                            </td>
+                                            <td><t t-esc="product.product_id.name or '-'" /></td>
+                                            <td style="text-align:center;"><t t-esc="'{:.2f}'.format(product.ctn or 0)" /></td>
+                                            <td style="text-align:center;"><t t-esc="'{:.2f}'.format(product.pcs or 0)" /></td>
+                                            <td style="text-align:center;"><t t-esc="'{:.2f}'.format(product.t_qty or 0)" /></td>
+                                            <td style="text-align:center;"><t t-esc="product.size_ctn" /></td>
+                                            <td style="text-align:center;"><t t-esc="'{:.2f}'.format(product.total_cbm or 0)" /></td>
+                                        </tr>
+                                    </t>
+                                    <tr style="background-color:#f5f5f5; font-weight:bold; text-align:center;">
+                                        <td colspan="3">TOTALS</td>
+                                        <td><t t-esc="'{:.2f}'.format(total_ctn or 0)" /></td>
+                                        <td><t t-esc="'{:.2f}'.format(total_pcs or 0)" /></td>
+                                        <td><t t-esc="'{:.2f}'.format(total_quantities or 0)" /></td>
+                                        <td></td>
+                                        <td><t t-esc="'{:.2f}'.format(total_cbm or 0)" /></td>
+                                    </tr>
+                                </t>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

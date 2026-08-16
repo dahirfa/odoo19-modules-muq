@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="freight_receipt_wizard" model="ir.ui.view">
+            <field name="name">freight.receipt.wizard</field>
+            <field name="model">freight.receipt.wizard</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <group >
+                        <field name="customer_id"/>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <footer>
+                        <button name="print_report" type="object" string="Print" class="btn btn-primary active" icon="fa-file-pdf-o" data-toggle="tooltip" />
+                        or
+                        <button string="Cancel" class="btn btn-danger" special="cancel" icon="fa-times"/>
+                    </footer>
+
+                </form>
+            
+            </field>
+        </record>
+
+        
+        <record id="freight_receipt_wizard_action" model="ir.actions.act_window">
+            <field name="name">Receipt Report</field>
+            <field name="res_model">freight.receipt.wizard</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="freight_receipt_wizard"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem
+            id="receipt_wizard_menu"
+            name="Receipt"
+            action="freight_receipt_wizard_action"
+            parent="reports_menu"
+            sequence="2"/>
+
+    </data>
+</odoo>

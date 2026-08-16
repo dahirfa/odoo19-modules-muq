@@ -1,0 +1,26 @@
+<odoo>
+    <record id="group_freight_manager" model="res.groups">
+        <field name="name">Freight Manager</field>
+    </record>
+    <record id="group_freight_user" model="res.groups">
+        <field name="name">Freight User</field>
+    </record>
+
+    <record model="ir.rule" id="freight_receipts_comp_rule">
+        <field name="name">freight receipts multi-company</field>
+        <field name="model_id" ref="model_freight_receipts"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record model="ir.rule" id="freight_delivery_comp_rule">
+        <field name="name">freight delivery multi-company</field>
+        <field name="model_id" ref="model_freight_delivery"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record model="ir.rule" id="freight_port_comp_rule">
+        <field name="name">freight port multi-company</field>
+        <field name="model_id" ref="model_freight_port"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+   
+   
+</odoo>

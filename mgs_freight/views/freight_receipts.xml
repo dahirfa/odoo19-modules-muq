@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="freight_receipts_tree" model="ir.ui.view">
+        <field name="name">freight.receipts.tree</field>
+        <field name="model">freight.receipts</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="customer_id" />
+                <field name="total_ctn" sum="Total CTN" />
+                <field name="total_cbm" sum="Total CBM" />
+                <field name="total_ctn_delivered" sum="Total ctn Delivered" />
+                <field name="total_remaining" sum="Total Remaining" />
+
+            </list>
+        </field>
+    </record>
+
+    <record id="freight_receipts_form" model="ir.ui.view">
+        <field name="name">freight.receipts.form</field>
+        <field name="model">freight.receipts</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_open_transfer_wizard"
+                    type="object"
+                    string="Transfer"
+                    class="btn-primary"
+                    icon="fa-exchange"/>
+
+                </header>
+                <sheet>
+                    <div name="button_box" class="oe_button_box">
+                        <button name="action_view_deliveries"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-truck">
+                            <field name="delivery_count" widget="statinfo" string="Deliveries"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name" />
+                            <field name="customer_id" />
+                            <field name="company_id" invisible="1" />
+                        </group>
+                        <notebook>
+                            <page string="Products">
+                                <field name="freight_receipt_ids">
+                                    
+                                    
+                                </field>
+                                <group class="oe_subtotal_footer oe_right" colspan="2">
+                                    <div class="oe_inline o_td_label">
+                                        <label for="total_ctn" string="Total CTN" />
+                                    </div>
+                                    <div class="oe_inline">
+                                        <field name="total_ctn" readonly="1" nolabel="1" />
+                                    </div>
+                                </group>
+
+                                <group class="oe_subtotal_footer oe_right" colspan="2">
+                                    <div class="oe_inline o_td_label">
+                                        <label for="total_cbm" string="Total CBM" />
+                                    </div>
+                                    <div class="oe_inline">
+                                        <field name="total_cbm" readonly="1" nolabel="1" />
+                                    </div>
+                                </group>
+
+                                <group class="oe_subtotal_footer oe_right" colspan="2">
+                                    <div class="oe_inline o_td_label">
+                                        <label for="total_ctn_delivered"
+                                            string="Total CTN Delivered" />
+                                    </div>
+                                    <div class="oe_inline">
+                                        <field name="total_ctn_delivered" readonly="1" nolabel="1" />
+                                    </div>
+                                </group>
+
+
+                                <group class="oe_subtotal_footer oe_right" colspan="2">
+                                    <div class="oe_inline o_td_label">
+                                        <label for="total_remaining" string="Total Remaining" />
+                                    </div>
+                                    <div class="oe_inline">
+                                        <field name="total_remaining" readonly="1" nolabel="1" />
+                                    </div>
+                                </group>
+                            </page>
+                        </notebook>
+                    </group>
+                </sheet>
+                <chatter />
+            </form>
+        </field>
+    </record>
+
+    <record id="freight_receipt_line_view_tree" model="ir.ui.view">
+        <field name="name">freight.receipt.line.view.tree</field>
+        <field name="model">freight.receipt.line</field>
+        <field name="arch" type="xml">
+            <list string="" default_order="receiver_date desc">
+                <field name="receiver_date" />
+                <field name="product_id" />
+                <field name="model" />
+                <field name="reference" />
+                <field name="item_image" widget="image" class="oe_avatar" />
+                <field name="ctn" />
+                <field name="pcs" />
+                <field name="t_qty" />
+                <field name="cbm" />
+                <field name="t_cmb" />
+                <field name="weight_kg" />
+                <field name="t_weight" />
+                <field name="ctn_delivered" />
+                <field name="remaining" readonly="1" />
+            </list>
+        </field>
+    </record>
+    <record id="freight_receipt_line_view_form" model="ir.ui.view">
+        <field name="name">freight.receipt.line.view.form</field>
+        <field name="model">freight.receipt.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="item_image" widget="image"
+                            class="oe_avatar" />
+                        <field name="receiver_date" />
+                        <field name="product_id"
+                            domain="[('type', '=', 'service')]"
+                        />
+                        <field name="suppler_no" />
+                        <field name="model" />
+                        <field name="reference" />
+
+                        <field name="ctn" />
+                        <field name="pcs" />
+                        <field name="t_qty" />
+                    </group>
+                    <group>
+                        <field name="length" />
+                        <field name="width" />
+                        <field name="height" />
+                        <field name="cbm" />
+                        <field name="t_cmb" />
+                        <field name="weight_kg" />
+                        <field name="t_weight" />
+                        <field name="ctn_delivered" />
+                        <field name="remaining" readonly="1" />
+                    </group>
+                </group>
+            </form>
+        </field>
+    </record>
+    <record id="freight_receipt_action" model="ir.actions.act_window">
+        <field name="name">Receipts</field>
+        <field name="res_model">freight.receipts</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Define a new receipt
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+        id="freight_receipt_menu"
+        name="Receipts"
+        action="freight_receipt_action"
+        parent="freight_menu"
+        sequence="2" />
+
+</odoo>

@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <!-- Server Action to Open Change Password Wizard -->
+    <record id="action_open_change_password_wizard_from_partner" model="ir.actions.server">
+        <field name="name">Change User Password</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="state">code</field>
+        <field name="code">
+        action = records.action_open_change_password_wizard()
+        </field>
+    </record>
+
+    <!-- Inherit Partner Form View -->
+    <record id="view_partner_form_inherit_password_button" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.password.button</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                <button name="%(action_open_change_password_wizard_from_partner)d" type="action" class="oe_stat_button" icon="fa-key" string="Change Password" invisible="not user_ids" />
+            </xpath>
+        </field>
+    </record>
+</odoo>

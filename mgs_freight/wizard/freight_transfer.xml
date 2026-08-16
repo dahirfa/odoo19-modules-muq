@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="view_freight_line_transfer_wizard_form" model="ir.ui.view">
+        <field name="name">freight.line.transfer.wizard.form</field>
+        <field name="model">freight.line.transfer.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Transfer Lines">
+                <group>
+                    <field name="receipt_id"/>
+                    <field name="new_receipt_id" />
+                    
+
+                </group>
+                <field name="line_ids" />
+                <footer>
+                    <button name="action_transfer_lines" type="object" string="Transfer" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    
+</odoo>

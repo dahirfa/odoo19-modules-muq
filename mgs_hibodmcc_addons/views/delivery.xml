@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+
+    <record id="view_picking_form_inherit_stock_" model="ir.ui.view">
+        <field name="name">stock.picking.view.form.inherit</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+
+            <field name="picking_type_id" position="after">
+                <field name="driver" readonly="state == 'done'" />
+                <field name="truck_num" readonly="state == 'done'" />
+            </field>
+             <field name="origin" position="after">
+                <field name="order_num" readonly="state == 'done'" />
+                <field name="difference" readonly="state == 'done'" />
+                <field name="bill_to" readonly="state == 'done'" />
+                <field name="deliver_to" readonly="state == 'done'" />
+                <field name="intercom_location" readonly="state == 'done'" />
+                <field name="loading_point" readonly="state == 'done'" />
+            </field>
+
+            <field name="location_dest_id" position="after">
+                <field name="intercoms" readonly="state == 'done'" />
+                <field name="transporter_id" readonly="state == 'done'" />
+               
+            </field>
+
+            <field name="product_uom_qty" position="attributes">
+                <attribute name="sum">Total Demand</attribute>
+            </field>
+
+            <field name="quantity" position="attributes">
+                <attribute name="sum">Total Demand</attribute>
+            </field>
+
+            <field name="product_uom_qty" position="after">
+                <field name="sales_price" sum="Total Sales Price" />
+            </field>
+
+            <xpath expr="//page[@name='operations']" position="after">
+                <page string="Proforma Invoice" name="proforma_invoice">
+                    <field name="proforma_invoice_ids">
+                        <list editable="bottom">
+                            <field name="product_id"/>
+                            <field name="description"/>
+                            <field name="quantity"/>
+                            <field name="uom"/>
+                            <field name="unit_price"/>
+                            <field name="tax_amount"/>
+                            <field name="net_amount"/>
+                        </list>
+                    </field>
+                    <group class="oe_subtotal_footer">
+                        <field name="proforma_total" widget="monetary" class="oe_subtotal_footer_separator"/>
+                    </group>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

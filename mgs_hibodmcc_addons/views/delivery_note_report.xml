@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="delviery_note_report">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+
+                <t t-foreach="docs" t-as="mo">
+
+                    <div style="font-family: Helvetica, page-break-before: always; page-break-inside: avoid; overflow: hidden; sans-serif;" class="page">
+
+                        <h2 style="text-align:center">PROFORMA INVOICE</h2>
+                        <br />
+                        <div class="row">
+                            <div class="col-8">
+                                <span style="font-weight:bold" t-esc="'Invoice No:'" />
+                                <span t-esc="mo.name" />
+                            </div>
+                            <div class="col-4">
+                                <span style="font-weight:bold" t-esc="'Date:'" />
+                                <span t-esc="mo.scheduled_date.strftime('%d-%m-%Y')" />
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <div class="col-8">
+                                <span style="font-weight:bold" t-esc="'Consignee Name:'" />
+                                <span t-esc="mo.partner_id.name" />
+                            </div>
+                            <div class="col-4">
+                                <span style="font-weight:bold" t-esc="'Currency:'" />
+                                <span t-esc="mo.currency_id.name" />
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <table class="table table-borderless">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                        Bill-To
+                                        </th>
+                                        <th>
+                                        Deliver-To
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <span t-esc="mo.bill_to.name"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="mo.deliver_to.name"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <t t-set="counter" t-value="0" />
+                        <div class="row">
+                            <table class="table table-borderless">
+                                <thead>
+                                    <tr>
+                                        <th> # </th>
+                                        <th> Item </th>
+                                        <th> Description </th>
+                                        <th style="text-align:right"> Qty </th>
+                                        <th> UoM </th>
+                                        <!-- <th> Delivery No </th> -->
+                                        <th style="text-align:right"> Unit Price </th>
+                                        <th style="text-align:right"> Tax Amount </th>
+                                        <th style="text-align:right"> Net Amount </th>
+                                    </tr>
+                                </thead>
+                                <t t-foreach="mo.proforma_invoice_ids" t-as="lines">
+                                    <t t-set="counter" t-value="counter + 1" />
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <span t-esc="counter"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="lines.product_id.name"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="lines.description"/>
+                                            </td>
+                                            <td style="text-align:right">
+                                                <span t-esc="'{:,.3f}'.format(lines.quantity)"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="lines.product_id.uom_id.name"/>
+                                            </td>
+                                            <!-- <td>
+                                                <span t-esc="mo.name"/>
+                                            </td> -->
+                                            <td style="text-align:right">
+                                                <span t-esc="mo.currency_id.symbol"/>
+                                                <span t-esc="'{:,.2f}'.format(lines.unit_price)"/>
+                                            </td>
+                                            <td style="text-align:right">
+                                                <span t-esc="mo.currency_id.symbol"/>
+                                                <span t-esc="'{:,.2f}'.format(lines.tax_amount)"/>
+                                            </td>
+                                            <td style="text-align:right">
+                                                <span t-esc="mo.currency_id.symbol"/>
+                                                <span t-esc="'{:,.2f}'.format(lines.net_amount)"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </t>
+                            </table>
+                        </div>
+                        <br />
+                        <div class="row" style="border:solid 1px black;">
+
+                            <div class="col-12">
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="width: 50%;" rowspan="3">
+                                            <img src="/mgs_hibodmcc_addons/static/description/Hibo Tiimbare.png" alt="Hibo Tiimbare" style="max-width: 50%; margin-left:25%; height: auto;"/>
+                                        </td>
+                                        <td style="padding-left: 5px;">Net Amount</td>
+                                        <td style="text-align: right; padding: 4px;">
+                                            <span t-esc="mo.currency_id.symbol"/>
+                                            <span t-esc="'{:,.2f}'.format(mo.mgs_net - mo.mgs_tax_total)" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding-left: 5px;">Tax</td>
+                                        <td style="text-align: right; padding: 4px;">
+                                            <span t-esc="mo.currency_id.symbol"/>
+                                            <span t-esc="'{:,.2f}'.format(mo.mgs_tax_total)" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding-left: 5px;">Gross Amount</td>
+                                        <td style="text-align: right; padding: 4px;">
+                                            <span t-esc="mo.currency_id.symbol"/>
+                                            <span t-esc="'{:,.2f}'.format(mo.proforma_total)" />
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row" style="border:solid 1px black;">
+                            <div class="col-12">
+                                <h5 style="border:solid 1px black;"> Additional Information </h5>
+                                <span style="font-weight:bold" t-esc="'Truck No:'" />
+                                <span t-esc="mo.truck_num" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Force New Page -->
+                    <div style="page-break-before: always;"></div>
+
+                    <div style="font-family: Arial, page-break-before: always; page-break-inside: avoid; overflow: hidden; sans-serif;" class="page">
+
+                        <h2 style="text-align:center">DELIVERY NOTE</h2>
+                        <br />
+                        <div class="row">
+                            <div class="col-12">
+                                <p>
+                                    <span style="font-weight:bold" t-esc="'Reference:'" />
+                                    <span t-esc="mo.name" />
+                                </p>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <div class="col-8">
+                                <span style="font-weight:bold" t-esc="'Consignee Name:'" />
+                                <span t-esc="mo.partner_id.name" />
+                            </div>
+                            <div class="col-4">
+                                <span style="font-weight:bold" t-esc="'Date:'" />
+                                <span t-esc="mo.scheduled_date.strftime('%d-%m-%Y')" />
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <table class="table table-borderless">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                        Bill-To
+                                        </th>
+                                        <th>
+                                        Deliver-To
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <span t-esc="mo.bill_to.name"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="mo.deliver_to.name"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <t t-set="counter" t-value="0" />
+
+                        <div class="row">
+                            <table class="table table-borderless">
+                                <thead>
+                                    <tr>
+                                        <th> # </th>
+                                        <th> Item </th>
+                                        <th> Description </th>
+                                        <th style="text-align:right"> Order Qty </th>
+                                        <th> UoM </th>
+                                        <th style="text-align:right"> Actual Quantity </th>
+
+                                    </tr>
+                                </thead>
+                                <t t-foreach="mo.move_ids" t-as="lines">
+                                    <t t-set="counter" t-value="counter + 1" />
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <span t-esc="counter"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="lines.product_id.name"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="lines.description_picking"/>
+                                            </td>
+                                            <td style="text-align:right">
+                                                <span t-esc="'{:,.3f}'.format(lines.product_uom_qty)"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="lines.product_id.uom_id.name"/>
+                                            </td>
+                                            <td style="text-align:right">
+                                                <span t-esc="'{:,.3f}'.format(lines.quantity)"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </t>
+                            </table>
+                        </div>
+                        <br />
+                        <div class="row" style="border:solid 1px black;">
+                            <div style="padding-left:5px;" class="col-12">
+                                <h5 style="border-bottom:solid 1px black;"> Delivery Information </h5>
+                                <span style="font-weight:bold" t-esc="'Intercoms:'" />
+                                <span t-esc="mo.intercoms" />
+                                <br />
+                                <span style="font-weight:bold" t-esc="'Intercom Location:'" />
+                                <span t-esc="mo.intercom_location" />
+                                <img src="/mgs_hibodmcc_addons/static/description/Hibo Tiimbare.png" alt="Hibo Tiimbare" style="max-width: 25%; margin-left:25%; height: auto;"/>
+                                <br />
+                                <span style="font-weight:bold" t-esc="'Loading Point:'" />
+                                <span t-esc="mo.loading_point" />
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row" style="border:solid 1px black;">
+                            <div style="padding-left:5px;" class="col-12">
+                                <h5 style="border-bottom:solid 1px black;"> Additional Information </h5>
+                                <span style="font-weight:bold" t-esc="'Truck No:'" />
+                                <span t-esc="mo.truck_num" />
+                                <br />
+                                <span style="font-weight:bold" t-esc="'Driver Name:'" />
+                                <span t-esc="mo.driver" />
+                                <br />
+                                <span style="font-weight:bold" t-esc="'Transporter:'" />
+                                <span t-esc="mo.transporter_id.name" />
+                            </div>
+                        </div>
+                    </div>
+
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Report Actions -->
+    <record id="action_print_report_delivery_note" model="ir.actions.report">
+        <field name="name">Delivery Note</field>
+        <field name="model">stock.picking</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="binding_view_types">form</field>
+        <field name="report_name">mgs_hibodmcc_addons.delviery_note_report</field>
+        <field name="report_file">mgs_hibodmcc_addons.delviery_note_report</field>
+        <field name="print_report_name">'Delivery Note'</field>
+        <field name="binding_model_id" ref="stock.model_stock_picking" />
+    </record>
+</odoo>

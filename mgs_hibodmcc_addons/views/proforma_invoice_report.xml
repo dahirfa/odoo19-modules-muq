@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="proforma_invoice_report">
+        <t t-call="web.html_container"></t>
+        <t t-call="web.external_layout">
+
+            <t t-foreach="docs" t-as="mo">
+                <div style="font-family: Helvetica, sans-serif;" class="page">
+
+                    <h2 style="text-align:center">PROFORMA INVOICE</h2>
+                    <br />
+                    <div class="row">
+                        <div class="col-8">
+                            <span style="font-weight:bold" t-esc="'Invoice No:'" />
+                            <span t-esc="mo.name" />
+                        </div>
+                        <div class="col-4">
+                            <span style="font-weight:bold" t-esc="'Date:'" />
+                            <span t-esc="mo.invoice_date.strftime('%Y-%m-%d') if mo.invoice_date else ''" />
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-8">
+                            <span style="font-weight:bold" t-esc="'Consignee Name:'" />
+                            <span t-esc="mo.partner_id.name" />
+                        </div>
+                        <div class="col-4">
+                            <span style="font-weight:bold" t-esc="'Currency:'" />
+                            <span t-esc="mo.currency_id.name" />
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <table class="table table-borderless">
+                            <thead>
+                                <tr>
+                                    <td>
+                                        Bill-To
+                                    </td>
+                                    <td>
+                                        Deliver-To
+                                    </td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <span t-esc="mo.bill_to.name"/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="mo.deliver_to.name"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <t t-set="counter" t-value="0" />
+                    <div class="row">
+                        <table class="table table-borderless">
+                            <thead>
+                                <tr>
+                                    <td> # </td>
+                                    <td> Item </td>
+                                    <td> Description </td>
+                                    <td> Qty </td>
+                                    <td> UoM </td>
+                                    <td> Delivery No </td>
+                                    <td> Unit Price </td>
+                                    <td> Tax Amount </td>
+                                    <td> Net Amount </td>
+                                </tr>
+                            </thead>
+                            <t t-foreach="mo.invoice_line_ids" t-as="lines">
+                                <t t-set="counter" t-value="counter + 1" />
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <span t-esc="counter"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="lines.product_id.name"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="lines.name"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="lines.quantity"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="lines.product_id.uom_id.name"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc=""/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="mo.currency_id.symbol"/>
+                                            <span t-esc="'%.2f' % (lines.price_unit)"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="mo.currency_id.symbol"/>
+                                            <span t-esc="'%.2f' % (lines.price_subtotal * (lines.tax_ids.amount / 100) if lines.tax_ids else 0)"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="mo.currency_id.symbol"/>
+                                            <span t-esc="'%.2f' % (lines.price_subtotal)"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </t>
+                        </table>
+                    </div>
+                    <br />
+                    <div class="row" style="border:solid 1px black;">
+                        
+                        <div class="col-12">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="width: 50%;"></td>
+                                    <td>Net Amount</td>
+                                    <td style="text-align: right; padding: 4px;">
+                                        <span t-esc="mo.currency_id.symbol"/>
+                                        <span t-esc="'%.2f' % (mo.amount_untaxed_in_currency_signed)" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td>Tax</td>
+                                    <td style="text-align: right; padding: 4px;">
+                                        <span t-esc="mo.currency_id.symbol"/>
+                                        <span t-esc="'%.2f' % (mo.amount_tax_signed)" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td>Gross Amount</td>
+                                    <td style="text-align: right; padding: 4px;">
+                                        <span t-esc="mo.currency_id.symbol"/>
+                                        <span t-esc="'%.2f' % (mo.amount_total_in_currency_signed)" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row" style="border:solid 1px black;">
+                        <div class="col-12">
+                            <h5 style="border:solid 1px black;"> Additional Information </h5>
+                            <span style="font-weight:bold" t-esc="'Truck No:'" />
+                            <span t-esc="mo.truck_num" />
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- Report Actions -->
+    <record id="action_print_report_proforma_invoice" model="ir.actions.report">
+        <field name="name">Proforma Invoice</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="binding_view_types">form</field>
+        <field name="report_name">mgs_hibodmcc_addons.proforma_invoice_report</field>
+        <field name="report_file">mgs_hibodmcc_addons.proforma_invoice_report</field>
+        <field name="print_report_name">'Proforma Invoice'</field>
+        <field name="binding_model_id" ref="account.model_account_move" />
+    </record>
+</odoo>

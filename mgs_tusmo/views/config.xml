@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="res_config_settings_view_form_tusmo_bank" model="ir.ui.view">
+        <field name="name">res.config.settings.view.weight.integration</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="40"/>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//setting[@id='use_invoice_terms']" position="after">
+                <setting help="Custom Bank Text">
+                    <field name="custom_bank_text" class="oe_account_terms mt-5 w-100"/>
+                </setting>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

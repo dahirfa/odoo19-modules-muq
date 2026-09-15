@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
+
+access_mgs_mass_mail_log,mgs_sms_marketing.mgs_mass_mail_log,model_mgs_mass_mail_log,group_mgs_mass_mail_user,1,1,1,0
+access_mgs_mail_contact,mgs_sms_marketing.mgs_mail_contact,model_mgs_mail_contact,group_mgs_mass_mail_user,1,1,1,0
+access_mgs_mailing_list,mgs_sms_marketing.mgs_mailing_list,model_mgs_mailing_list,group_mgs_mass_mail_user,1,1,1,0
+access_mgs_sms,mgs_sms_marketing.mgs_sms,model_mgs_sms,group_mgs_mass_mail_user,1,1,1,0
+
+admin_access_mgs_mass_mail_log,mgs_sms_marketing.mgs_mass_mail_log,model_mgs_mass_mail_log,group_mgs_mass_mail_admin,1,1,1,1
+admin_access_mgs_mail_contact,mgs_sms_marketing.mgs_mail_contact,model_mgs_mail_contact,group_mgs_mass_mail_admin,1,1,1,1
+admin_access_mgs_mailing_list,mgs_sms_marketing.mgs_mailing_list,model_mgs_mailing_list,group_mgs_mass_mail_admin,1,1,1,1
+admin_access_mgs_sms,mgs_sms_marketing.mgs_sms,model_mgs_sms,group_mgs_mass_mail_admin,1,1,1,1

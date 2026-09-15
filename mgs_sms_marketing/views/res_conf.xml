@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <record id="res_config_settings_view_form_golis" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.inherit.marketing.sms</field>
+            <field name="model">res.config.settings</field>
+            <field name="priority" eval="100"/>
+            <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form" position="inside">
+                    <app name="mgs_sms_marketing" string="MGS SMS Config" data-string="mgs_sms_marketing" web_icon="mgs_sms_marketing,static/description/icon.png">
+                        <block title="SMS Gateway Settings" name="sms_gateway_config_block">
+                            
+                            <setting string="Sender" name="mgs_marketing_sms_sender_id">
+                                <field name="mgs_marketing_sms_sender_id"/>
+                                <div class="content-group"/>
+                            </setting>
+    
+                            <setting string="Username" name="mgs_marketing_sms_username">
+                                <field name="mgs_marketing_sms_username"/>
+                                <div class="content-group"/>
+                            </setting>
+    
+                            <setting string="Password" name="mgs_marketing_sms_password">
+                                <field name="mgs_marketing_sms_password" password="1"/>
+                                <div class="content-group"/>
+                            </setting>
+    
+                        </block>
+                    </app>
+                </xpath>
+            </field>
+        </record>
+    
+        <record id="sms_settings_view_action" model="ir.actions.act_window">
+            <field name="name">Settings</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="context">{'module' : 'mgs_sms_marketing'}</field>
+        </record>
+
+
+          <menuitem id="sms_configuration_menu"
+            name="Settings" parent="mgs_sms_marketing_root" action="sms_settings_view_action"
+            sequence="16" groups="base.group_erp_manager"/>
+
+</odoo>

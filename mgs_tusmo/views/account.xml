@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="account_move_form" model="ir.ui.view">
+        <field name="name">account.move.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_shipping_id']" position="after">
+                <field name="mgs_container_type" readonly="state != 'draft'" string="TYPE" invisible="move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund')"/>
+                <field name="container_referrence" readonly="state != 'draft'" string="Container No." invisible="move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund') or mgs_container_type != 'container'"/>
+                <field name="bill_referrence" readonly="state != 'draft'" string="Bill No." invisible="move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund') or mgs_container_type != 'bill'"/>
+            </xpath>
+        </field>
+    </record>
+
+
+
+    <record id="mgs_inherit_view_account_payment_form" model="ir.ui.view">
+        <field name="name">account.view_account_payment_form.form</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="mgs_partner_bal" style="font-weight: bold;color:red"
+                  invisible = "payment_type != 'inbound' or partner_id == False"/>
+            </xpath>
+        </field>
+    </record>
+
+
+</odoo>

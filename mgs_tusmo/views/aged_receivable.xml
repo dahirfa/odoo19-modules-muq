@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="account_reports.aged_receivable_report" model="account.report">
+        <field name="column_ids">
+            <record id="aged_receivable_phone_col" model="account.report.column">
+                <field name="name">Phone</field>
+                <field name="expression_label">phone</field>
+                <field name="figure_type">string</field>
+                <field name="sequence">5</field>
+            </record>
+        </field>
+    </record>
+
+    <record id="aged_receivable_line_phone" model="account.report.expression">
+        <field name="report_line_id" ref="account_reports.aged_receivable_line"/>
+        <field name="label">phone</field>
+        <field name="engine">custom</field>
+        <field name="formula">_report_custom_engine_aged_receivable</field>
+        <field name="subformula">phone</field>
+        <field name="auditable" eval="False"/>
+    </record>
+
+</odoo>

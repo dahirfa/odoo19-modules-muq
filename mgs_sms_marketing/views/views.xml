@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="mgs_mailing_list_list" model="ir.ui.view">
+    <field name="name">mgs_mailing_list.list</field>
+    <field name="model">mgs.mailing.list</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="name"/>
+      </list>
+    </field>
+  </record>
+
+
+  <record id="mgs_mailing_list_form" model="ir.ui.view">
+    <field name="name">mgs.mailing.list.form</field>
+    <field name="model">mgs.mailing.list</field>
+    <field name="arch" type="xml">
+      <form string="">
+        <header>
+        </header>
+        <sheet>
+          <h1><field name="name" placeholder="Mailing List" /></h1>
+          <notebook>
+              <page name="contacts" string="Contacts">
+                <field name="partner_ids">
+                  
+                  <list editable="bottom">
+                      <field name="name"/>
+                      <field name="phone"/>
+                      <field name="email"/>
+                      
+                  </list>
+                  
+                </field>
+              </page>
+          </notebook>
+          
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+
+  <record id="mgs_mailing_list_action" model="ir.actions.act_window">
+    <field name="name">Mailing List</field>
+    <field name="res_model">mgs.mailing.list</field>
+    <field name="view_mode">list,form</field>
+  </record>
+
+
+  <!-- <record id="mgs_mail_contact_list" model="ir.ui.view">
+    <field name="name">mgs.mail.contact.list</field>
+    <field name="model">mgs.mail.contact</field>
+    <field name="arch" type="xml">
+      <list string="">
+        <field name="name"/>
+        <field name="mobile"/>
+        <field name="email"/>
+        <field name="company_name"/>      
+      </list>
+    </field>
+  </record>
+
+  <record id="mgs_mail_contact_form" model="ir.ui.view">
+    <field name="name">mgs.mail.contact.form</field>
+    <field name="model">mgs.mail.contact</field>
+    <field name="arch" type="xml">
+      <form string="">
+        <header>
+        </header>
+        <sheet>
+          <h1><field name="name" placeholder="Contact Name"/></h1>
+
+          <group name="name" string="Info">
+            <group>
+              <field name="company_name"/>
+              <field name="mobile"  widget="phone"/>
+              <field name="email"/>
+            </group>
+            <group>
+              <field name="tag_ids" 
+              widget="many2many_tags"
+              />
+              
+            </group>
+          </group>
+          <notebook>
+            <page string="Mailing List" name="mail_lists">
+            <field name="list_ids">
+            
+            <list  editable="bottom">
+              <field name="name"/>
+              <field name="contact_count"/>
+              <field name="mailing_count"/>
+            </list>
+            
+            </field>
+  
+            </page>
+          </notebook>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="mgs_mail_contact_action" model="ir.actions.act_window">
+    <field name="name">Contacts</field>
+    <field name="res_model">mgs.mail.contact</field>
+    <field name="view_mode">list,form</field>
+  </record> -->
+
+
+
+  <!-- <menuitem
+    id="mgs_sms_marketing_mailing"
+    name="Mailing"
+    parent="mgs_sms_marketing_root"
+    sequence="3"/>
+
+
+  <menuitem
+    id="mgs_mail_list_menu"
+    name="Mailing List"
+    action="mgs_mailing_list_action"
+    parent="mgs_sms_marketing_mailing"
+    sequence="1"/> -->
+
+  <record id="mgs_mass_mail_log_list" model="ir.ui.view">
+    <field name="name">mgs.mass.mail.log.list</field>
+    <field name="model">mgs.mass.mail.log</field>
+    <field name="arch" type="xml">
+      <list string="" editable="bottom">
+        <!-- <field name="sms_id"/> -->
+        <field name="partner_id" 
+        readonly="1"
+        />
+        <field name="mobile" readonly="1"/>
+        <field name="email" readonly="1"/>
+        <field name="mail_list_id" readonly="1"/>
+        <field name="description" readonly="1"/>
+        <field name="state" readonly="1" widget='badge' decoration-danger="state == 'failed'" decoration-success=" state=='sent'"/>
+      </list>
+    </field>
+  </record>
+
+
+  <record id="mgs_mass_mail_log_action" model="ir.actions.act_window">
+    <field name="name">Mass Mail log</field>
+    <field name="res_model">mgs.mass.mail.log</field>
+    <field name="view_mode">list</field>
+  </record>
+
+
+</odoo>

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <record id="mgs_sms_cron" model="ir.cron">
+            <field name="name">Mgs SMS Process Queue</field>
+            <field name="model_id" ref="model_mgs_sms"/>
+            <field name="interval_number">2</field>
+            <field name="interval_type">minutes</field>
+           
+            <field name="state">code</field>
+            <field name="code">model._process_queue()</field>
+            
+        </record>
+   
+
+
+        
+        
+       
+
+
+        <record id="mgs_sms_tree" model="ir.ui.view">
+            <field name="name">mgs.sms.tree</field>
+            <field name="model">mgs.sms</field>
+            <field name="arch" type="xml">
+                <list string="mgs sms" >
+                    <field name="datetime"/>
+                    <field name="source_name"/>
+                    <field name="model_id"/>
+                    <field name="partner_id"/>
+                    <field name="mobile"/>
+                    <field name="state" widget='badge' decoration-danger="state == 'failed'" decoration-success=" state=='sent'"/>
+                </list>
+            </field>
+        </record>
+
+
+        <record id="mgs_sms_form" model="ir.ui.view">
+            <field name="name">mgs.sms.form</field>
+            <field name="model">mgs.sms</field>
+            <field name="arch" type="xml">
+                <form string="mgs sms">
+                    <header>
+                        <button name="action_send_mgs_sms" class="btn btn-primary" type="object"   invisible="is_mass_sms != False" string="SEND SMS"/>
+                        <button name="action_send"  invisible="is_mass_sms != True " class="btn btn-primary" type="object" string="SEND Bulk SMS"/>
+                        <field name="state" widget="statusbar" statusbar_visible="sent,failed"/>
+                    </header>
+                    <sheet>
+                            <div class="oe_button_box" name="button_box"  invisible="is_mass_sms != True">
+
+                                <button type="object"  name="action_open_log_sent"
+                                    class="o_form_field o_stat_info text-success"
+                                    icon="fa-address-card-o">
+                                    <field string="SENT" name="sent_count" widget="statinfo"  class="o_stat_text text-success"/>
+                                </button>
+
+                                <button type="object"  name="action_open_log_queue"
+                                    class="o_form_field o_stat_info text-info"
+                                    icon="fa-address-card-o">
+                                    <field string="Queue" name="queue_count" widget="statinfo"  class="o_stat_text text-info"/>
+                                </button>
+
+                                <button type="object"  name="action_open_log_failed"
+                                    class="o_form_field o_stat_info text-danger"
+                                    icon="fa-address-card-o">
+                                    <field string="FAILED" name="failed_count" widget="statinfo"  class="o_stat_text text-danger"/>
+                                </button>
+
+                            </div>
+
+
+
+                        <h1><field name="source_name" placeholder='2023 Sept Promo' /></h1>
+                        <group>  
+                                <group>
+                                
+                                    <field name="is_mass_sms" invisible='1'/>
+                                    <field name="datetime" 
+                                    readonly="1"
+                                    />
+                                    <field name="model_id"  invisible="is_mass_sms != False"/>
+                                </group>
+                                <group>
+                                    <field name="mail_list_ids" widget="many2many_tags" readonly="state == 'sent'" invisible="is_mass_sms == False"/>
+                                    <field name="partner_id" invisible="is_mass_sms != False"/>
+                                    <field name="mobile" invisible="is_mass_sms != False"/>
+                                </group>
+                        </group>
+
+                        <group>
+                            <field name="response" groups='base.group_no_one' readonly="state == 'sent'"/>
+                        </group>
+                        <notebook>
+                            <page name="message"  string="Message" readonly="state == 'sent'">
+                                <field name="message" />
+                            </page>
+                        </notebook>
+                    </sheet>
+
+                   
+                    <chatter />
+                   
+                </form>
+            </field>
+        </record>
+
+
+        <record id="mgs_sms_action" model="ir.actions.act_window">
+            <field name="name">SMS LOG</field>
+            <field name="res_model">mgs.sms</field>
+            <field name="view_mode">list,form</field>
+            <field name="domain">[('is_mass_sms','=',False)]</field>
+            <field name="context">{'create': True}</field>
+        </record>
+
+        <record id="mgs_sms_bulk_tree" model="ir.ui.view">
+            <field name="name">mgs.sms.tree</field>
+            <field name="model">mgs.sms</field>
+            <field name="priority">20</field>
+            <field name="arch" type="xml">
+                <list string="mgs sms" >
+                    <field name="datetime"/>
+                    <field name="source_name"/>
+                    <field name="mail_list_ids" widget="many2many_tags"/>
+                    <field name="state" widget='badge' decoration-danger="state == 'failed'" decoration-success=" state=='sent'"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="mgs_sms_action_bulk" model="ir.actions.act_window">
+            <field name="name">SMS BULK</field>
+            <field name="res_model">mgs.sms</field>
+            <field name="view_mode">list,form</field>
+            <field name="domain">[('is_mass_sms','=',True)]</field>
+            <field name="context">{'default_is_mass_sms':True}</field>
+        </record>
+
+        <menuitem id="mgs_sms_marketing_root" web_icon="mgs_sms_marketing,static/description/icon.png" name="MGS SMS" groups="mgs_sms_marketing.group_mgs_mass_mail_admin,mgs_sms_marketing.group_mgs_mass_mail_user"/>
+
+        <!-- <menuitem
+            id="mgs_sms_bulk_menu"
+            name="BULK SMS"
+            action="mgs_sms_action_bulk"
+            parent="mgs_sms_marketing_root"
+            sequence="2" /> -->
+
+        <menuitem
+            id="mgs_sms_menu"
+            name="SMS LOG"
+            action="mgs_sms_action"
+            parent="mgs_sms_marketing_root"
+            sequence="1" />
+
+
+</odoo>

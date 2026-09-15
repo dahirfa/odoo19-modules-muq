@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="inherit_view_account_payment_form" model="ir.ui.view">
+        <field name="name">inherit.view.account.payment.form</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_post']" position="after">
+                    <button name="send_mgs_sms" string="Resend payment sms" type="object" class="oe_highlight" invisible="state !=  'posted'" groups="mgs_sms_marketing.group_mgs_mass_mail_admin"/>
+                </xpath>
+            
+        </field>
+    </record>
+
+    <record id="inherit_view_freight_delivery_view_form" model="ir.ui.view">
+        <field name="name">inherit.view.freight.delivery.form</field>
+        <field name="model">freight.delivery</field>
+        <field name="inherit_id" ref="mgs_freight.freight_delivery_view_form"/>
+        <field name="arch" type="xml">
+                <xpath expr="//button[@name='reset_to_draft']" position="after">
+                    <button name="send_delivery_sms" string="Send sms" type="object" invisible="state !=  'confirm'" groups="mgs_sms_marketing.group_mgs_mass_mail_admin"/>
+                </xpath>
+            
+        </field>
+    </record>
+</odoo>

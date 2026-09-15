@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- <odoo>
+
+
+        <record id="action_report_gross_profit" model="ir.actions.report">
+            <field name="name">Gross Profit</field>
+            <field name="model">mgs_account.gross_profit</field>
+            <field name="report_type">qweb-html</field>
+            <field name="report_name">mgs_account.gross_profit_report</field>
+            <field name="binding_model_id" ref="model_mgs_account_gross_profit"/>
+        </record>
+
+        <template id="gross_profit_report">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.internal_layout" t-lang="en_US">
+                        <div class="page">
+                            <div class="container" style="font-size:12px;font-family:Arial;margin-top:1px;">
+                                <h2>Gross Profit</h2>
+                                <div class="row" style="margin-top: 32px !important;font-size: 1.2em; font-family: 'Lato-Reg'">
+                                    <div class="col-3" t-if="date_from or date_to">
+                                        <strong>Date:</strong>
+                                        <p t-esc="date_from" style="margin-bottom: 0"/>
+                                        <p t-esc="date_to"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="partner_id[0]">
+                                        <strong>Partner:</strong>
+                                        <p class="m-0" t-esc="partner_id[1]"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="product_id[0]">
+                                        <strong>Product:</strong>
+                                        <p class="m-0" t-esc="product_id[1]"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="company_id"  groups="base.group_multi_company">
+                                        <strong>Company:</strong>
+                                        <span style="border: 1px solid black; padding: 1px; border-radius: 4px; background: #eeebeb; margin-right: 2px " t-esc="company_id.name"/>
+                                    </div>
+                                </div>
+
+                                <table class="table table-condensed table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th><span t-esc="report_by"/></th>
+                                            <th><span t-if="report_by == 'Product'">Product Code</span></th>
+                                            <th style="text-align: right">Actual Revenue</th>
+                                            <th style="text-align: right">Actual Cost</th>
+                                            <th style="text-align: right">Gross Profit</th>
+                                            <th style="text-align: right">Gross Profit %</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <t t-set="no" t-value="0"/>
+                                        <t t-set="total_act_cost" t-value="0"/>
+                                        <t t-set="total_act_revenue" t-value="0"/>
+
+                                         <tr t-foreach="lines(company_id.id, date_from, date_to, partner_id[0], product_id[0], target_moves, product_type, report_by)" t-as="line">
+                                            
+                                            <t t-set="no" t-value="no+1"/>
+                                            <td><span t-esc="no"/></td>
+
+                                            <td>
+                                              <span t-esc="line['group']"/>
+                                             
+                                              </td>
+                                            <td><span t-if="report_by == 'Product'" t-esc="line['default_code']"/></td>
+                                            <td style="text-align: right"><span t-esc="'{0:,.2f}'.format(line['act_revenue'])"/></td>
+                                            <td style="text-align: right"><span t-esc="'{0:,.2f}'.format(line['act_cost'])"/></td>
+                                            <t t-set="balance" t-value="line['act_revenue']-line['act_cost']"/>
+                                            <td style="text-align: right"><span t-esc="'{0:,.2f}'.format(balance)"/></td>
+
+                                            <t t-set="balance_percentage" t-value="(balance/line['act_revenue']) * 100" t-if="line['act_revenue']"/>
+                                            <td style="text-align: right">
+                                                <span t-esc="'{0:,.2f}'.format(balance_percentage)" t-if="balance_percentage"/>
+                                            </td>
+
+                                            <t t-set="total_act_cost" t-value="total_act_cost + line['act_cost']"/>
+                                            <t t-set="total_act_revenue" t-value="total_act_revenue + line['act_revenue']"/>
+                                        </tr>
+
+                                        <tr style="font-weight: bold">
+                                            <td colspan="3"/>
+                                            <td style="text-align: right"><span t-esc="'{0:,.2f}'.format(total_act_revenue)"/></td>
+                                            <td style="text-align: right"><span t-esc="'{0:,.2f}'.format(total_act_cost)"/></td>
+                                            <td style="text-align: right"><span t-esc="'{0:,.2f}'.format(total_act_revenue-total_act_cost)"/></td>
+                                            <td style="text-align: right"/>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div> 
+                        </div> 
+                    </t> 
+                </t>
+            </t> 
+        </template>
+</odoo> -->
+
+<odoo>
+
+    <!-- <report id="action_report_gross_profit" name="mgs_account.gross_profit_report" model="mgs_account.gross_profit_report" string="Gross Profit" report_type="qweb-html" /> -->
+
+    <record id="action_report_gross_profit" model="ir.actions.report">
+        <field name="name">Gross Profit</field>
+        <field name="model">mgs_account.gross_profit</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">mgs_account.gross_profit_report</field>
+        <field name="binding_model_id" ref="model_mgs_account_gross_profit"/>
+    </record>
+
+    <template id="gross_profit_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.internal_layout" t-lang="en_US">
+                    <div class="page">
+                        <div class="container" style="font-size:12px;font-family:Arial;margin-top:1px;">
+                            <h2>Gross Profit</h2>
+                            <div class="row" style="margin-top: 32px !important;font-size: 1.2em; font-family: 'Lato-Reg'">
+                                <div class="col-3" t-if="date_from or date_to">
+                                    <strong>Date:</strong>
+                                    <p t-esc="date_from" style="margin-bottom: 0"/>
+                                    <p t-esc="date_to"/>
+                                </div>
+
+                                <div class="col-3" t-if="partner_id[0]">
+                                    <strong>Partner:</strong>
+                                    <p class="m-0" t-esc="partner_id[1]"/>
+                                </div>
+
+                                <div class="col-3" t-if="company_id" groups="base.group_multi_company">
+                                    <strong>Company:</strong>
+                                    <span style="border: 1px solid black; padding: 1px; border-radius: 4px; background: #eeebeb; margin-right: 2px " t-esc="company_id.name"/>
+                                </div>
+
+                                <div class="col-3" t-if="analytic_account_names">
+                                    <strong>Analytic Accounts:</strong>
+                                    <span t-esc="', '.join(analytic_account_names)"/>
+                                </div>
+                            </div>
+
+                            <!-- Category Report Layout -->
+                            <!-- Category Report Layout -->
+                            <t t-if="report_by == 'Category'">
+                                <table class="table table-condensed table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Parent Category</th>
+                                            <th>Child Category</th>
+                                            <th>Product</th>
+                                            <th style="text-align: right">Actual Revenue</th>
+                                            <th style="text-align: right">Actual Cost</th>
+                                            <th style="text-align: right">Gross Profit</th>
+                                            <th style="text-align: right">Gross Profit %</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <t t-set="no" t-value="0"/>
+                                        <t t-set="total_act_cost" t-value="0"/>
+                                        <t t-set="total_act_revenue" t-value="0"/>
+
+                                        <tr t-foreach="lines(company_id.id, date_from, date_to, partner_id[0], product_id, target_moves, product_type, report_by, analytic_account_ids, product_categ_ids, journal_ids)" t-as="line">
+                                            <!-- Parent Category Header -->
+                                            <t t-if="line.get('type') == 'parent_header'">
+                                                <td></td>
+                                                <td style="font-weight: bold; background-color: #f8f9fa;">
+                                                    <span t-esc="line['group']"/>
+                                                </td>
+                                                <td colspan="6"></td>
+                                            </t>
+
+                                            <!-- Child Category Header -->
+                                            <t t-elif="line.get('type') == 'child_header'">
+                                                <td></td>
+                                                <td></td>
+                                                <td style="font-weight: bold;">
+                                                    <span t-esc="line['group']"/>
+                                                </td>
+                                                <td colspan="5"></td>
+                                            </t>
+
+                                            <!-- Product Line -->
+                                            <t t-elif="line.get('type') == 'consu'">
+                                                <t t-set="no" t-value="no+1"/>
+                                                <td>
+                                                    <span t-esc="no"/>
+                                                </td>
+                                                <td></td>
+                                                <td></td>
+                                                <td>
+                                                    <span t-esc="line['group']"/>
+                                                </td>
+                                                <td style="text-align: right">
+                                                    <span t-esc="'{0:,.2f}'.format(line['act_revenue'])"/>
+                                                </td>
+                                                <td style="text-align: right">
+                                                    <span t-esc="'{0:,.2f}'.format(line['act_cost'])"/>
+                                                </td>
+                                                <t t-set="balance" t-value="line['act_revenue']-line['act_cost']"/>
+                                                <td style="text-align: right">
+                                                    <span t-esc="'{0:,.2f}'.format(balance)"/>
+                                                </td>
+
+                                                <t t-set="balance_percentage" t-value="(balance/line['act_revenue']) * 100" t-if="line['act_revenue']"/>
+                                                <td style="text-align: right">
+                                                    <span t-esc="'{0:,.2f}'.format(balance_percentage)" t-if="balance_percentage"/>
+                                                </td>
+
+                                                <t t-set="total_act_cost" t-value="total_act_cost + line['act_cost']"/>
+                                                <t t-set="total_act_revenue" t-value="total_act_revenue + line['act_revenue']"/>
+                                            </t>
+
+                                            <!-- Child Category Subtotal -->
+                                            <t t-elif="line.get('type') == 'child_subtotal'">
+                                                <td></td>
+                                                <td></td>
+                                                <td style="font-weight: bold; font-style: italic;">
+                                                    <span t-esc="line['group']"/>
+                                                </td>
+                                                <td></td>
+                                                <td style="text-align: right; font-weight: bold;">
+                                                    <span t-esc="'{0:,.2f}'.format(line['act_revenue'])"/>
+                                                </td>
+                                                <td style="text-align: right; font-weight: bold;">
+                                                    <span t-esc="'{0:,.2f}'.format(line['act_cost'])"/>
+                                                </td>
+                                                <t t-set="subtotal_balance" t-value="line['act_revenue']-line['act_cost']"/>
+                                                <td style="text-align: right; font-weight: bold;">
+                                                    <span t-esc="'{0:,.2f}'.format(subtotal_balance)"/>
+                                                </td>
+                                                <t t-set="subtotal_percentage" t-value="(subtotal_balance/line['act_revenue']) * 100" t-if="line['act_revenue']"/>
+                                                <td style="text-align: right; font-weight: bold;">
+                                                    <span t-esc="'{0:,.2f}'.format(subtotal_percentage)" t-if="subtotal_percentage"/>
+                                                </td>
+                                            </t>
+
+                                            <!-- Parent Category Subtotal -->
+                                            <t t-elif="line.get('type') == 'parent_subtotal'">
+                                                <td></td>
+                                                <td style="font-weight: bold; background-color: #e9ecef; border-top: 2px solid #dee2e6;">
+                                                    <span t-esc="line['group']"/>
+                                                </td>
+                                                <td style="background-color: #e9ecef; border-top: 2px solid #dee2e6;"></td>
+                                                <td style="background-color: #e9ecef; border-top: 2px solid #dee2e6;"></td>
+                                                <td style="text-align: right; font-weight: bold; background-color: #e9ecef; border-top: 2px solid #dee2e6;">
+                                                    <span t-esc="'{0:,.2f}'.format(line['act_revenue'])"/>
+                                                </td>
+                                                <td style="text-align: right; font-weight: bold; background-color: #e9ecef; border-top: 2px solid #dee2e6;">
+                                                    <span t-esc="'{0:,.2f}'.format(line['act_cost'])"/>
+                                                </td>
+                                                <t t-set="parent_balance" t-value="line['act_revenue']-line['act_cost']"/>
+                                                <td style="text-align: right; font-weight: bold; background-color: #e9ecef; border-top: 2px solid #dee2e6;">
+                                                    <span t-esc="'{0:,.2f}'.format(parent_balance)"/>
+                                                </td>
+                                                <t t-set="parent_percentage" t-value="(parent_balance/line['act_revenue']) * 100" t-if="line['act_revenue']"/>
+                                                <td style="text-align: right; font-weight: bold; background-color: #e9ecef; border-top: 2px solid #dee2e6;">
+                                                    <span t-esc="'{0:,.2f}'.format(parent_percentage)" t-if="parent_percentage"/>
+                                                </td>
+                                            </t>
+                                        </tr>
+
+                                        <!-- Grand Total for Category Report -->
+                                        <tr style="font-weight: bold; border-top: 3px solid #333;">
+                                            <td colspan="4" style="background-color: #f8f9fa;">GRAND TOTAL</td>
+                                            <td style="text-align: right; background-color: #f8f9fa;">
+                                                <span t-esc="'{0:,.2f}'.format(total_act_revenue)"/>
+                                            </td>
+                                            <td style="text-align: right; background-color: #f8f9fa;">
+                                                <span t-esc="'{0:,.2f}'.format(total_act_cost)"/>
+                                            </td>
+                                            <td style="text-align: right; background-color: #f8f9fa;">
+                                                <span t-esc="'{0:,.2f}'.format(total_act_revenue-total_act_cost)"/>
+                                            </td>
+                                            <td style="text-align: right; background-color: #f8f9fa;"/>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </t>
+
+                            <!-- Standard Report Layout (Product/Partner) -->
+                            <t t-else="">
+                                <table class="table table-condensed table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>
+                                                <span t-esc="report_by"/>
+                                            </th>
+                                            <th>
+                                                <span t-if="report_by == 'Product'">Product Code</span>
+                                            </th>
+                                            <th style="text-align: right">Actual Revenue</th>
+                                            <th style="text-align: right">Actual Cost</th>
+                                            <th style="text-align: right">Gross Profit</th>
+                                            <th style="text-align: right">Gross Profit %</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <t t-set="no" t-value="0"/>
+                                        <t t-set="total_act_cost" t-value="0"/>
+                                        <t t-set="total_act_revenue" t-value="0"/>
+
+                                        <tr t-foreach="lines(company_id.id, date_from, date_to, partner_id[0], product_id, target_moves, product_type, report_by, analytic_account_ids, product_categ_ids, journal_ids)" t-as="line">
+                                            <t t-set="no" t-value="no+1"/>
+                                            <td>
+                                                <span t-esc="no"/>
+                                            </td>
+
+                                            <td>
+                                                <span t-esc="line['group']"/>
+                                            </td>
+                                            <td>
+                                                <span t-if="report_by == 'Product'" t-esc="line['default_code']"/>
+                                            </td>
+                                            <td style="text-align: right">
+                                                <span t-esc="'{0:,.2f}'.format(line['act_revenue'])"/>
+                                            </td>
+                                            <td style="text-align: right">
+                                                <span t-esc="'{0:,.2f}'.format(line['act_cost'])"/>
+                                            </td>
+                                            <t t-set="balance" t-value="line['act_revenue']-line['act_cost']"/>
+                                            <td style="text-align: right">
+                                                <span t-esc="'{0:,.2f}'.format(balance)"/>
+                                            </td>
+
+                                            <t t-set="balance_percentage" t-value="(balance/line['act_revenue']) * 100" t-if="line['act_revenue']"/>
+                                            <td style="text-align: right">
+                                                <span t-esc="'{0:,.2f}'.format(balance_percentage)" t-if="balance_percentage"/>
+                                            </td>
+
+                                            <t t-set="total_act_cost" t-value="total_act_cost + line['act_cost']"/>
+                                            <t t-set="total_act_revenue" t-value="total_act_revenue + line['act_revenue']"/>
+                                        </tr>
+
+                                        <tr style="font-weight: bold">
+                                            <td colspan="3"/>
+                                            <td style="text-align: right">
+                                                <span t-esc="'{0:,.2f}'.format(total_act_revenue)"/>
+                                            </td>
+                                            <td style="text-align: right">
+                                                <span t-esc="'{0:,.2f}'.format(total_act_cost)"/>
+                                            </td>
+                                            <td style="text-align: right">
+                                                <span t-esc="'{0:,.2f}'.format(total_act_revenue-total_act_cost)"/>
+                                            </td>
+                                            <td style="text-align: right"/>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </t>
+                        </div>                        <!--container-->
+                    </div>                    <!--page-->
+                </t>                <!--web.external_layout-->
+            </t>
+        </t>        <!--web.html_container-->
+    </template>
+</odoo>

@@ -1,17 +1,22 @@
 # -*- coding: utf-8 -*-
 {
     'name': "MGS Sales Reports",
-    'summary': "",
-    'description': "",
+    'summary': """""",
+    'description': """""",
     'author': "Meisour Solutions",
     'website': "http://www.meisour.com",
     'category': 'Reporting',
-    'version': '2.0',
+    'version': '1.0',
     'depends': ['sale', 'sale_margin'],
     'license': 'LGPL-3',
     'data': [
         'security/ir.model.access.csv',
-        'views/report_mgs_sale.xml',
-        'wizards/sale_report.xml',
+        'views/paperformat.xml',
+        'views/report_sales_by_customer.xml',
+        'views/report_sales_by_item.xml',
+        'views/report_sales_by_rep.xml',
+        'wizards/sales_by_customer.xml',
+        'wizards/sales_by_item.xml',
+        'wizards/sales_by_rep.xml',
     ],
 }

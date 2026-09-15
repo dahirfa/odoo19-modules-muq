@@ -3,10 +3,10 @@
     'name': "MGS Inventory Reports",
     'summary': """""",
     'description': """""",
-    'author': "Meisour Global Solutions",
+    'author': "Meisour Solutions",
     'website': "http://www.meisour.com",
     'category': 'Reporting',
-    'version': '13.01',
+    'version': '1.0',
     'depends': ['stock', 'sale'],
     'license': 'LGPL-3',
     'data': [

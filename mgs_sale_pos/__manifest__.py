@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 {
     'name': "MGS Sales Reports: POS",
-    'summary': "",
-    'description': "",
+    'summary': """""",
+    'description': """""",
     'author': "Meisour Solutions",
     'website': "http://www.meisour.com",
     'category': 'Reporting',
-    'version': '2.0',
-    'depends': ['pos_sale', 'mgs_sale'],
+    'version': '1.0',
+    'depends': ['mgs_sale', 'point_of_sale', 'sale_management', 'pos_sale_margin'],
     'license': 'LGPL-3',
-    'data': [
-    ],
+    'data': [],
 }

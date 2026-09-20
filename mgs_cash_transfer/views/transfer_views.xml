@@ -32,16 +32,16 @@
               <div name="amount_div" class="o_row">
                 <field name="amount" readonly="state != 'draft'"/>
               </div>
-              <field name="show_rate" invisible="1"/>
+              <!-- <field name="show_rate" invisible="1"/>
               <field name="currency_rate" invisible="show_rate != True" string="Currency Rate" groups="base.group_multi_currency"/>
               <label for="override_rate" string="Custom Rate" groups="base.group_multi_currency"/>
               <div name="amount_div" class="o_row" groups="base.group_multi_currency">
                 <field name="override_rate" readonly="state != 'draft'" invisible="show_rate != True"/>
                 <field name="custom_rate"  readonly="state != 'draft'" invisible="override_rate != True" required="override_rate == True"/>
-              </div>
+              </div> -->
               <field name="date" readonly="state != 'draft'"/>
               <field name="memo"/>
-              <field name="company_id" readonly="state != 'draft'" options="{'no_create': True}" groups="base.group_multi_company"/>
+              <field name="company_id" readonly="1" options="{'no_create': True}" groups="base.group_multi_company"/>
             </group>
             <group>
               <field name="journal_id" string="From" readonly="state != 'draft'" options="{'no_create': True}" domain="[('id', '!=', destination_journal_id), ('type', 'in', ['cash', 'bank'])]"/>
@@ -102,8 +102,8 @@
     <field name="search_view_id" ref="view_cash_transfer_search"/>
   </record>
 
-  <!-- <menuitem id="menu_cash_transfer_root" name="Cash Transfer" sequence="10" web_icon="mgs_cash_transfer,static/description/icon.png" groups="mgs_cash_transfer.group_mgs_cash_transfer_user"/> -->
-  <menuitem id="menu_cash_transfer" name="Transfers" parent="account.menu_finance" action="action_cash_transfer" sequence="4" groups="mgs_cash_transfer.group_mgs_cash_transfer_user"/>
-  <!-- <menuitem id="menu_cash_transfer_config" name="Configuration" parent="menu_cash_transfer_root" sequence="1000"/> -->
-  <menuitem id="menu_cash_transfer_config_settings" name="Cash Transfer Settings" parent="account.menu_finance_configuration" action="res_config_settings_action_mct" sequence="100"/>
+  <menuitem id="menu_cash_transfer_root" name="Transfers" sequence="10" web_icon="mgs_cash_transfer,static/description/icon.png" groups="mgs_cash_transfer.group_mgs_cash_transfer_user"/>
+  <menuitem id="menu_cash_transfer" name="Transfers" parent="menu_cash_transfer_root" action="action_cash_transfer" sequence="10"/>
+  <menuitem id="menu_cash_transfer_config" name="Configuration" parent="menu_cash_transfer_root" sequence="1000"/>
+  <menuitem id="menu_cash_transfer_config_settings" name="Settings" parent="menu_cash_transfer_config" action="res_config_settings_action_mct" sequence="1"/>
 </odoo>

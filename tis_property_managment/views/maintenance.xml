@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<odoo>
+
+    <record id="action_maintenance_report_print" model="ir.actions.report">
+        <field name="name">Maintenance Report</field>
+        <field name="model">pm.maintenance</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">tis_property_managment.maintenance_report_print</field>
+        <field name="report_file">tis_property_managment.maintenance_report_print</field>
+        <field name="binding_model_id" ref="model_pm_maintenance"/>
+        <field name="binding_type">report</field>
+    </record>
+
+  <template id="maintenance_report_print">
+    <t t-call="web.html_container">
+      <t t-foreach="docs" t-as="doc">
+        <t t-call="web.external_layout" t-lang="en_US">
+          <div class="page">
+            <div class="container">
+              <div class="row">
+              </div>
+                <h3 class="text-left"><strong><span t-field="doc.code"/></strong></h3>
+                <h2 class="text-center"><strong>Maintenance Request</strong></h2>
+
+              <table class="table table-condensed table-sm">
+                <tr>
+                  <td>
+                    Tenant :
+                    <t t-esc="doc.tenant_id.name"/>
+                  </td>
+                  <td class="text-right">
+                    Unit :
+                    <t t-esc="doc.property_id.display_name"/>
+                  </td>
+                </tr>
+              </table>
+
+              <table class="table table-bordered table-sm">
+                <tr>
+                  <th class="text-center" colspan="7">Maintenance Detail</th>
+                </tr>
+                <tr>
+                  <th>#</th>
+                  <th>Description</th>
+                  <th>Type</th>
+                  <th>Cost</th>
+                </tr>
+                <t t-set="no" t-value="0"/>
+                <t t-set="costs" t-value="0"/>
+                <!--                <t t-set="total_com_cost" t-value="0"/>-->
+                <t t-set="total_cost_total" t-value="0"/>
+                <t t-foreach="doc.maintenance_line_ids" t-as="line">
+                  <tr>
+                    <t t-set="no" t-value="no+1"/>
+                    <t t-set="costs" t-value="costs+line.cost"/>
+                    <td nowrap="nowrap"><span t-esc="no"/></td>
+                    <td>
+                      <span t-field="line.name"/>
+                      
+                    </td>
+                    <td>
+                    <span t-field="line.type_id.name"/>
+                    </td>
+                    <td>
+                      <span t-field="line.cost"/>
+                    </td>
+                  </tr>
+
+                </t>
+                <tr>
+                  <td colspan="2"></td>
+                  <td><strong>Total cost</strong></td>
+                  <td><t t-esc="costs" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/></td>
+                </tr>
+                <tr>
+                  <td colspan="2"></td>
+                  <td><strong>Service cost</strong></td>
+                  <td><t t-esc="doc.mgmt_comm_amount" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/></td>
+                </tr>
+                <tr>
+                  <!-- <t t-set="total_cost_total" t-value="costs + doc.comm_amount"/> -->
+                  <td colspan="2"></td>
+                  <td><strong>TOTAL</strong></td>
+                  <td><t t-esc="doc.total_amount" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/></td>
+                </tr>
+              </table>
+              <br/>
+              <br/>
+            </div>
+          </div> 
+        </t> 
+      </t>
+    </t> 
+  </template>
+
+
+
+
+    <record model="ir.ui.view" id="maintenance_list_view">
+        <field name="name">maintenance.list</field>
+        <field name="model">pm.maintenance</field>
+        <field name="arch" type="xml">
+            <list string="maintenance List" default_order="id desc">
+                <field name="code"/>
+                <field name="property_id"/>
+                <field name="landlord_id"/>
+                <field name="tenant_id"/>
+                <field name="date"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="total_amount" widget="monetary"/>
+                <field name="tenant_fault"/>
+                <field name="state" widget="badge" decoration-warning="state == 'in_progress'" decoration-success="state == 'done'" decoration-danger="state == 'cancel'" decoration-info="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="maintenance_form_view">
+        <field name="name">maintenance.form</field>
+        <field name="model">pm.maintenance</field>
+        <field name="arch" type="xml">
+            <form string="maintenance Form">
+                <header>
+                    <button id="button_action_start" name="action_start" string="Start" class="btn-primary"
+                            invisible="state != 'draft'" type="object"/>
+                    <button id="button_done" name="action_done" string="Done" class="btn-primary"
+                            invisible="state != 'in_progress'" type="object"/>
+                    <button id="button_draft" name="action_draft" string="Set To Draft" class="btn-primary"
+                            invisible="state != 'cancel'" type="object"/>
+                    <button id="button_cancel" name="action_cancel" string="Cancel" invisible="state not in ('draft', 'in_progress')"
+                            type="object"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,in_progress,done"/>
+
+                    <button id="button_create" invisible="invoice_id or subtract_from_deposit" name="create_invoice" string="Create Invoice" type="object" class="btn-primary"/>
+
+                    <button  invisible="entry_id or not subtract_from_deposit" name="create_journal_entry" string="Create Entry" type="object" class="btn-primary"/>
+                        
+                </header>
+                <sheet>
+                <div class="oe_button_box">
+                        <button name="action_view_invoice" invisible="not invoice_id"
+                        width="150" type="object" class="oe_stat_button" icon="fa-money">
+                            Invoice
+                        </button>
+
+                        <button name="action_view_entry" invisible="not entry_id"
+                        width="150" type="object" class="oe_stat_button" icon="fa-money">
+                            Entry
+                        </button>
+                    </div>
+                            <h1 class="o_row">
+                                <field name="code" readonly="1" string="Code" placeholder="Code"/>
+                            </h1>
+                    <group string="Maintenance Request">
+
+                        <group>
+                            <field name="property_id" readonly="state in ('done', 'cancel')"/>
+                            <field name="tenant_fault" readonly="state in ('done', 'cancel')"/>
+                            <field name="date" readonly="state in ('done', 'cancel')"/>
+                            <field name="invoice_id" invisible="1" />
+                            <field name="entry_id" invisible="1"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state in ('done', 'cancel')"/>
+                        </group>
+                        
+                        <group>
+                            <field name="landlord_id" readonly="state in ('done', 'cancel')"/>
+                            <field name="tenant_id" readonly="state in ('done', 'cancel')"/>
+                             <field name="available_deposit" widget="monetary" />
+                            <field name="subtract_from_deposit" readonly="state in ('done', 'cancel')"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        
+                        <page string="Maintenance Lines">
+                            <field name="maintenance_line_ids" readonly="state in ('done', 'cancel')">
+                                <list>
+                                    <field name="currency_id" invisible="1"/>
+                                    <field name="name"/>
+                                    <field name="type_id"/>
+                                    <field name="action"/>
+                                    <field name="cost" widget="monetary" sum="Total"/>
+                                </list>
+
+                                <form>
+                                <sheet>
+                                <group>
+                                    <group>
+                                        <field name="currency_id" invisible="1"/>
+                                        <field name="name"/>
+                                        <field name="type_id"/>
+                                        <field name="action"/>
+                                    </group>
+
+
+                                    <group>
+                                        <field name="cost" widget="monetary"/>
+                                    </group>
+                                </group>
+                                    
+                                    <notebook>
+                                        <page string="description">
+                                            <field name="description" />
+                                        </page>                
+                                    </notebook>
+                                </sheet>
+
+                                </form>
+
+                            </field>
+                        </page>
+
+                    </notebook>
+                        <h3 colspan="2" ><label for="mgmt_comm_amount"  modifiers="{}"/><field  name="mgmt_comm_amount" readonly="state in ('done', 'cancel')" widget="monetary"/></h3>
+
+
+                        <group class="oe_subtotal_footer oe_right" colspan="2" modifiers="{}">
+                            <div class="oe_subtotal_footer_separator oe_inline o_td_label" modifiers="{}">
+                                <label for="total_amount" modifiers="{}"/>
+                            </div>
+                            <field name="total_amount" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}" modifiers="{'readonly':true}" id="total_amount"/>
+					    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="maintenance_list_action">
+        <field name="name">maintenance</field>
+        <field name="res_model">pm.maintenance</field>
+        <field name="view_mode">list,form</field>
+        <field name="context"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create the first maintenance
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="maintenance_menu"
+              name="Maintenance"
+              parent="main_property_managment_menu"
+              action="maintenance_list_action"/>
+
+</odoo>

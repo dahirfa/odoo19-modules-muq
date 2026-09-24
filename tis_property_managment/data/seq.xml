@@ -1,0 +1,61 @@
+<odoo>
+ <data noupdate="0">
+        <!-- Sequences for hospital.patient -->
+        <record id="pm_property_sequence" model="ir.sequence">
+            <field name="name">Property Sequence</field>
+            <field name="code">pm.property</field>
+            <field name="prefix">PR/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="pm_property_maintenance_sequence" model="ir.sequence">
+            <field name="name">Maintenance Sequence</field>
+            <field name="code">pm.maintenance</field>
+            <field name="prefix">PM/</field>
+            <field name="padding">3</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="pm_tenancy_sequence" model="ir.sequence">
+            <field name="name">Tenancy Sequence</field>
+            <field name="code">pm.tenancy</field>
+            <field name="prefix">T/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+
+        <!-- <record id="pms_income_account" model="account.account">
+	       <field name="name">Property Revenue</field>
+	        <field name="code">400050</field>
+	        <field name="user_type_id" ref="account.data_account_type_income" />
+	        <field name="reconcile" eval="False" />
+	   </record>
+
+	  <record id="pms_expense_account" model="account.account">
+	        <field name="name">Landlord Expenses</field>
+	        <field name="code">600050</field>
+	        <field name="user_type_id" ref="account.data_account_type_expense" />
+	        <field name="reconcile" eval="False" />
+	</record>
+    
+	  <record id="pms_liability_account" model="account.account">
+	        <field name="name">Rent Deposit</field>
+	        <field name="code">200050</field>
+	        <field name="user_type_id" ref="account.data_account_type_liability" />
+	        <field name="reconcile" eval="False" />
+	    </record> -->
+
+
+        
+        <!-- Sequences for hospital.appointment -->
+<!--         <record id="seq_hospital_appointment" model="ir.sequence">
+            <field name="name">Appointment Sequence</field>
+            <field name="code">hospital.appointment</field>
+            <field name="prefix">HP</field>
+            <field name="padding">3</field>
+            <field name="company_id" eval="False"/>
+        </record> -->
+
+    </data>
+</odoo>

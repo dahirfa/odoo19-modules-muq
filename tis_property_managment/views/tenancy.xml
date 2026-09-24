@@ -1,0 +1,289 @@
+<odoo>
+    <data noupdate="1">
+       <record id="close_contract_cron" model="ir.cron">
+           <field name="name">Close tenancies</field>
+           <field name="model_id" ref="model_pm_tenancy"/>
+           <field name="state">code</field>
+           <field name="code">model.closer_cron()</field>
+            <field name='interval_number'>1</field>
+           <field name='interval_type'>days</field>
+       </record>
+</data>
+
+    <record model="ir.ui.view" id="tenancy_list_view">
+        <field name="name">tenancy.list</field>
+        <field name="model">pm.tenancy</field>
+        <field name="arch" type="xml">
+            <list string="tenancy List" default_order="id desc">
+                <field name="code"/>
+                <field name="property_id"/>
+                <field name="landlord_id"/>
+                <field name="tenant_id"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="closing_date" optional="hide"/>
+                <field name="rent_type_id"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="rent_price" widget="monetary"/>
+                <field name="rent_price_per_period" widget="monetary"/>
+                <field name="remaning_days" invisible="1"/>
+                <field name="state" widget="badge" on_change="1" decoration-success="state == 'in_progress'" decoration-info="state == 'draft'"
+                    decoration-danger="state == 'close'" decoration-warning="remaning_days &lt; 31 and remaning_days &gt; 0 "/>
+            </list>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="tenancy_form_view">
+        <field name="name">tenancy.form</field>
+        <field name="model">pm.tenancy</field>
+        <field name="arch" type="xml">
+            <form string="tenancy Form" duplicate="0" unlink="0">
+                <header>
+                    <button id="button_sent" name="action_in_progress" string="Start" class="btn-primary"
+                            invisible="state != 'draft'" type="object"/>
+                    <button id="button_sale" name="action_cancel" string="Close Tenancy" 
+                            confirm="Are You Sure You Want To Close This Tenancy? All Uninvoiced Rent Schedules Will Be Archived" invisible="state != 'in_progress'" type="object"/>
+                    <button id="button_draft" name="action_draft" string="Renew" class="btn-primary"
+                            invisible="state != 'close'" type="object"/>
+                    <button id="button_receive" name="action_receive_deposit_wizard"  invisible="deposit_payment_id or state in ('close', 'draft') or amount_deposit == 0.0"
+                    string="Receive Deposit" class="btn-primary" type="object"/>
+
+
+                    <button id="button_receive_agreement_charge" invisible="agreement_charge_invoice_id or state in ('close', 'draft') or agreement_charge == 0.0"
+                    name="create_agreement_charge_invoice" string="Create Agreement Charge Invoice" class="btn-primary" type="object"/>
+
+                    <button id="button_return" invisible="return_deposit_payment_id or state == 'draft' or not deposit_payment_id"
+                    name="action_return_deposit_wizard" string="Return Deposit" class="btn-primary" type="object"/>
+
+
+                    <field name="state" widget="statusbar" statusbar_visible="draft,in_progress"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_return_deposit_payment" invisible="not return_deposit_payment_id"
+                        icon="fa-credit-card" width="200" type="object" class="oe_stat_button">
+                           Deposit Return
+                        </button>
+
+                        <button name="action_view_agreement_charge_invoice" invisible="not agreement_charge_invoice_id"
+                        icon="fa-money" width="250" type="object" class="oe_stat_button">
+                            Agreement Charge Inv
+                        </button>
+
+                        <button name="action_view_receive_deposit_payment" invisible="not deposit_payment_id"
+                        icon="fa-money" width="170" type="object" class="oe_stat_button">
+                            Deposit Payment
+                        </button>
+                        
+                        <button name="action_view_rents" width="200" type="object" class="oe_stat_button" icon="fa-calendar">
+                            Scheduled Rent
+                        </button>
+                        <button name="action_view_invoices" type="object" class="oe_stat_button" icon="fa-money">
+                            Invoices
+                        </button>
+                        <button name="action_view_bills" type="object" class="oe_stat_button" icon="fa-credit-card">
+                            Bills
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1 class="o_row">
+                            <field name="code" readonly="1" string="Code" placeholder="Code"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Property Info">
+                                <field name="id" invisible="1"/>
+                                <field name="deposit_payment_id" invisible="1"/>
+                                <field name="return_deposit_payment_id" invisible="1"/>
+                                <field name="property_id"  readonly="state in ('in_progress', 'close')"/>
+                                <field name="tenant_id" context="{'default_is_tenant':True}" readonly="state in ('in_progress', 'close')"/>
+                                <field name="landlord_id" context="{'default_is_landlord':True}"/>
+                                <!-- <field name="currency_id" /> -->
+                                <field name="rent_price" widget="monetary" readonly="state in ('in_progress', 'draft', 'close')"/>
+                                <field name="rent_price_per_period" widget="monetary" readonly="state in ('in_progress', 'close')"/>
+                        </group>
+
+                        <group string="Tenancy Info">
+                            <field name="date" readonly="state in ('in_progress', 'close')"/>
+                            <field name="amount_deposit" widget="monetary" readonly="state in ('in_progress', 'close')" required="1"/>
+                            <field name="agreement_charge" widget="monetary" readonly="state in ('in_progress', 'close')" required="1"/>
+                            <field name="deposit_received"/>
+                            <field name="deposit_returned"/>
+                            <field name="invoice_id" invisible="1"/>
+                            <field name="agreement_charge_invoice_id" invisible="1"/>
+                            <field name="bill_id" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state in ('in_progress', 'close')"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Contract Info">
+                                <field name="start_date"  readonly="state in ('in_progress', 'close')"/>
+                                <field name="no_of_months"  readonly="state in ('in_progress', 'close')"/>
+                                <field name="end_date"/>
+                                <field name="rent_type_id"  readonly="state in ('in_progress', 'close')"/>
+                                <!-- <field name="rent_entry_chck" invisible="1"/> -->
+                        </group>
+
+                        <group string="Commission Info" invisible="not enable_comm">
+                            <field name="enable_comm" readonly="state in ('in_progress', 'close')"/>
+                            <field name="comm_type" readonly="state in ('in_progress', 'close')" required="enable_comm" invisible="not enable_comm"/>
+                            <field name="mgmt_precentage" widget="percentage" readonly="state in ('in_progress', 'close')" invisible="comm_type != 'precentage'" required="comm_type == 'precentage'"/>
+                            <field name="mgmt_fix_cost" readonly="state in ('in_progress', 'close')" invisible="comm_type != 'fixed_cost'" required="comm_type == 'fixed_cost'"/>
+                            <field name="landlord_amount" readonly="1" invisible="not enable_comm"/>
+                            <field name="mgmt_comm" readonly="1" invisible="not enable_comm"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                                <page string="Extra Services">
+                                    <field name="service_lines"> 
+                                        <list editable="bottom">
+                                            <field name="product_id" required="1"/>
+                                            <field name="price" required="1" sum="Total Price"/>
+                                            <field name="mgmt_comm" widget="percentage"/>
+                                            <!-- <field name="landlord_comm"/> -->
+                                            <field name="landlord_comm_amount" sum="Total LL Amount"/>
+                                            <field name="mgmt_comm_amount" sum="Total Mgmt Amount"/>
+                                            
+                                        </list>
+                                    </field>
+                                        
+                                </page>
+
+                        <page string="Terms And Conditions">
+                            <field name="note" readonly="state in ('in_progress', 'close')"/>
+                        </page>
+
+                            <page string="Rent Schedule" invisible="1">
+                                <field name="rent_schedule_ids">
+                                   
+                                    <list   decoration-info="invoice_id and inv_status == 'Not Paid'" 
+                                            decoration-danger="not invoice_id and inv_status == 'Not Paid'"
+                                            decoration-warning="invoice_id and inv_status == 'Partially Paid'"
+                                            decoration-success="invoice_id and inv_status == 'Paid'">
+                                        <field name="date"/>
+                                        <field name="amount"/>
+                                        <field name="tenant_id"/>
+                                        <field name="landlord_id" context="{'default_is_landlord':True}"/>
+                                        <field name="tenancy_id"/>
+                                        <field name="property_id"/>
+                                        <field name="invoice_id" invisible="1"/>
+                                        <field name="bill_id" invisible="1"/>
+                                        <field name="inv_status" widget="badge"
+                                            decoration-info="invoice_id and inv_status == 'Not Paid'" 
+                                            decoration-danger="not invoice_id and inv_status == 'Not Paid'"
+                                            decoration-warning="invoice_id and inv_status == 'Partially Paid'"
+                                            decoration-success="invoice_id and inv_status == 'Paid'"/>
+                                        <button name="create_entries" class="btn-success" type="object" 
+                                        confirm="This Will Create Tenant Invoice And Landlord Bill" 
+                                        invisible="invoice_id or bill_id" string="Generate Entries"/>
+                                    </list>
+                                </field>
+                            </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="tenancy_search_view">
+        <field name="name">tenancy.search</field>
+        <field name="model">pm.tenancy</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="code"/>
+                <field name="landlord_id"/>
+                <field name="property_id"/>
+                <field name="tenant_id"/>
+                <!--                     <filter name="available" string="available"
+                                            domain="[('state', '=', )]"/> -->
+
+                <group>
+                    <filter name="by_state" string="state"
+                            context="{'group_by': 'state'}"/>
+                </group>
+
+                <group >
+                    <filter name="by_landlord" string="Landlord"
+                            context="{'group_by': 'landlord_id'}"/>
+                            </group>
+                <group >
+                    <filter name="by_rent_type" string="Rent Type"
+                            context="{'group_by': 'rent_type_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+
+    <!-- window action -->
+    <!--
+        The following tag is an action definition for a "window action",
+        that is an action opening a view or a set of views
+    -->
+    <record model="ir.actions.act_window" id="tenancy_list_action">
+        <field name="name">Tenancies</field>
+        <field name="res_model">pm.tenancy</field>
+        <field name="view_mode">list,form</field>
+        <field name="context"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create the first Tenancy
+            </p>
+        </field>
+    </record>
+
+
+
+<!--     <menuitem id="property_managment_menu" name="Properties"
+              parent="main_property_managment_menu"/> -->
+    <!-- the following menuitem should appear *after*
+         its parent openacademy_menu and *after* its
+         action course_list_action -->
+    <menuitem id="tenancy_menu" name="Tenancies"
+              parent="main_property_managment_menu" sequence="1"
+              action="tenancy_list_action"/>
+
+
+        
+
+
+
+
+
+
+    <record model="ir.ui.view" id="receive_deposit_wizard_form">
+        <field name="name">Receive Deposit</field>
+        <field name="model">pm.tenancy.rceceive.deposit.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+            <group>                    
+                <group>
+                    <field name="partner_id" readonly="1"/>
+                    <field name="amount" readonly="1" widget="monetary"/>
+                </group>               
+                <group>
+                    <field name="date"/>
+                    <field name="journal_id"/>
+                    <field name="currency_id" invisible="1"/>
+                    <!-- <field name="company_id" groups="base.group_multi_company"/> -->
+
+                </group>
+            </group>
+            <footer>
+                <button string="Create Payment" name="create_payment" type="object" class="btn btn-success"/>
+                <button string="Cancel" special="cancel" class="btn btn-secondary"/>
+            </footer>
+            </form>
+        </field> 
+    </record>
+
+    <record model="ir.actions.act_window" id="action_receive_deposit_wizard">
+        <field name="name">Receive Deposit</field>
+        <field name="res_model">pm.tenancy.rceceive.deposit.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

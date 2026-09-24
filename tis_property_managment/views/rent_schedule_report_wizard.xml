@@ -1,0 +1,49 @@
+<odoo>
+    <record model="ir.ui.view" id="rent_schedule_wizard_form">
+        <field name="name">Rent Schedule Report</field>
+        <field name="model">pm.rent.scheduale.report.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+            <group>
+                <group>
+                    <field name="start_date"/>
+                    <field name="landlord_id" options="{'create': false, 'create_edit': false}"/>
+                    <field name="search_with" string="Search By" widget="radio"/>
+                    <field name="parent_property_ids" widget="many2many_tags" invisible="search_with != 'parent'" domain="landlord_id and [('landlord_id', '=', landlord_id)] or []"
+                    options="{'create': false, 'create_edit': false}"/>
+
+                </group>
+                <group>
+                    <field name="end_date"/>
+                    <field name="contract_status"/>
+                    <field name="info" string="Type" widget="radio"/>
+                    <field name="property_ids" widget="many2many_tags" invisible="search_with != 'property'" domain="landlord_id and [('landlord_id', '=', landlord_id)] or []"
+                    options="{'create': false, 'create_edit': false}"/>
+                    <!-- <field name="company_id" groups="base.group_multi_company"/> -->
+                </group>
+            </group>
+            <footer>
+                <button string="View Report" name="view_report" type="object" class="btn btn-success"/>
+                <button string="Cancel" special="cancel" class="btn btn-secondary"/>
+            </footer>
+            </form>
+
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="rent_schedule_wizard_action">
+        <field name="name">Rent Schedule</field>
+        <field name="res_model">pm.rent.scheduale.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="property_managment_report_menu" parent="main_property_managment_menu" name="Reporting"/>
+
+    <menuitem id="rent_schedule_report_menu"
+              name="Rent Schedule Report"
+              parent="property_managment_report_menu"
+              action="rent_schedule_wizard_action"/>
+
+
+</odoo>

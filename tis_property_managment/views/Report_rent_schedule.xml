@@ -1,0 +1,164 @@
+<odoo>
+<record id="actiont_rent_scheduale_report" model="ir.actions.report">
+    <field name="name">Rent Schedule Report</field>
+    <field name="model">pm.rent.scheduale.report.wizard</field>
+    <field name="report_type">qweb-html</field>
+    <field name="report_name">tis_property_managment.report_rent_scheduale_details</field>
+    <field name="report_file">tis_property_managment.report_rent_scheduale_details</field>
+    <field name="binding_model_id" ref="model_pm_rent_scheduale_report_wizard"/>
+    <field name="binding_type">report</field>
+</record>
+
+<template id="report_rent_scheduale_details">
+    <t t-call="web.html_container">
+                <t t-call="web.internal_layout">
+                    <div class="page">
+                        <style>
+
+                                table {
+                                font-family: Arial, Helvetica, sans-serif;
+                                border-collapse: collapse;
+                                width: 100%;
+                                margin-left: auto;
+                                margin-right: auto;
+                                }
+
+                                table td, table th {
+                                border: 1px solid #ddd;
+                                padding: 8px;
+                                }
+
+                                table tr:nth-child(even){background-color: #f2f2f2;}
+
+                                table tr:hover {background-color: #ddd;}
+
+                                table th {
+                                padding-top: 12px;
+                                padding-bottom: 12px;
+                                text-align: left;}
+
+                            .center {
+                                margin-left: auto;
+                                margin-right: auto;
+                                }
+                        </style>
+                        <div class="oe_structure"/>
+                        <div class="text-center">
+                            <h2>Rent Report</h2>
+                        </div>
+                            <div class="center">
+                                <t t-if="form['landlord_id']">
+                                    <div class="col-3">
+                                        <p nowrap="nowrap">Landlord: <t t-esc="form['landlord_id'][1]"/></p>
+                                    </div>
+                                </t>
+                                <div class="col-3">
+                                    <p>From: <t t-esc="form['start_date']"/> To: <t t-esc="form['end_date']"/></p>
+                                </div>
+                            </div>
+
+                        <table class="table table-sm center" style="width:100%;">
+                            <thead>
+                                <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" nowrap="nowrap">Tenancy</th>
+                                <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" nowrap="nowrap">Property</th>
+                                <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" nowrap="nowrap">Tenant</th>
+                                <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" nowrap="nowrap">Phone</th>
+                                <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" nowrap="nowrap">Due Date</th>
+                                <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" nowrap="nowrap">End Date</th>
+                                    <t t-if="not form['landlord_id']">
+                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" nowrap="nowrap">Landlord</th>
+                                    </t>
+                                <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" class="text-right" nowrap="nowrap">Rent Amount</th>
+                                <t t-if="form['info'] == 'detailed'">
+                                    <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" class="text-right" nowrap="nowrap">Mgmt comm</th>
+                                    <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" class="text-right" nowrap="nowrap">Landlord amount</th>                                    
+                                </t>
+                                <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" nowrap="nowrap" class="text-right">Others</th>
+                                <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" nowrap="nowrap">Inv Status</th>
+                                <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" nowrap="nowrap" class="text-right">Amount Paid</th>
+                                <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" nowrap="nowrap" class="text-right">Amount Residual</th>
+                            </thead>
+                            <t t-set="total_amount" t-value="0"/>
+                            <t t-set="total_others" t-value="0"/>
+
+                            <t t-set="mgmt_comm" t-value="0"/>
+                            <t t-set="landlord_amount" t-value="0"/>
+
+                            <t t-set="total_acheived" t-value="0"/>
+                            <t t-foreach="rent_schedule" t-as="line">
+                                <tr>
+                                    <td nowrap="nowrap"><span t-esc="line['tenancy']"></span></td>
+                                    <td nowrap="nowrap"><span t-esc="line['property_name']"></span></td>
+                                    <td nowrap="nowrap"><span t-esc="line['tenant']"></span></td>
+                                    <td nowrap="nowrap"><span t-esc="line['phone']"></span></td>
+                                    <td nowrap="nowrap"><span t-esc="line['due_date']"></span></td>
+                                    <td nowrap="nowrap"><span t-esc="line['end_date']"></span></td>
+                                    <t t-if="not form['landlord_id']">
+                                        <td nowrap="nowrap"><span t-esc="line['landlord']"></span></td>
+                                    </t>
+                                    <td nowrap="nowrap" class="text-right"><span t-esc="'{0:,.2f}'.format(line['rent_amount'])"></span></td>
+                                    
+                                    <t t-if="form['info'] == 'detailed'">
+                                    <td nowrap="nowrap" class="text-right"><span t-esc="'{0:,.2f}'.format(line['mgmt_comm'])"></span></td>
+                                    <td nowrap="nowrap" class="text-right"><span t-esc="'{0:,.2f}'.format(line['landlord_amount'])"></span></td>
+                                    </t>   
+
+                                    <td nowrap="nowrap" class="text-right"><span t-esc="'{0:,.2f}'.format(line['_others'])"></span></td>
+                                    <td nowrap="nowrap" class="text-center"><span t-esc="line['inv_status']"></span></td>
+
+                                    
+                                    <td nowrap="nowrap" class="text-right"><t t-if="line['amount_paid']" t-esc="'{0:,.2f}'.format(line['amount_paid'])"/></td>
+                                    
+                                    <td nowrap="nowrap" class="text-right"><t t-if="line['amount_residual']" t-esc="'{0:,.2f}'.format(line['amount_residual'])"/></td>
+
+                                </tr>
+
+                                <t t-if="line['inv_status'] == 'Partially Paid'">
+                                    <t t-set="total_acheived" t-value="total_acheived+line['rent_amount']-line['amount_residual']"/>
+                                </t>
+                                
+                                <t t-if="line['inv_status'] == 'Paid'">
+                                    <t t-set="total_acheived" t-value="total_acheived+line['rent_amount']+line['_others']"/>
+                                </t>
+                            <t t-set="total_amount" t-value="total_amount+line['rent_amount']"/>
+                            <t t-set="total_others" t-value="total_others+line['_others']"/>
+                            <t t-set="mgmt_comm" t-value="mgmt_comm+line['mgmt_comm']"/>
+                            <t t-set="landlord_amount" t-value="landlord_amount+line['landlord_amount']"/>
+                            </t>
+                                     <tr>
+                                        <td></td>
+                                        <t t-if="not form['landlord_id']">
+                                            <td></td>
+                                        </t>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="text-right">Total:</td>
+                                        <td nowrap="nowrap" class="text-right"><span t-esc="'{0:,.2f}'.format(total_amount)"></span></td>
+
+                                        <t t-if="form['info'] == 'detailed'">
+                                            <td nowrap="nowrap" class="text-right"><span t-esc="'{0:,.2f}'.format(mgmt_comm)"></span></td>
+                                            <td nowrap="nowrap" class="text-right"><span t-esc="'{0:,.2f}'.format(landlord_amount)"></span></td>
+                                        </t>
+                                        
+                                        <td nowrap="nowrap" class="text-right"><span t-esc="'{0:,.2f}'.format(total_others)"></span></td>
+
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                        </table>
+                    </div>
+
+                    <t t-set="total" t-value="total_amount+total_others"/>
+                    <p class="text-left">Total Receivable : <span t-esc="'{0:,.2f}'.format(total)"></span></p>
+                    <p class="text-left">Total Collected : <span t-esc="'{0:,.2f}'.format(total_acheived)"></span></p>
+                    <t t-set="diff" t-value="total-total_acheived"/>
+                    <p class="text-left">Remaining : <span t-esc="'{0:,.2f}'.format(diff)"></span></p>
+
+                </t>
+            </t>
+</template>
+
+</odoo>

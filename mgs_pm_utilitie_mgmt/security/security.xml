@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    
+    <record model="ir.rule" id="_model_pm_utility_type">
+        <field name="name">Only company can see it.</field>
+        <field name="model_id" ref="model_pm_utility_type"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">
+            [('company_id', 'in', company_ids)]
+        </field>
+    </record>
+
+    <record model="ir.rule" id="_model_pm_utility_reading">
+        <field name="name">Only company can see it.</field>
+        <field name="model_id" ref="model_pm_utility_reading"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">
+            [('company_id', 'in', company_ids)]
+        </field>
+    </record>
+
+    <record model="ir.rule" id="_model_pm_utility_info">
+        <field name="name">Only company can see it.</field>
+        <field name="model_id" ref="model_pm_utility_info"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">
+            [('company_id', 'in', company_ids)]
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,227 @@
+<odoo>
+    <record model="ir.ui.view" id="property_feature_list_view">
+        <field name="name">property.feature.list</field>
+        <field name="model">pm.property.feature</field>
+        <field name="arch" type="xml">
+            <list string="features List" default_order="id desc" editable="bottom">
+                <field name="name" string="Name"/>
+                <field name="color" string="Name" widget="color_picker"/>
+            </list>
+        </field>
+    </record>
+
+
+
+
+    <record model="ir.ui.view" id="property_list_view">
+        <field name="name">property.list</field>
+        <field name="model">pm.property</field>
+        <field name="arch" type="xml">
+            <list string="Property List" default_order="id desc">
+                <field name="code"/>
+                <!-- <field name="parent_property_id"/> -->
+                <field name="parent_property_id"/>
+                <field name="display_name" string="Name"/>
+                <field name="landlord_id"/>
+                <field name="type_id"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="street"/>
+                <field name="bedrooms"/>
+                <field name="bathrooms"/>
+                <field name="feature_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                <field name="rent_price" widget="monetary"/>
+                <field name="state" widget="badge"  on_change="1" decoration-success="state == 'available'" decoration-info="state == 'draft'"
+                    decoration-danger="state == 'close' or state == 'booked'" decoration-warning="state == 'on_lease'"/>
+            </list>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="property_form_view">
+        <field name="name">property.form</field>
+        <field name="model">pm.property</field>
+        <field name="arch" type="xml">
+            <form string="Property Form">
+                <header>
+                    <button id="button_open" name="action_open" string="Open" class="btn-primary"
+                            invisible="state != 'draft'" type="object"/>
+                    <button id="button_draft" name="action_draft" string="Re Open" class="btn-primary"
+                            invisible="state != 'close'" type="object"/>
+                    <button id="button_close" name="action_close" string="close" invisible="state not in ('draft', 'available', 'on_lease', 'booked')"
+                            type="object"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,available,on_lease,booked"/>
+                </header>
+                <sheet>
+                            <field name="image_1920" widget="image" class="oe_avatar"/>                         
+                  
+                  <div>
+                        <h1>
+                            <field name="parent_property_id" placeholder="Parent"/>
+                        </h1>
+                        <h1>
+                            <field name="name" default_focus="1" placeholder="Name"/>
+                        </h1>
+                    </div>
+
+
+                    <group>
+
+
+                        <group>
+                            <label for="street" string="Address"/>
+                            <div>
+                                <field name="street" placeholder="Street..." required="1" readonly="parent_property_id"/>
+                                <field name="street2" placeholder="Street2..."  readonly="parent_property_id"/>
+                                <div class="address_format">
+                                    <field name="city" placeholder="City" style="width: 100%%"  readonly="parent_property_id"/>
+                                </div>
+                                <field name="country_id" placeholder="Country" class="oe_no_button"
+                                       options='{"no_open": True, "no_create": True}'  readonly="parent_property_id"/>
+                            </div>
+                            <field name="date"/>
+                            <field name="rent_price" widget="monetary"/>
+                            <!-- <field name="analytic_acc_id"/> -->
+                            <field name="active" invisible="1"/>
+                        </group>
+
+                        <group>
+                            <field name="landlord_id" required="1" context="{'default_is_landlord':True}" readonly="parent_property_id"/>
+                            <field name="type_id"/>
+                            <field name="furnishing"/>
+                            <field name="facing"/>
+                            <field name="bedrooms"/>
+                            <field name="bathrooms"/>
+                            <field name="feature_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+
+
+                    </group>
+
+                    <notebook>
+                        <page string="Tenancies And Occupancy">
+                        <group name="occupancy" string="Occupancy">
+                            <field name="tenant_id" readonly="1"/>
+                        </group>
+
+                        <h2>
+                            <label for="tenancy_ids" string="Tenancies"/>
+                        </h2>
+                            <field name="tenancy_ids" options="{'create': false, 'create_edit': false}">
+                                    <list>
+                                        <field name="tenant_id"/>
+                                        <field name="start_date"/>
+                                        <field name="end_date"/>
+                                        <field name="amount_deposit"/>
+                                        <field name="rent_type_id"/>
+                                        <field name="mgmt_comm" widget="percentage"/>
+                                        <field name="landlord_amount"/>
+                                        <field name="state" widget="badge" on_change="1" decoration-success="state == 'in_progress'" decoration-info="state == 'draft'"
+                                                decoration-danger="state == 'close'"/>
+                                    </list>
+                            </field>
+                        </page>
+                        
+                        <page string="Commission" >
+                        
+                            <group>
+                                <group>
+                                        <field name="enable_comm" readonly="state in ('in_progress', 'close')"/>
+                                        <field name="comm_type"  readonly="state in ('in_progress', 'close')" required="enable_comm" invisible="not enable_comm"/>
+                                        <field name="mgmt_precentage" widget="percentage" readonly="state in ('in_progress', 'close')" invisible="comm_type != 'precentage' or not enable_comm" required="comm_type == 'precentage'"/>
+                                        <field name="mgmt_fix_cost" readonly="state in ('in_progress', 'close')" invisible="comm_type != 'fixed_cost' or not enable_comm" required="comm_type == 'fixed_cost'"/>
+                                </group>
+                                <group>
+                                        <field name="mgmt_comm" invisible="not enable_comm"/>
+                                        <field name="landlord_amount" invisible="not enable_comm"/>
+                                </group>
+                            </group>
+
+                        </page>
+                        
+                        <page name="maintenancies" string="Maintenancies">
+                            <field name="maintenance_ids" options="{'create': false, 'create_edit': false}">
+                            <list>
+                                <field name="code"/>
+                                <field name="tenant_id"/>
+                                <field name="total_amount"/>
+                                <field name="tenant_fault"/>
+                                <field name="state" widget="badge" decoration-warning="state == 'in_progress'"
+                                decoration-success="state == 'done'" decoration-danger="state == 'cancel'" 
+                                decoration-info="state == 'draft'"
+                                />
+                            </list>
+                            </field>
+                        </page>
+                    </notebook>
+
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="property_search_view">
+        <field name="name">property.search</field>
+        <field name="model">pm.property</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="display_name"/>
+                <field name="name"/>
+                <field name="parent_property_id"/>
+                <field name="code"/>
+                <field name="landlord_id"/>
+                <field name="type_id"/>
+                <field name="street"/>
+                <field name="rent_price"/>
+                <filter name="available" string="available"
+                        domain="[('state', '=','available')]"/>
+
+                <group >
+                    <filter name="by_state" string="state"
+                            context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+
+    <!-- window action -->
+    <!--
+        The following tag is an action definition for a "window action",
+        that is an action opening a view or a set of views
+    -->
+    <record model="ir.actions.act_window" id="property_list_action">
+        <field name="name">Property</field>
+        <field name="res_model">pm.property</field>
+        <field name="view_mode">list,form</field>
+        <field name="context"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create the first Property
+            </p>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="property_feature_list_action">
+        <field name="name">Property Tags</field>
+        <field name="res_model">pm.property.feature</field>
+        <field name="view_mode">list</field>
+        <field name="context"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create the first tag
+            </p>
+        </field>
+    </record>
+
+    <!-- top level menu: no parent -->
+    <menuitem id="main_property_managment_menu" name="Real Estate" web_icon="tis_property_managment,static/src/img/pm_icon.png"/>
+
+
+    <menuitem id="properties_menu" name="Properties"
+              parent="main_property_managment_menu" sequence="2"/>
+
+    <menuitem id="property_menu" name="Properties"
+              parent="properties_menu" sequence="1"
+              action="property_list_action"/>
+</odoo>

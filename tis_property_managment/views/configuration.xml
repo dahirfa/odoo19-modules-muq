@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record model="ir.ui.view" id="property_type_form_view">
+        <field name="name">property type.form</field>
+        <field name="model">pm.property.type</field>
+        <field name="arch" type="xml">
+            <form string="Property Form">
+                <sheet>
+                    <group>
+                        <field name="name"></field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="property_type_list_view">
+        <field name="name">property type.list</field>
+        <field name="model">pm.property.type</field>
+        <field name="arch" type="xml">
+            <list string="Property list">
+                <field name="name"></field>
+            </list>
+        </field>
+    </record>
+
+
+
+
+              <!--END Rent Type  FORM/LIST-->
+
+    <record model="ir.ui.view" id="rent_type_list_view">
+        <field name="name">Rent type list</field>
+        <field name="model">pm.tenancy.type</field>
+        <field name="arch" type="xml">
+            <list string="Rent Type list">
+                <field name="name"></field>
+            </list>
+        </field>
+    </record>
+
+     <record model="ir.ui.view" id="rent_type_form_view">
+        <field name="name">Rent type form</field>
+        <field name="model">pm.tenancy.type</field>
+        <field name="arch" type="xml">
+             <form string="Rent Type Form">
+                <sheet>
+                            <group>
+                                <group>
+                                    <field name="name"></field>
+                                </group>
+
+                                <group>
+                                    <field name="number"></field>
+                                    <field name="_type"></field>
+                                </group>
+                            </group>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+              <!-- END  Rent Type  FORM/LIST-->
+
+
+
+
+
+     <record model="ir.ui.view" id="maintenance_type_form_view">
+        <field name="name">maintenance type.form</field>
+        <field name="model">pm.maintenance.type</field>
+        <field name="arch" type="xml">
+             <form string="Maintenance Form">
+                <sheet>
+                    <group>
+                        <field name="name"></field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="maintenance_type_list_view">
+        <field name="name">maintenance.type.list</field>
+        <field name="model">pm.maintenance.type</field>
+        <field name="arch" type="xml">
+             <list string="Maintenance List">
+                <field name="name"></field>
+            </list>
+        </field>
+    </record>
+
+
+    <record model="ir.actions.act_window" id="configuration_p_type_list_action">
+        <field name="name">property type</field>
+        <field name="res_model">pm.property.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="context"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create the first property type
+            </p>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="configuration_m_type_list_action">
+        <field name="name">maintenance type</field>
+        <field name="res_model">pm.maintenance.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="context"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create the first maintenance type
+            </p>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="configuration_r_type_list_action">
+        <field name="name">Rent type</field>
+        <field name="res_model">pm.tenancy.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="context"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            </p>
+        </field>
+    </record>
+
+
+
+
+
+    <menuitem id="property_managment_configuration_menu"
+              name="Configuration"
+              parent="main_property_managment_menu" sequence="16"/>
+
+    <menuitem id="property_type_menu"
+              name="Property Type"
+              parent="property_managment_configuration_menu"
+              action="configuration_p_type_list_action"/>
+
+              <!-- Rent Type  menue Item-->
+    <menuitem id="rent_type_menu"
+              name="Rent Type"
+              parent="property_managment_configuration_menu"
+              action="configuration_r_type_list_action"/>
+
+    <menuitem id="property_features_menu"
+              name="Property Features"
+              parent="property_managment_configuration_menu"
+              action="property_feature_list_action"/>
+
+    <menuitem id="maintenance_type_menu"
+              name="Maintenance Type"
+              parent="property_managment_configuration_menu"
+              action="configuration_m_type_list_action"/>
+
+</odoo>

@@ -1,0 +1,87 @@
+<odoo>
+<record id="actiont_landlord_summary_report" model="ir.actions.report">
+    <field name="name">Landlord Summary Report</field>
+    <field name="model">pm.landlord.statement.wizard.report</field>
+    <field name="report_type">qweb-html</field>
+    <field name="report_name">tis_property_managment.report_landlord_summary</field>
+    <field name="report_file">tis_property_managment.report_landlord_summary</field>
+    <field name="binding_model_id" ref="model_pm_landlord_statement_wizard_report"/>
+    <field name="binding_type">report</field>
+</record>
+
+<template id="report_landlord_summary">
+    <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style>
+                            table tr:nth-child(even){background-color: #f2f2f2;}
+
+                            table tr:hover {background-color: #ddd;}
+                            .center {
+                                margin-left: auto;
+                                margin-right: auto;
+                                }
+                        </style>
+                        <div class="oe_structure"/>
+                         <div class="text-center">
+                             <h2>Landlord Summary</h2>
+                        </div>
+                            <div class="row center" style="width:100%;">
+                                <div class="col-3">
+                                    <strong>Landlord: </strong>
+                                    <p nowrap="nowrap"><t t-esc="form['landlord_id'][1]"/></p>
+                                </div>
+                                <div class="col-3">
+                                    <strong>From: <t t-esc="datetime.datetime.strptime(form['start_date'], '%Y-%m-%d').strftime('%d-%b-%Y')"/></strong>
+                                </div>
+                                 <div class="col-3">
+                                        <strong>To: <t t-esc="datetime.datetime.strptime(form['end_date'], '%Y-%m-%d').strftime('%d-%b-%Y')"/></strong>  
+                                </div>
+                            </div>
+
+                        <table class="table table-sm center" style="width:100%;">
+                            <thead>
+                                <th nowrap="nowrap">tenant</th>
+                                <th nowrap="nowrap">Property</th>
+                                <th nowrap="nowrap">Date</th>
+                                <th nowrap="nowrap" class="text-right">Rent Amount</th>
+                                <th nowrap="nowrap" class="text-right">Others</th>
+                                <th nowrap="nowrap" class="text-right">mgmt Comm</th>
+                                <th nowrap="nowrap" class="text-right">Landlord Amount</th>
+                            </thead>
+                            <t t-set="total_amount" t-value="0"/>
+                            <t t-set="total_others_amount" t-value="0"/>
+                            <t t-set="total_mgmt_comm" t-value="0"/>
+                            <t t-set="total_services_amount_for_landlord" t-value="0"/>
+                            <t t-foreach="rent_schedule" t-as="line">
+                                <tr>
+                                    <td nowrap="nowrap"><span t-esc="line['tenant_id'][1]"></span></td>
+                                    <td nowrap="nowrap"><span t-esc="line['property_id'][1]"></span></td>
+                                    <td nowrap="nowrap"><span t-esc="datetime.datetime.strptime(line['date'], '%Y-%m-%d').strftime('%d-%b-%Y')"></span></td>
+                                    <td nowrap="nowrap" class="text-right"><span t-esc="'{0:,.2f}'.format(line['amount'])"></span></td>
+                                    <td nowrap="nowrap" class="text-right"><span t-esc="'{0:,.2f}'.format(line['total_services_amount_for_landlord'])"></span></td>
+                                    <td nowrap="nowrap" class="text-right"><span t-esc="'{0:,.2f}'.format(line['mgmt_comm'])"></span></td>
+                                    <td nowrap="nowrap" class="text-right"><span t-esc="'{0:,.2f}'.format(line['landlord_amount'])"></span></td>
+                                </tr>
+                                <t t-set="total_amount" t-value="total_amount+line['amount']"/>
+                                <t t-set="total_others_amount" t-value="total_others_amount+line['total_services_amount_for_landlord']"/>                               
+                                <t t-set="total_mgmt_comm" t-value="total_mgmt_comm+line['mgmt_comm']"/>
+                                <t t-set="total_services_amount_for_landlord" t-value="total_services_amount_for_landlord+line['landlord_amount']"/>
+                            </t>
+                            <tr style="font-weight:BOLD;">
+                                    <td nowrap="nowrap">Total:</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td nowrap="nowrap" class="text-right"><span t-esc="'{0:,.2f}'.format(total_amount)"></span></td>
+                                    <td nowrap="nowrap" class="text-right"><span t-esc="'{0:,.2f}'.format(total_others_amount)"></span></td>
+                                    <td nowrap="nowrap" class="text-right"><span t-esc="'{0:,.2f}'.format(total_mgmt_comm)"></span></td>
+                                    <td nowrap="nowrap" class="text-right"><span t-esc="'{0:,.2f}'.format(total_services_amount_for_landlord)"></span></td>
+                                </tr>
+                        </table>
+
+                    </div>
+                </t>
+            </t>
+</template>
+
+</odoo>

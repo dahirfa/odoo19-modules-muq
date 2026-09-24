@@ -1,0 +1,58 @@
+<odoo>
+
+    <!-- <data> -->
+        <record id="property_settings_view" model="ir.ui.view">
+            <field name="name">Property Configuration</field>
+            <field name="model">res.config.settings</field>
+            <field name="priority" eval="50"/>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form" position="inside">
+                    <app data-string="Property MS" string="Property MS" name="tis_property_managment">
+                        <block title="Property MS Settings" name="property_ms_settings_container">
+                            <setting id="income_account_id" string="Default Rent Income Account">
+                                <field name="income_account_id" options="{'no_create': True}" required="0"/>
+                            </setting>
+                            <setting id="expense_account_id" string="Default Expense Account">
+                                <field name="expense_account_id" options="{'no_create': True}" required="0"/>
+                            </setting>
+                            <setting id="deposit_account_id" string="Default Deposit Account">
+                                <field name="deposit_account_id" options="{'no_create': True}" required="0"/>
+                            </setting>
+                            <setting id="agreement_income_account_id" string="Default Agreement Income Account">
+                                <field name="agreement_income_account_id" options="{'no_create': True}" required="0"/>
+                            </setting>
+                            <setting id="services_income_account_id" string="Default Services Income Account">
+                                <field name="services_income_account_id" options="{'no_create': True}" required="0"/>
+                            </setting>
+                            <setting id="maintenance_income_account_id" string="Default Maintenance Income Account">
+                                <field name="maintenance_income_account_id" options="{'no_create': True}" required="0"/>
+                            </setting>
+                            <setting id="maintenance_expense_account_id" string="Default Maintenance Expense Account">
+                                <field name="maintenance_expense_account_id" options="{'no_create': True}" required="0"/>
+                            </setting>
+                            <setting id="maintenance_expense_product_id" string="Default Maintenance Expense Product">
+                                <field name="maintenance_expense_product_id" options="{'no_create': True}" required="0"/>
+                            </setting>
+                        </block>
+                    </app>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="property_settings_view_action" model="ir.actions.act_window">
+            <field name="name">Settings</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            
+            <field name="context">{'module' : 'tis_property_managment'}</field>
+        </record>
+
+        <menuitem id="property_setting_menu"
+                  name="Settings"
+                  parent="property_managment_configuration_menu"
+                  action="property_settings_view_action"/>
+    <!-- </data> -->
+
+</odoo>

@@ -1,0 +1,34 @@
+<odoo>
+        <record model="ir.actions.act_window" id="landlord_list_action">
+            <field name="name">Landlords</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">list,form,kanban</field>
+            <field name="context">{'default_is_landlord':True}</field>
+             <field name="domain">[('is_landlord','=',True)]</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Create the first landlord
+                </p>
+            </field>
+        </record>
+
+
+        <record model="ir.actions.act_window" id="tenant_list_action">
+            <field name="name">Tenants</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">list,form,kanban</field>
+            <field name="context">{'default_is_tenant':True}</field>
+             <field name="domain">[('is_tenant','=',True)]</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Create the first Tenant
+                </p>
+            </field>
+        </record>
+        <menuitem id="pm_partners_menu" name="Partners" parent="main_property_managment_menu" sequence="3"/>
+        <menuitem id="landlord_menu" name="landlords" parent="pm_partners_menu"
+                  action="landlord_list_action"/>
+        <menuitem id="tenant_menu" name="Tenants" parent="pm_partners_menu"
+                  action="tenant_list_action"/>
+        <!-- Full id location:
+             action="openacademy.course_list_action"
+             It is not required when it is the same module -->
+</odoo>

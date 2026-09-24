@@ -1,0 +1,22 @@
+<odoo>
+
+    <!-- <data> -->
+        <record id="utility_settings_view" model="ir.ui.view">
+            <field name="name">Property Configuration</field>
+            <field name="model">res.config.settings</field>
+            <field name="priority" eval="50"/>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form" position="inside">
+                    <app data-string="Property Utilities" string="Property Utilities" name="mgs_pm_utilitie_mgmt">
+                        <block title="Utility Settings" name="utility_settings_container">
+                            <setting id="readings_product_category" string="Product category for services that require readings">
+                                <field name="readings_product_category" options="{'no_create': True}" required="0"/>
+                            </setting>
+                        </block>
+                    </app>
+                </xpath>
+            </field>
+        </record>
+
+</odoo>

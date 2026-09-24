@@ -1,0 +1,175 @@
+<odoo>
+            <record model="ir.ui.view" id="rent_schedule_list_view">
+                <field name="name">rent.schedule.list</field>
+                <field name="model">pm.rent.schedule</field>
+                <field name="arch" type="xml">
+                    <list string="Rent Schedule List" default_order="id"
+                        decoration-info="invoice_id and inv_status == 'Not Paid'" 
+                        decoration-danger="not invoice_id and inv_status == 'Not Paid'"
+                        decoration-warning="invoice_id and inv_status == 'Partially Paid'"
+                        decoration-success="invoice_id and inv_status == 'Paid'">
+                        <field name="date"/>
+                        <field name="tenancy_id"/>
+                        <field name="tenant_id"/>
+                        <field name="property_id"/>
+                        <field name="landlord_id"/>
+                        <field name="amount"/>
+                        <field name="invoice_id" invisible="1"/>
+                        <field name="inv_status" widget="badge"
+                        decoration-info="invoice_id and inv_status == 'Not Paid'" 
+                        decoration-danger="not invoice_id and inv_status == 'Not Paid'"
+                        decoration-warning="invoice_id and inv_status == 'Partially Paid'"
+                        decoration-success="invoice_id and inv_status == 'Paid'"/>
+                    </list>
+                </field>
+            </record>
+
+
+            <record model="ir.ui.view" id="rent_schedule_form_view">
+                <field name="name">rent.schedule.form</field>
+                <field name="model">pm.rent.schedule</field>
+                <field name="arch" type="xml">
+                    <form string="Rent Schedule Form">
+                        <header>
+                        <!-- <field name="state" widget="statusbar" statusbar_visible="notpaid,paid"/> -->
+                        <button id="button_create" invisible="invoice_id or bill_id"
+                        name="create_entries" confirm="This Will Create Tenant Invoice And Landlord Bill"
+                        string=" Generate Entries" height="30" type="object" class="btn-primary"/>
+                        
+                        <!-- <button id="button_create" attrs="{'invisible': [('bill_id','!=',False)]}"
+                        name="create_bill" string="  Create Landlord Bill" height="30" type="object" class="btn-primary" icon="fa-credit-card"/> -->
+                        </header>
+                        <sheet>
+                    <div class="oe_button_box">
+                        <button name="action_view_invoice" invisible="not invoice_id"
+                        width="150" type="object" class="oe_stat_button" icon="fa-money">
+                            Tenant Invoice
+                        </button>
+
+                        <button name="action_view_bill" invisible="not bill_id"
+                        type="object" width="150" class="oe_stat_button" icon="fa-credit-card">
+                            Landlord Bill
+                        </button>
+
+
+                    </div>
+                            <group>
+                                <group>
+                                    <field name="id" invisible="1"/>
+                                    <field name="tenancy_id"  readonly="id"/>
+                                    <field name="property_id"/>
+                                    <field name="date"/>
+                                    <field name="tenant_id"/>
+                                    <field name="amount"/>
+                                    <field name="currency_id" invisible="1"/>
+                                    <field name="total_services_price"/> 
+                                    <field name="invoice_id" invisible="1"/>
+                                </group>
+                                <group>
+                                    <field name="landlord_id"/>
+                                    <field name="landlord_amount" invisible="letting_comm or not enable_comm"/>
+                                    <field name="mgmt_comm" widget="percentage" invisible="letting_comm or not enable_comm"/>
+                                    <field name="enable_comm" invisible="1"/>
+                                    <field name="bill_id" invisible="1"/>
+                                    <field name="company_id" groups="base.group_multi_company"/>
+                                    
+                                    <field name="inv_status" widget="badge"
+                                        decoration-info="invoice_id and inv_status == 'Not Paid'" 
+                                        decoration-danger="not invoice_id and inv_status == 'Not Paid'"
+                                        decoration-warning="invoice_id and inv_status == 'Partially Paid'"
+                                        decoration-success="invoice_id and inv_status == 'Paid'"/>
+                                    <field name="amount_residual" invisible="inv_status != 'Partially Paid'"/>
+                                    
+                                </group>
+                            </group>
+
+                            <notebook>
+
+
+                            <page string="NOTE">
+                                    <field name="note"/>
+                            </page>
+                            <page string="Letting Commision">
+                                <group>
+                                    <group>
+                                        <field name="letting_comm"/>
+                                            <div name="letting_comm_precentage">
+                                                <label for="letting_comm_precentage" string="Precentage" invisible="not letting_comm"/>
+                                                <field name="letting_comm_precentage" 
+                                                class="oe_inline" invisible="not letting_comm" required="letting_comm"/> %%
+                                            </div>
+                                        <field name="letting_comm_Amount" invisible="not letting_comm"/>
+                                        <field name="new_landlord_amount" invisible="not letting_comm"/>
+                                    </group>
+
+                                    <group>
+                                    </group>
+                                </group>
+                            </page>
+
+                           
+                            </notebook>
+                        </sheet>
+                        <chatter/>
+                    </form>
+                </field>
+            </record>
+
+            <record model="ir.ui.view" id="rent_schedule_search_view">
+                <field name="name">rent.schedule.search</field>
+                <field name="model">pm.rent.schedule</field>
+                <field name="arch" type="xml">
+                    <search>
+                        <field name="tenant_id"/>
+                        <field name="landlord_id"/>
+                        <field name="property_id"/>
+                        <field name="date"/>
+                        <field name="tenancy_id"/>
+                        
+                        <!--                     <filter name="available" string="available"
+                                                    domain="[('state', '=', )]"/> -->
+                        <filter string="Current Month" name="current_month"
+                            domain="[('date','&lt;',(context_today()+relativedelta(months=1)).strftime('%%Y-%%m-01')), ('date','&gt;=',time.strftime('%%Y-%%m-01'))]"/>
+                        <filter string="Prev Month" name="prev_month" 
+                            domain="[('date','&gt;=',(context_today()-relativedelta(months=1)).strftime('%%Y-%%m-01')),('date','&lt;',time.strftime('%%Y-%%m-01'))]"/>
+                        <group >
+                            <filter name="by_date" string="date"
+                                    context="{'group_by': 'date'}"/>
+                        </group>
+                        <group >
+                            <filter name="by_landlord" string="landlord"
+                                    context="{'group_by': 'landlord_id'}"/>
+                        </group>
+                        <group >
+                            <filter name="by_tenant_id" string="tenant"
+                                    context="{'group_by': 'tenant_id'}"/>
+                        </group>
+                        <group >
+                            <filter name="by_property_id" string="Property"
+                                    context="{'group_by': 'property_id'}"/>
+                        </group>
+                    </search>
+                </field>
+            </record>
+
+
+            <!-- window action -->
+            <!--
+                The following tag is an action definition for a "window action",
+                that is an action opening a view or a set of views
+            -->
+            <record model="ir.actions.act_window" id="rent_schedule_list_action">
+                <field name="name">Rent Schedule</field>
+                <field name="res_model">pm.rent.schedule</field>
+                <field name="view_mode">list,form</field>
+                <field name="context">{"search_default_current_month":1}</field>
+                <field name="help" type="html">
+                    <p class="o_view_nocontent_smiling_face">
+                    </p>
+                </field>
+            </record>
+    <menuitem id="rent_schedule_menu" name="Rent Schedule"
+              parent="main_property_managment_menu"
+              action="rent_schedule_list_action"/>
+
+</odoo>

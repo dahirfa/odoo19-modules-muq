@@ -1,0 +1,1093 @@
+<odoo>
+  
+        <record id="action_rent_contract_report" model="ir.actions.report">
+        <field name="name">Rent Contract</field>
+        <field name="model">pm.tenancy</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">saafi_plaza_contract.rent_contract_report</field>
+        <field name="report_file">saafi_plaza_contract.rent_contract_report</field>
+        <field name="binding_model_id" ref="tis_property_managment.model_pm_tenancy"/>
+    </record>
+
+    <record id="paperformat_5_padding" model="report.paperformat">
+        <field name="name">European A4</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">10</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">5</field>
+        <field name="margin_right">5</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">43</field>
+        <field name="dpi">90</field>
+    </record>
+
+
+        <template id="rent_contract_report">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                        <t t-call="web.basic_layout">
+                            <div class="page">
+                                    <style>
+
+                                .table {
+                                font-family: Arial, Helvetica, sans-serif;
+                                border-collapse: collapse;
+                                width: 100%;
+                                margin-left: auto;
+                                margin-right: auto;
+                                }
+
+                                table td, table th {
+                                border: 1px solid #ddd;
+                                }
+
+                                    * {
+                                        box-sizing: border-box;
+                                        }
+
+                                        /* Create a two-column layout */
+                                        .col {
+                                        float: left;
+                                        width: 50%;
+                                        padding: 5px;
+                                        height:50%;
+                                        }
+                                       
+                                        .row::after {
+                                        content: "";
+                                        clear: both;
+                                        display: table;
+                                        }
+                                    </style>
+                            <div class="oe_structure"/>
+                                <h1 style="text-align:center;"><img src='/web/binary/company_logo' height="85px" width="auto" class="center" alt="Logo"/></h1>
+                                <h4 style="text-align:center;">Tel: +252-610 54 06 30 / +252-610 54 06 31</h4>
+                                    <h4 style="text-align:center;">MOGADISHU   SOMALIA</h4>
+                                    <h4 style="text-align:center;">HESHIISKA KIREYNTA SAAFI GROUP INVESTMENT (DEEGAAN)</h4>
+                                    <h4>DEEGAN/XAFIISYO</h4>
+                                    <ol type="a">
+                                        <li>
+                                            <p>Guest Houses oo ah apartments ka kooban 3 qol oo jiif ah iyo musqulahooda, Fadhi iyo ku shiin oo si casri ah loo qalabeeyay taas oo ku dhan tahay dhamaan wixii agab ah ee Deegan looga baahnaa.</p>
+                                        </li>
+                                        <li>
+                                            <p>Apartments ka kooban 3 qol oo jiif ah iyo musqulahooda, Fadhi iyo kushiin Oo bannaan.  </p>
+                                        </li>
+                                        <li>
+                                            <p>Waxaa Kale oo u adeegsan kartaa xafiisyo  </p>
+                                        </li>
+                                    </ol>
+                                    <h4> ADEEGYADA GURIGA </h4>
+                                    <p>Kireeste walba oo dagan daarta SAAFI PLAZA waxuu xaq u leeyahy;  </p>
+                                    <ul>
+                                        <li>
+                                            <p>Security   waardiye 24 saac ah  </p>
+                                        </li>
+                                        <li>
+                                            <p>Parking   goob amaan ah oo gaarigiisa ku xareesto (hal gaari)</p>
+                                        </li>
+                                        <li>
+                                            <p>Cleaning - Nadaafad Guud  </p>
+                                        </li>
+                                    </ul>
+                                    <h4>XEER KA KIREYNTA SAAFI PALAZA EE DEEGAANKA  </h4>
+                                    <ol>
+                                        <li>
+                                        <h6>SHURUUDAHA KIREESTAHA  </h6>
+                                        </li>
+                                
+                                        <h6>SHURUUDAHA LOOGA BAAHAN YAHAY KIREYSTAHA</h6>
+                                        <ol type="a">
+                                            <li>
+                                                <p>Waxaa Laga rabaa kireyste walba inuu bixiyo lacagta kirada lagu heshiiyay.</p>
+                                            </li>
+                                            <li>
+                                                <p>Waxaa laga doonayaa kireystaha inuu bixiyo hal bil oo rahan ah ama deposit</p>
+                                            </li>
+                                            <li>
+                                                <p>Kirada guriga waa hormaris 3 bil kasta, waxaad bixinaysaa bil kahor inta aanu kirada kuu dhamaan</p>
+                                            </li>
+                                            <li>
+                                                <p>Apartment kasta oo guriga ka mid ah waxey leedahay saacad gooni ah oo xisaabineysa Korantada iyo biyaha appartmen kaas laga isticmaalay. Hadaba, kireestuhu waa inuu bixiyaa qarashka ku waajibay   bil kasta.  </p>
+                                            </li>
+                                            <li>
+                                                <p>Kireystuhu waa inuu ilaaliyaa badqabka guriga la dajiyay.</p>
+                                            </li>
+                                            <li>
+                                                <p>Kireystaha waxa la geyn doona degmada guriga looga kireeyay si loo maro sharciga guryo kireynta ee u yaalo gobolka Banaadir.</p>
+                                            </li>
+                                            <li>
+                                                <p>Kiresytaha waa inuu buuxiya foomka Diiwaanka kireystaha ee SAAFI PLAZA</p>
+                                            </li>
+                                        </ol>
+                                    
+                                        <li>
+                                            <h6>NADAAFADA:   kireeste walba oo dagaya daarta SAAFI PLAZA waxaa laga doonayaa inuu nadiifiyo dhamaan goobahan;  </h6>
+                                            <ol type="a">
+                                                <li>
+                                                    <p>Qolalka jiifka- kireestaha waxaa waajib ku ah inuu nadiifiyo personal rooms si maalin ah kana taxadaro inuu wax yeeleyn gaarsiiyo  </p>
+                                                </li>
+                                                <li>
+                                                    <p>Kushiin ka- jikada guriga wa in la nadiifiyo mar waliba oo cunto lagu diyaarsho</p>
+                                                </li>
+                                                <li>
+                                                    <p>Musqulaha waa in la nadiifiyo mar walba oo la isticmaalo iyo markii loo baahdaba.  </p>
+                                                </li>
+                                                <li>
+                                                    <p>Goobaha dadka kale kala dhaxeeya- kireestuhu waa inoo nadiifiyaa goobaha danta guud hadii uu asiga ama martida asiga u timid waxwasaqeyn ah gaar siiyaan.</p>
+                                                </li>
+                                            </ol>
+                                        </li>
+
+                                        <li>
+                                            <h6>MARTIDA</h6>
+                                            <p>kireestaha waxaa waajib ku ah ineysan usoo marti Karin 3 qof ka badan halkii mar, tirada intaas ka badan waa in lagu war galiyaa maamulaha guriga, asiga oo fasax laga heysana lama marti qaadi karo tira intaas ka badan halkii mar.  </p>
+                                        </li>
+
+                                        <li>
+                                            <h6>BALWADA- SMOKING  </h6>
+                                            <p>Gurigaan waxaa mamnuuc ka ah nuuc walba oo mukhaadaraad ah, kireestuhu waa inuu ilaaliya badqabka dadka daris ka la ah.  </p>
+                                        </li>
+                                    </ol>
+
+                                    <div>
+                                    <p></p>
+                                    <p></p>
+                                    <p></p>
+                                    <p></p>
+                                    <p></p>
+                                    <h3 style="text-align:center;">Contract Info</h3>
+                                    <h5>Warbixinta Kireystaha</h5>
+                                    <table class="table">
+                                            <td>Tenant : <t t-esc="o.tenant_id.name"/></td>
+                                            <td>Phone : <t t-esc="o.tenant_id.phone"/></td>
+                                            <td>Email : <t t-esc="o.tenant_id.email"/></td>
+                                    </table>
+
+                                    <h5>Warbixinta Kirada</h5>
+                                        <table class="table">
+                                            <tr>
+                                                <td>Guriga <t t-esc="o.property_id.display_name"/> </td>
+                                                <td>Qabka lacag bixinta : <t t-esc="o.rent_type_id.name"/>  </td>
+                                                <td>Lacagta : <t t-esc="'{0:,.2f}'.format(o.rent_price)"/></td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td>Bilawga Kirada : <t t-esc="o.start_date"/>  </td>
+                                                <td>Dhamaanshaha kirada : <t t-esc="o.end_date"/>  </td>
+                                                <td>Mudada heshiiska: <t t-esc="o.no_of_months"/> Bilood</td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>Deposit : <t t-esc="'{0:,.2f}'.format(o.amount_deposit)"/></td>
+                                                <td colspan="2">Deposit + Kirada: <t t-esc="'{0:,.2f}'.format(o.amount_deposit + o.rent_price)"/></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                                <p style="color:white;">______________________</p>
+                                                <p style="color:white;">______________________</p>
+                                                <p style="color:white;">______________________</p>
+                                                <p style="color:white;">______________________</p>
+                                                <p style="color:white;">______________________</p>
+                                                <p style="color:white;">______________________</p>
+                                                <p style="color:white;">______________________</p>
+                                                <p style="color:white;">______________________</p>
+                                                <p style="color:white;">______________________</p>
+                                                <p style="color:white;">______________________</p>
+                                                <p style="color:white;">______________________</p>
+                                                <p style="color:white;">______________________</p>
+                                                <p style="color:white;">______________________</p>
+                                                <p style="color:white;">______________________</p>
+                                                <p style="color:white;">______________________</p>
+                                                <p style="color:white;">______________________</p>
+                                                <p style="color:white;">______________________</p>
+                                
+                                <t t-if="o.property_id.furnishing in ['full_furnished','semi_furnished']">
+                                    
+                                
+                                
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="card shadow-sm p-3 mb-5 bg-white rounded">
+                                            <h3>Bedroom 1</h3>
+                                            <table>
+                                                
+                                                    <tr>
+                                                        <th>Description</th>
+                                                        <th>Yes/No</th>
+                                                                <th>Condition</th>
+                                                    </tr>
+                                                
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Walls/Ceiling:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Beds And Billows:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Beds And Billows:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Door(s):</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Window(s):</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Window Curtains:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Light:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Outlets/Switches:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Flooring/Carpet:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Shelves/Closet:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Keys:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Paints:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>A C with Remote:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Bedside Table:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Tiles:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            </div>
+                                            </div>
+
+
+                                            <div class="col">
+                                                <div class="card shadow-sm p-3 mb-5 bg-white rounded">
+                                                    <h3>Bedroom 2</h3>
+                                            <table>
+                                                
+                                                    <tr>
+                                                        <th>Description</th>
+                                                        <th>Yes/No</th>
+                                                                <th>Condition</th>
+                                                    </tr>
+                                                
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Walls/Ceiling:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Beds And Billows:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Beds And Billows:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Door(s):</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Window(s):</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Window Curtains:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Light:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Outlets/Switches:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Flooring/Carpet:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Shelves/Closet:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Keys:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Paints:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>A C with Remote:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Bedside Table:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Tiles:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            </div>
+                                            </div>
+                                        </div>
+
+
+
+
+
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="card shadow-sm p-3 mb-5 bg-white rounded">
+                                            <h3>Bedroom 3</h3>
+                                            <table>
+                                                
+                                                    <tr>
+                                                        <th>Description</th>
+                                                        <th>Yes/No</th>
+                                                                <th>Condition</th>
+                                                    </tr>
+                                                
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Walls/Ceiling:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Beds And Billows:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Beds And Billows:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Door(s):</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Window(s):</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Window Curtains:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Light:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Outlets/Switches:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Flooring/Carpet:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Shelves/Closet:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Keys:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Paints:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>A C with Remote:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Bedside Table:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Tiles:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            </div>
+                                            </div>
+                                            <div class="col">
+                                                <div class="card shadow-sm p-3 mb-5 bg-white rounded">
+                                            <h3>Living Room</h3>
+                                            <table>
+                                                
+                                                    <tr>
+                                                        <th>Description</th>
+                                                        <th>Yes/No</th>
+                                                                <th>Condition</th>
+                                                    </tr>
+                                                
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Walls/Ceiling:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Smart TV Samsung:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Door(s):</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Window(s):</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Window Curtains:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Light Fixture(s):</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Outlets/Switches:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Flooring/Carpet:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Paints:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>A C with Remote:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Modem to-link:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Couch, Sofa:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Chairs And coffee table:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                                <p style="color:white;">______________________</p>
+                                                <p style="color:white;">______________________</p>
+                                                <p style="color:white;">______________________</p>
+                                                <p style="color:white;">______________________</p>
+                                               
+                                            
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="card shadow-sm p-3 mb-5 bg-white rounded">
+                                            <h3>Bedroom 1</h3>
+                                            <table>
+                                                
+                                                    <tr>
+                                                        <th>Description</th>
+                                                        <th>Yes/No</th>
+                                                                <th>Condition</th>
+                                                    </tr>
+                                                
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Walls/Ceiling:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Beds And Billows:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Beds And Billows:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Door(s):</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Window(s):</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Window Curtains:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Light:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Outlets/Switches:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Flooring/Carpet:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Shelves/Closet:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Keys:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Paints:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>A C with Remote:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Bedside Table:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Tiles:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            </div>
+                                            </div>
+                                            <div class="col">
+                                                <div class="card shadow-sm p-3 mb-5 bg-white rounded">
+                                                    <h3>Bedroom 2</h3>
+                                            <table>
+                                                
+                                                    <tr>
+                                                        <th>Description</th>
+                                                        <th>Yes/No</th>
+                                                                <th>Condition</th>
+                                                    </tr>
+                                                
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Walls/Ceiling:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Beds And Billows:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Beds And Billows:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Door(s):</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Window(s):</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Window Curtains:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Light:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Outlets/Switches:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Flooring/Carpet:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Shelves/Closet:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Keys:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Paints:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>A C with Remote:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Bedside Table:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Tiles:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            </div>
+                                            </div>
+                                        </div>
+
+                                                
+
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="card shadow-sm p-3 mb-5 bg-white rounded">
+                                            <h3>Bedroom 3</h3>
+                                            <table>
+                                                
+                                                    <tr>
+                                                        <th>Description</th>
+                                                        <th>Yes/No</th>
+                                                                <th>Condition</th>
+                                                    </tr>
+                                                
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Walls/Ceiling:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Beds And Billows:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Beds And Billows:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Door(s):</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Window(s):</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Window Curtains:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Light:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Outlets/Switches:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Flooring/Carpet:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Shelves/Closet:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Keys:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Paints:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>A C with Remote:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Bedside Table:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Tiles:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            </div>
+                                            </div>
+                                            <div class="col">
+                                                <div class="card shadow-sm p-3 mb-5 bg-white rounded">
+                                            <h3>Kitchen</h3>
+                                            <table>
+                                                
+                                                    <tr>
+                                                        <th>Description</th>
+                                                        <th>Yes/No</th>
+                                                                <th>Condition</th>
+                                                    </tr>
+                                                
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Range/Stove:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Hood fan:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Shelves:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Sink/Faucets:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Refrigerator:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Countertops:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Walls/Ceiling:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Door(s):</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Keys:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Window(s):</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Window Curtains:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Light Fixture(s):</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Outlets/Switches:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Cabinets/Built-ins:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Paints:</td>
+                                                        <td>_____</td>
+                                                        <td>______________________</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+
+                                            <div class="col">
+                                                <p>Saxiixa Kireestaha: ______________________</p>
+                                            </div>
+
+                                            <div class="col">
+                                                <p>Taariikhda:____/____/____</p>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col"></div>
+                                            <div class="col">
+                                                <p>Sixiixa Maamulaha: ______________________</p>
+                                            </div>
+                                            <div class="col"></div>
+                                        </div>
+                                </div>
+                            </t>
+                             
+                            </div>
+                        </t>
+                </t>
+            </t>
+        </template>
+  
+</odoo>

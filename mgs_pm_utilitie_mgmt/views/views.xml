@@ -1,0 +1,272 @@
+<odoo>
+<record id="inherit_property_parent_form_view" model="ir.ui.view">
+  <field name="name">inherit.parent.property.form</field>
+  <field name="model">pm.property.parent</field>
+  <field name="inherit_id" ref="tis_property_managment.property_parent_form_view" />
+  <field name="arch" type="xml">
+    <xpath expr="//page[@name='properties']" position="after">
+    <page name='utility' string="Utility info" groups='base.group_no_one'>
+       <field name="utility_info_ids">
+              <list delete="0" editable="bottom">
+                  <field name="product_id"/>
+                  <field name="opening_read"/>
+                  <field name="last_read" readonly="1"/>
+              </list>
+          </field>
+    </page>
+    </xpath>
+  </field>
+</record>
+
+
+<record id="inherit_property_form_view" model="ir.ui.view">
+  <field name="name">inherit.property.form</field>
+  <field name="model">pm.property</field>
+  <field name="inherit_id" ref="tis_property_managment.property_form_view" />
+  <field name="arch" type="xml">
+    <xpath expr="//page[@name='maintenancies']" position="after">
+    <page name='utility' string="Utility info" groups='base.group_no_one'>
+       <field name="utility_info_ids">
+              <list delete="0" editable="bottom">
+                  <field name="product_id"/>
+                  <field name="opening_read"/>
+                  <field name="last_read" readonly="1"/>
+              </list>
+          </field>
+    </page>
+    </xpath>
+  </field>
+</record>
+
+
+
+  <record id="pm_utility_type_tree" model="ir.ui.view">
+    <field name="name">pm.utility.type.tree</field>
+    <field name="model">pm.utility.type</field>
+    <field name="arch" type="xml">
+        <list>
+        <field name="name"/>
+        <field name="enable_readings"/>
+        <field name="uom_id"/>
+        <field name="rate_per_uom"/>
+        </list>
+    </field>
+  </record>
+
+  <record id="pm_utility_type_form" model="ir.ui.view">
+    <field name="name">pm.utility.type.form</field>
+    <field name="model">pm.utility.type</field>
+    <field name="arch" type="xml">
+      <form>
+        <sheet>
+
+          <group>
+                <field name="name"/>
+                <field name="enable_readings"/>
+                <field name="uom_id" invisible="not enable_readings"/>
+          </group>
+
+           <group>
+                <field name="rate_per_uom" invisible="not enable_readings"/>
+                <field name="company_id" invisible="not enable_readings" groups="base.group_multi_company"/>
+          </group>
+
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+
+
+
+
+
+  <record id="pm_utility_reading_tree" model="ir.ui.view">
+    <field name="name">pm.utility.reading.tree</field>
+    <field name="model">pm.utility.reading</field>
+    <field name="arch" type="xml">
+        <list>
+          <field name="sequence"/>
+          <field name="date"/>
+          <field name="partner_id"/>
+          <field name="currency_id" invisible="1"/>
+          <field name="last_reading"/>
+          <field name="current_reading"/>
+          <field name="difference" sum="Total Diffrence"/>
+          <field name="total_amount" sum="Total Amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+          <field name="property_id"/>
+          <field name="state" widget="badge" decoration-danger="state == 'cancel'" decoration-info="state == 'draft'" decoration-success="state == 'confirmed'"/>
+          <field name="inv_state" widget="badge" decoration-danger="inv_state == 'not_paid'" decoration-warning="inv_state in ('partial', 'in_payment')" decoration-success="inv_state in ('paid', 'reversed')" invisible="inv_state == 'invoicing_legacy'" optional="show"/>
+        </list>
+    </field>
+  </record>
+
+  <record id="pm_utility_reading_form" model="ir.ui.view">
+    <field name="name">pm.utility.reading.form</field>
+    <field name="model">pm.utility.reading</field>
+    <field name="arch" type="xml">
+      <form string="">
+        <header>
+         <button id="button_open" confirm="Are you sure?" name="action_confirm" string="Confirm" class="btn-primary" invisible="state != 'draft'" type="object"/>
+         <button id="button_cancel" confirm="Are you sure?" name="action_cancel" string="Cancel" class="btn-secondary" invisible="state not in ('draft', 'confirmed')" type="object"/>
+         <button id="button_draft" confirm="Are you sure?" name="action_draft" string="RESET TO DRAFT" class="btn-secondary" invisible="state != 'cancel'" type="object"/>
+
+            <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
+        </header>
+        <sheet>
+
+        <div class="oe_button_box" name="button_box">
+            <button name="action_view_move" invisible="not move_id"
+            width="150" type="object" class="oe_stat_button" icon="fa-money">
+                Utility journal
+            </button>
+
+        </div>
+
+            <group>
+              <group>
+                  <h1 class="oe_right">Billed :
+                    <field name="bill_on_date" decoration-danger="1==1"/>
+                  </h1>
+              </group>
+              <group>
+                  <h1>Invoiced :
+                    <field name="invices_on_date" decoration-success="1==1"/>
+                  </h1>
+              </group>
+            </group>
+
+          <div class="oe_title">
+                <h1 class="o_row">
+                    <field name="sequence" readonly="1" string="Code" placeholder="Code"/>
+                </h1>
+            </div>
+
+          <group>
+                <group string="Property">
+                      <field name="product_id" string="Service" readonly="state in ('confirmed', 'cancel')"/>
+                      <field name="parent_property_id" readonly="state in ('confirmed', 'cancel')" invisible="property_id or reading_type == 'out_invoice'"/>
+                      <field name="property_id" readonly="state in ('confirmed', 'cancel')" invisible="parent_property_id or reading_type == 'in_invoice'"/>
+                      <field name="partner_id" force_save="1" readonly="state in ('confirmed', 'cancel') or reading_type == 'out_invoice'"/>
+                      <field name="date" readonly="state in ('confirmed', 'cancel')"/>
+
+                      <field name="company_id" groups="base.group_multi_company" readonly="state in ('confirmed', 'cancel')"/>
+                </group>
+
+                <group string="Utility info">
+                      <field name="reading_type" invisible="1"/>
+                      <field name="readings_product_category" invisible="1"/>
+                      <field name="enable_readings" force_save="1" invisible="1"/>
+                      <field name="move_id" invisible="1"/>
+                      <field name="amount" invisible="enable_readings or not product_id" readonly="state in ('confirmed', 'cancel')"/>
+                      <field name="uom_id" force_save="1" invisible="not enable_readings" readonly="state in ('confirmed', 'cancel')"/>
+                      <field name="rate_per_uom" invisible="not enable_readings"/>
+                      <field name="invoice_date_due"  readonly="state in ('confirmed', 'cancel')"/>
+                </group>
+          </group>
+          
+          <group  invisible="not enable_readings">
+                <group string="Previous reading" invisible="not enable_readings">
+                      <field name="last_reading" readonly="1" force_save="1" invisible="not enable_readings"/>
+                      <field name="last_reading_date" readonly="1" force_save="1" invisible="not enable_readings"/>
+                </group>
+
+                <group string="Current reading"  invisible="not enable_readings">
+                      <field name="current_reading" invisible="not enable_readings" readonly="state in ('confirmed', 'cancel')"/>
+                      <field name="difference" invisible="not enable_readings"/>
+
+                </group>
+
+                <group class="oe_subtotal_footer oe_right" colspan="2" name="sale_total" modifiers="{}">
+                    <div class="oe_subtotal_footer_separator oe_inline o_td_label" modifiers="{}">
+                        <label for="total_amount" modifiers="{}"/>
+                    </div>
+                    <field name="total_amount" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}" modifiers="{'readonly':true}" id="total_amount"/>
+                </group>
+          </group>
+
+        </sheet>
+                  <chatter/>
+      </form>
+    </field>
+  </record>
+
+
+    <record model="ir.ui.view" id="pm_utility_reading_search_view">
+        <field name="name">pm.utility.reading.search</field>
+        <field name="model">pm.utility.reading</field>
+        <field name="arch" type="xml">
+            <search>
+                    <field name="partner_id"/>
+                    <field name="parent_property_id"/>
+                    <field name="property_id"/>
+                    <field name="product_id"/>
+
+
+                  <group >
+                    <filter name="by_partner_id" string="tenant"
+                            context="{'group_by': 'partner_id'}"/>
+                </group>
+                
+                <group >
+                    <filter name="by_state" string="state"
+                            context="{'group_by': 'state'}"/>
+                </group>
+
+                <group >
+                    <filter name="by_date" string="date"
+                            context="{'group_by': 'date'}"/>
+                </group>
+
+                <group >
+                    <filter name="by_inv_state" string="payment state"
+                            context="{'group_by': 'inv_state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+
+    <!-- <record model="ir.actions.act_window" id="pm_utility_type_action">
+        <field name="name">Utility type</field>
+        <field name="res_model">pm.utility.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="context"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create the first utility type
+            </p>
+        </field>
+    </record> -->
+
+    <record model="ir.actions.act_window" id="pm_utility_reading_out_action">
+        <field name="name">Utility reading</field>
+        <field name="res_model">pm.utility.reading</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'default_reading_type':'out_invoice'}</field>
+        <field name="domain">[('reading_type','=','out_invoice')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create the first utility reading
+            </p>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="pm_utility_reading_in_action">
+        <field name="name">Utility reading</field>
+        <field name="res_model">pm.utility.reading</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'default_reading_type':'in_invoice'}</field>
+        <field name="domain">[('reading_type','=','in_invoice')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create the first utility reading
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="utility_menu" name="Utilities"
+              parent="tis_property_managment.main_property_managment_menu" sequence="14"/>
+
+    <menuitem id="utility_reading_menu_inv" name="Utility Invoices" parent="utility_menu" action="pm_utility_reading_out_action"/>
+    <menuitem id="utility_reading_menu_bill" name="Utility Bills" parent="utility_menu" action="pm_utility_reading_in_action"/>
+
+
+</odoo>

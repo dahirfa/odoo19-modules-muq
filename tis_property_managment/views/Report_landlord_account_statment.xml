@@ -1,0 +1,80 @@
+<odoo>
+    <record id="actiont_landlord_account_statment_report" model="ir.actions.report">
+        <field name="name">Landlord Summary Report</field>
+        <field name="model">pm.landlord.account.statement.wizard</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">tis_property_managment.report_landlord_account_statment</field>
+        <field name="report_file">tis_property_managment.report_landlord_account_statment</field>
+        <field name="binding_model_id" ref="model_pm_landlord_account_statement_wizard"/>
+        <field name="binding_type">report</field>
+    </record>
+
+        <template id="report_landlord_account_statment">
+            <t t-call="web.html_container">
+                        <t t-call="web.external_layout">
+                            <div class="page">
+                    <style>
+                                table tr:nth-child(even){background-color: #f2f2f2;}
+                                table tr:hover {background-color: #ddd;}                       
+                                     
+                                .center {
+                                margin-left: auto;
+                                margin-right: auto;
+                                }
+                        </style>
+                                <div class="oe_structure"/>
+                                <div class="text-center">
+                                    <h2 class="center">Account Summary</h2>
+                                </div>
+
+                                <div class="row center" style="width:100%;">
+                                        <div class="col-3">
+                                            <strong>Landlord:</strong>
+                                            <p nowrap="nowrap"><t t-esc="form['landlord_id'][1]"/></p>
+                                        </div>
+                                        <div class="col-3">
+                                            <strong>From: <t t-esc="datetime.datetime.strptime(form['start_date'], '%Y-%m-%d').strftime('%d-%b-%Y')"/></strong>
+                                            <strong>To: <t t-esc="datetime.datetime.strptime(form['end_date'], '%Y-%m-%d').strftime('%d-%b-%Y')"/></strong>
+                                        </div>
+                                </div>
+
+                                <table class="table table-sm center" style="width:100%;">
+                                    <thead>
+
+                                        <th nowrap="nowrap">Date</th>
+                                        <th nowrap="nowrap">Description</th>
+                                        <th nowrap="nowrap">Ref</th>
+                                        <th nowrap="nowrap" class="text-right">Debit</th>
+                                        <th nowrap="nowrap" class="text-right">Credit</th>
+                                        <th nowrap="nowrap" class="text-right">Balance</th>
+                                    </thead>
+                                    <t t-set="total_debit" t-value="0"/>
+                                    <t t-set="total_credit" t-value="0"/>
+                                    <t t-set="balance" t-value="0"/>
+                                    <t t-foreach="account_move_line" t-as="line">
+                                        <t t-set="balance" t-value="balance+line['debit']-line['credit']"/>
+                                    <tr>
+                                            <td nowrap="nowrap"><span t-esc="datetime.datetime.strptime(line['date'], '%Y-%m-%d').strftime('%d-%b-%Y')"></span></td>
+                                            <td><span t-esc="line['name']"></span></td>
+                                            <td><span t-esc="line['ref']"></span></td>
+                                            <td nowrap="nowrap" class="text-right"><span t-esc="'{0:,.2f}'.format(line['credit'])"/></td>
+                                            <td nowrap="nowrap" class="text-right"><span  t-esc="'{0:,.2f}'.format(line['debit'])"/></td>
+                                            <td nowrap="nowrap" class="text-right"><span  t-esc="'{0:,.2f}'.format(balance)"/></td>
+                                    </tr>
+                                        <t t-set="total_credit" t-value="total_credit+line['credit']"/>
+                                        <t t-set="total_debit" t-value="total_debit+line['debit']"/>
+                                    </t>
+                                        <tr style="font-weight:BOLD;">
+                                            <td>Total:</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td nowrap="nowrap" class="text-right"><span t-esc="'{0:,.2f}'.format(total_credit)"></span></td>
+                                            <td nowrap="nowrap" class="text-right"><span t-esc="'{0:,.2f}'.format(total_debit)"></span></td>
+                                            <td nowrap="nowrap" class="text-right"><span  t-esc="'{0:,.2f}'.format(balance)"/></td>
+                                        </tr>
+                                </table>
+                            </div>
+                        </t>
+                    </t>
+        </template>
+</odoo>

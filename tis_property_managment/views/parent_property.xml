@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record model="ir.ui.view" id="property_parent_list_view">
+        <field name="name">property.parent.list</field>
+        <field name="model">pm.property.parent</field>
+        <field name="arch" type="xml">
+            <list string="Property List" default_order="id desc">
+                <field name="name"/>
+                <field name="landlord_id"/>
+                <field name="street"/>
+                <field name="country_id"/>
+            </list>
+        </field>
+    </record>
+
+            <record model="ir.ui.view" id="property_parent_form_view">
+                <field name="name">property.parent.form</field>
+                <field name="model">pm.property.parent</field>
+                <field name="arch" type="xml">
+                    <form string="Parent Properties">
+                        <sheet>
+                                    <field name="image_1920" widget="image" class="oe_avatar"/>
+                            <h1>
+                                    <field name="name" placeholder="Name"/>
+                            </h1>
+                            <group>
+                                <group>
+                                    <field name="id" invisible="1"/>
+                                    <field name="landlord_id" context="{'default_is_landlord':True}"/>
+                                    <field name="company_id" groups="base.group_multi_company"/>
+                                    
+                                    <field name="active" invisible="1"/>
+                                </group>
+
+                                <group>
+
+                                <label for="street" string="Address"/>
+                                
+                                <div>
+                                        <field name="street" placeholder="Street..." required="1"/>
+                                        <field name="street2" placeholder="Street2..."/>
+                                        <div class="address_format">
+                                            <field name="city" placeholder="City" style="width: 100%%"/>
+                                        </div>
+                                        <field name="country_id" placeholder="Country" class="oe_no_button"
+                                            options='{"no_open": True, "no_create": True}'/>
+                                </div>
+                                </group>
+                            </group>
+
+                            <notebook>
+
+                                    <page name="properties" string="Properties">
+                                        <field name="property_ids" context="{'parent_property_id': id}">
+                                            <list>
+                                                <field name="code"/>
+                                                <field name="name"/>
+                                                <field name="rent_price"  widget="monetary"/>
+                                                <field name="bedrooms"/>
+                                                <field name="bathrooms"/>
+                                                <field name="type_id"/>
+                                                <field name="state" widget="badge"  on_change="1" decoration-success="state == 'available'" decoration-info="state == 'draft'"
+                                                            decoration-danger="state == 'close' or state == 'booked'" decoration-warning="state == 'on_lease'"/>
+                                            </list>
+                                        </field>
+
+                                    </page>
+
+                            </notebook>
+
+                        </sheet>
+                    </form>
+                </field>
+            </record>
+
+
+        <record model="ir.actions.act_window" id="property_parent_list_action">
+            <field name="name">Parent Property</field>
+            <field name="res_model">pm.property.parent</field>
+            <field name="view_mode">list,form</field>
+            <field name="context"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Create the first Property
+                </p>
+            </field>
+        </record>
+
+            <menuitem id="property_parent_menu" name="Parent Properties"
+              parent="properties_menu" sequence="2"
+              action="property_parent_list_action"/>
+
+</odoo>

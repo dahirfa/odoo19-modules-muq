@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="module_restrict_partner_users" model="ir.module.category">
+        <field name="name">Restrict Partner Per user</field>
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="res_groups_privilege_restrict_partner_users" model="res.groups.privilege">
+        <field name="name">Restrict Partner Per user</field>
+        <field name="category_id" ref="module_restrict_partner_users" />
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="group_restrict_partner_user" model="res.groups">
+        <field name="name"> User</field>
+        <field name="privilege_id" ref="res_groups_privilege_restrict_partner_users" />
+        <field name="user_ids" eval="[(4, ref('base.group_user'))]" />
+    </record>
+
+    <record id="group_restrict_partner_admin" model="res.groups">
+        <field name="name"> Admin</field>
+        
+        <field name="privilege_id" ref="res_groups_privilege_restrict_partner_users" />
+    </record>
+</odoo>

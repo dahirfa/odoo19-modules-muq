@@ -1,0 +1,29 @@
+<odoo>
+    <!-- <record id="view_landed_cost_form" model="ir.ui.view">
+        <field name="name">stock.landed.cost.line.form</field>
+        <field name="model">stock.landed.cost.line</field>
+        <field name="inherit_id" ref="stock_landed_cost.view_landed_cost_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='cost']" position="after">
+                <field name="analytic_line_id"/>
+            </xpath>
+        </field>
+    </record> -->
+
+    <record id="inherit_view_landed_cost_form" model="ir.ui.view">
+        <field name="name">stock.landed.cost.form</field>
+        <field name="model">stock.landed.cost</field>
+        <field name="inherit_id" ref="stock_landed_costs.view_stock_landed_cost_form"/>
+                                      
+        <field name="arch" type="xml">
+            <!-- Assuming 'cost_lines' is the field name for the one2many relationship to landed cost lines -->
+            <!-- <xpath expr="//field[@name='cost_lines']/tree/field[@name='name']" position="after">
+                <field name="analytic_line_ids"/>
+            </xpath> -->
+            <xpath expr="//field[@name='cost_lines']/list/field[@name='name']" position="before">
+                    <field name="analytic_account_id" />
+                    
+			</xpath>
+        </field>
+    </record>
+</odoo>

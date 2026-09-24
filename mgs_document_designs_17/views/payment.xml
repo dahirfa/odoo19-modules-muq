@@ -1,0 +1,121 @@
+<odoo>
+    <template id="account.report_payment_receipt_document">
+		<t t-call="web.external_layout">
+			<t t-set="o" t-value="o.with_context(lang=lang)"/>
+            <div class="page">
+              
+  
+                          <div class="row mb8">
+                            <div class="col-12" t-if="o.partner_type" style="font-weight: bold; font-size: 22px; text-align: center; background-color: #a7adba; border: 1px solid #EAECEE;border-radius:18px;">
+                                <t t-if="o.payment_type == 'inbound'">
+                                    <strong>RECEIPT VOUCHER </strong> 
+                                </t>
+                                <t t-if="o.payment_type == 'outbound'">
+                                    <strong>PAYMENT VOUCHER </strong> 
+                                </t>
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="row justify-content-end mb16">
+                            <div class="col-4" name="right_box">
+                                <div t-field="o.name" t-options="{'widget': 'barcode', 'width': 600, 'height': 100, 'img_style': 'width:300px;height:50px;'}"/>
+                            </div>
+                        </div>                        
+                         
+                        <br/>
+                        
+                        <div class="row mb8" style="font-size:16px;">
+                             <div class="col-3" t-if="o.amount">
+                                <t t-if="o.payment_type == 'inbound'">
+                                    <strong>Amount:</strong>
+                                </t>
+                                <t t-if="o.payment_type == 'outbound'">
+                                    <strong>Paid Amount:</strong>
+                                </t>
+                            </div>
+                          <div class="col-4" t-if="o.amount" style="background-color:#EAECEE;border:1px solid #ABB2B9;padding-left: 10px;">
+              								<strong><span t-field="o.amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></strong>
+                          </div> 
+                            <div class="col-2 text-right" style="border:1px solid #ABB2B9;padding-left: 20px;">
+                              <strong>Date:</strong>
+                            </div>
+                            <div class="col-3" t-if="o.date" style="border:1px solid #ABB2B9;padding-left: 10px;">
+                                <span t-field="o.date"/> <br/>
+                             </div>
+                        </div>
+
+
+                        <div class="row mb8" style="font-size:16px">
+                          <div class="col-3">
+                            <strong>in Words:</strong>
+                          </div>
+                          <div class="col-9" style="border:1px solid #ABB2B9;padding-left: 10px;">
+                            <span t-field="o.check_amount_in_words"/>
+                          </div>
+                          </div>
+                          
+                          
+                        <div class="row mb8" style="font-size:16px">
+                            <div class="col-3" t-if="o.partner_type">
+                               <t t-if="o.partner_type == 'customer'">
+                                    <strong>Customer: </strong>
+                                </t>
+                                <t t-if="o.partner_type == 'supplier'">
+                                    <strong>Vendor: </strong>
+                                </t>                                
+                            </div>
+                            <div class="col-9" t-if="o.partner_type" style="border:1px solid #ABB2B9;padding-left: 10px;">
+                                <span t-field="o.partner_id"/>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb8" style="font-size:16px">
+                          <div class="col-3">
+                            <strong>Voucher No:</strong>
+                          </div>
+                          <div class="col-9" style="border:1px solid #ABB2B9;padding-left: 10px;">
+                            <span t-field="o.name"/>
+                          </div>
+                          </div>
+
+                        <div class="row" style="font-size:16px">
+                            <div class="col-3" t-if="o.memo">                              
+                                    <strong>Remarks:</strong>
+                            </div>
+                            <div class="col-9" t-if="o.memo" style="border:1px solid #ABB2B9;padding-left: 10px;">                              
+                                    <span t-field="o.memo"/>
+                            </div>							
+                        </div>	
+
+                        <div class="row mb8" style="font-size:16px">
+                            <div class="col-3">                              
+                                    <strong>Journal Acc:</strong>
+                            </div>
+                            <div class="col-9" t-if="o.journal_id" style="border:1px solid #ABB2B9;padding-left: 10px;">                              
+                                    <span t-field="o.journal_id"/>
+                            </div>							
+                        </div>		
+                      <br/>
+                      <br/>
+                      
+                      
+          						              
+                          <br/>
+                          
+                        <div class="row">
+                            <div class="col-7">                              
+                              <strong>Partner:</strong>________________________
+                            </div>
+                            <div class="col-5 text-right">                             
+                                <strong>Cashier:</strong>________________________
+                            </div>							
+                        </div>	                          
+                        
+                        <br/>
+                        <br/>
+
+                
+            </div>
+		</t>
+	</template>
+</odoo>

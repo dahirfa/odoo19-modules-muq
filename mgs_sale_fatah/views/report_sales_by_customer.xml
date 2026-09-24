@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+        <record id="action_sales_by_customer" model="ir.actions.report">
+            <field name="name">Sales by Customer</field>
+            <field name="model">mgs_sale.sales_by_customer</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">mgs_sale_fatah.sales_by_customer_report</field>
+            <field name="paperformat_id" ref="mgs_sale_paperformat"/>
+        
+        </record>
+
+        <template id="sales_by_customer_report">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.internal_layout" t-lang="en_US">
+                        <div class="page">
+                            <style>
+                                .table-sm > thead > tr > th {
+                                    border-top: 2px solid #212529 !important;
+                                    border-bottom: 2px solid #212529 !important;
+                                }
+
+                                .table-sm > tbody > tr > td {
+                                    border-top: 1px solid #7d7d7d;
+                                }
+
+                                .mgs_text_right {
+                                    text-align: right !important
+                                }
+                            </style>
+
+                            <div class="container" style="font-size:12px;font-family:Arial;margin-top:1px;">
+                                <h2>Sales by Customer <span t-esc="report_by"/></h2>
+
+                                <div class="row" style="margin-top: 32px !important;font-size: 1.2em; font-family: 'Lato-Reg'">
+
+                                    <div class="col-3" t-if="date_from or date_to">
+                                        <strong>Date:</strong>
+                                        <p t-esc="date_from" style="margin-bottom: 0"/>
+                                        <p t-esc="date_to"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="partner_id[0]">
+                                        <strong>Partner:</strong>
+                                        <p class="m-0" t-esc="partner_id[1]"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="user_id[0]">
+                                        <strong>Salesperson:</strong>
+                                        <p class="m-0" t-esc="user_id[1]"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="team_id[0]">
+                                        <strong>Salesteam:</strong>
+                                        <p class="m-0" t-esc="team_id[1]"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="product_tag_id[0]">
+                                        <strong>Product Tag:</strong>
+                                        <p class="m-0" t-esc="product_tag_id[1]"/>
+                                    </div>
+
+                                    <div class="col-4" t-if="company_id"  groups="base.group_multi_company">
+                                        <strong>Company:</strong>
+                                        <p t-esc="company_id.name"/>
+                                    </div>
+
+
+                            </div>
+
+                            <table class="table table-condensed table-sm">
+                                <thead>
+                                    <tr>
+                                        <th nowrap="nowrap">Customer</th>
+                                        <th nowrap="nowrap"><t t-if="report_by == 'Detail'">Date</t></th>
+                                        <th nowrap="nowrap"><t t-if="report_by == 'Detail'">Order</t></th>
+                                        <!-- <th nowrap="nowrap"><t t-if="report_by == 'Detail'">Salesperson</t></th> -->
+                                        <th nowrap="nowrap"><t t-if="report_by == 'Detail'">Item</t></th>
+                                        <th class="text-center" nowrap="nowrap">Ordered Qty</th>
+                                        <th class="text-center" nowrap="nowrap">Delivered Qty</th>
+                                        <th class="text-center" nowrap="nowrap">Invoiced Qty</th>
+                                        <th class="text-center" nowrap="nowrap">To Invoice Qty</th>
+                                        <th class="mgs_text_right" nowrap="nowrap"><t t-if="report_by == 'Detail'">Rate</t></th>
+                                        <th class="mgs_text_right" nowrap="nowrap">Amount</th>
+                                       
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <t t-set="total_qty_ordered" t-value="0"/>
+                                    <t t-set="total_qty_delivered" t-value="0"/>
+                                    <t t-set="total_qty_invoiced" t-value="0"/>
+                                    <t t-set="total_qty_to_invoice" t-value="0"/>
+                                    <t t-set="total_amount" t-value="0"/>
+                                    <t t-set="total_cost" t-value="0"/>
+                                    <t t-set="total_margin" t-value="0"/>
+
+                                    <t t-foreach="lines(date_from, date_to, company_id.id, partner_id[0], user_id[0], product_ids, team_id[0])" t-as="group">
+                                        <tr t-if="report_by == 'Detail'" style="color: red; font-weight: bold;">
+                                            <td colspan="10"><span t-esc="group['name']"/></td>
+                                            
+                                        </tr>
+
+                                        <tr t-if="report_by == 'Detail'" t-foreach="group['lines']" t-as="line">
+                                            <td />
+                                            <td nowrap="nowrap"><span t-esc="line['date']"/></td>
+                                            <td><span t-esc="line['name']"/></td>
+                                            <!-- <td  nowrap="nowrap"><span t-esc="line['user_id']"/></td> -->
+                                            <td  nowrap="nowrap"><span t-esc="line['product']['en_US']"/></td>
+                                            <td class="mgs_text_right"><span t-esc="'{0:,.2f}'.format(line['product_uom_qty'])"/></td>
+                                            <td class="mgs_text_right"><span t-esc="'{0:,.2f}'.format(line['qty_delivered'])"/></td>
+                                            <td class="mgs_text_right"><span t-esc="'{0:,.2f}'.format(line['qty_invoiced'])"/></td>
+                                            <td class="mgs_text_right"><span t-esc="'{0:,.2f}'.format(line['qty_to_invoice'])"/></td>
+                                            <td class="mgs_text_right">
+                                                <t t-set="rate" t-value="0"/>
+                                                <t t-set="rate" t-value="line['price_total']/line['product_uom_qty']" t-if="line['product_uom_qty'] and line['price_total']"/>
+                                                <span t-esc="'{0:,.2f}'.format(rate)"/>
+                                            </td>
+                                            <td class="mgs_text_right"><span t-esc="'{0:,.2f}'.format(line['price_total'])"/></td>
+                                            <t t-set="cost" t-value="0"/>
+                                            <t t-set="margin" t-value="0"/>
+
+                                           
+                                        </tr>
+
+                                        <tr style="font-weight: bold">
+                                            <td colspan="4">
+                                                <span t-esc="group['name']" t-if="report_by == 'Summary'"/>
+                                                <span t-if="report_by == 'Detail'" style="color: red; font-weight: bold;">TOTAL </span>
+                                            </td>
+                                            <td class="mgs_text_right">
+                                                <span t-if="report_by == 'Detail'" style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(group['total_qty_ordered'])"/>
+                                                <span t-if="report_by == 'Summary'" t-esc="'{0:,.2f}'.format(group['total_qty_ordered'])"/>
+                                            </td>
+                                            <td class="mgs_text_right">
+                                                <span t-if="report_by == 'Detail'" style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(group['total_qty_delivered'])"/>
+                                                <span t-if="report_by == 'Summary'" t-esc="'{0:,.2f}'.format(group['total_qty_delivered'])"/>
+                                            </td>
+                                            <td class="mgs_text_right">
+                                                <span t-if="report_by == 'Detail'" style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(group['total_qty_invoiced'])"/>
+                                                <span t-if="report_by == 'Summary'" t-esc="'{0:,.2f}'.format(group['total_qty_invoiced'])"/>
+                                            </td>
+                                            <td class="mgs_text_right">
+                                                <span t-if="report_by == 'Detail'" style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(group['total_qty_to_invoice'])"/>
+                                                <span t-if="report_by == 'Summary'" t-esc="'{0:,.2f}'.format(group['total_qty_to_invoice'])"/>
+                                            </td>
+                                            <td class="mgs_text_right"></td>
+                                            <td class="mgs_text_right">
+                                                <span t-if="report_by == 'Detail'" style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(group['total_amount'])"/>
+                                                <span t-if="report_by == 'Summary'" t-esc="'{0:,.2f}'.format(group['total_amount'])"/>
+                                            </td>
+                                            
+                                        </tr>
+
+                                        <tr t-if="report_by == 'Detail'"><td colspan="11"/>
+                                        
+                                        </tr>
+                                        
+                                        <t t-set="total_qty_ordered" t-value="total_qty_ordered+group['total_qty_ordered']"/>
+                                        <t t-set="total_qty_delivered" t-value="total_qty_delivered+group['total_qty_delivered']"/>
+                                        <t t-set="total_qty_invoiced" t-value="total_qty_invoiced+group['total_qty_invoiced']"/>
+                                        <t t-set="total_qty_to_invoice" t-value="total_qty_to_invoice+group['total_qty_to_invoice']"/>
+                                        <t t-set="total_amount" t-value="total_amount+group['total_amount']"/>
+                                        
+                                    </t>
+
+                                    <tr style="font-weight: bold">
+                                        <td colspan="4"/>
+                                        <td class="mgs_text_right">
+                                            <span t-esc="'{0:,.2f}'.format(total_qty_ordered)"/>
+                                        </td>
+                                        <td class="mgs_text_right">
+                                            <span t-esc="'{0:,.2f}'.format(total_qty_delivered)"/>
+                                        </td>
+                                        <td class="mgs_text_right">
+                                            <span t-esc="'{0:,.2f}'.format(total_qty_invoiced)"/>
+                                        </td>
+                                        <td class="mgs_text_right">
+                                            <span t-esc="'{0:,.2f}'.format(total_qty_to_invoice)"/>
+                                        </td>
+                                        <td class="mgs_text_right"></td>
+                                        <td class="mgs_text_right">
+                                            <span t-esc="'{0:,.2f}'.format(total_amount)"/>
+                                        </td>
+                                        
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div> 
+                    </div> 
+                </t> 
+            </t>
+        </t> 
+    </template>
+</odoo>

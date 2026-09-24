@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="partner_record_rule_user" model="ir.rule">
+        <field name="name">Restrict Partners by User Tag</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="domain_force">[('id', 'in', user.partner_tag_id.partner_ids.ids)]</field>
+        <field name="groups" eval="[(4, ref('mgs_partner_restrict_users_17.group_restrict_partner_user'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+     <record id="partner_record_rule_admin" model="ir.rule">
+        <field name="name">Restrict Partners by User Tag</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('mgs_partner_restrict_users_17.group_restrict_partner_admin'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+</odoo>

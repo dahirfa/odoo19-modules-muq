@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_mgs_landed_cost_analytic_mgs_landed_cost_analytic,mgs_landed_cost_analytic.mgs_landed_cost_analytic,model_mgs_landed_cost_analytic_mgs_landed_cost_analytic,base.group_user,1,1,1,1

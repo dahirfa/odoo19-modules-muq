@@ -3,11 +3,11 @@
     'name': "MGS Inventory Reports",
     'summary': """""",
     'description': """""",
-    'author': "Meisour Solutions",
+    'author': "Meisour Global Solutions",
     'website': "http://www.meisour.com",
     'category': 'Reporting',
-    'version': '1.0',
-    'depends': ['stock', 'sale'],
+    'version': '19.0.1.0.0',
+    'depends': ['stock', 'sale', 'stock_account'],
     'license': 'LGPL-3',
     'data': [
         'security/ir.model.access.csv',
@@ -23,4 +23,4 @@
         'wizards/non_moving_items.xml',
         'wizards/reserved_items.xml',
     ],
-} # type: ignore
+}

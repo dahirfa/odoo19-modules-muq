@@ -8,15 +8,15 @@
 					<sheet>
 						<group>
 							<group>
-<!-- add new -->
+
 								<field name="date"   />
-								<field name="stock_location_ids" placeholder="All Locations" string="Warehouse" options="{'no_create': True}" widget="many2many_tags"/>
+								<field name="stock_location_ids" domain="[('usage', '=', 'internal'), ('company_id', '=', company_id)] if company_id else [('usage', '=', 'internal')]" placeholder="All Locations" string="Warehouse" options="{'no_create': True}" widget="many2many_tags"/>
                 				<field name="company_id" groups="base.group_multi_company" />
 							</group>
 							<group>
                 				<field name="parent_categ_id" string="Parent Category" options="{'no_create': True}" />
 								<field name="categ_id" string="Category" options="{'no_create': True}" />
-								<field name="product_id" string="Product" options="{'no_create': True}"/>
+								<field name="product_id" string="Product" domain="[('categ_id', '=', categ_id)] if categ_id else []" options="{'no_create': True}"/>
 							</group>
 						</group>
 

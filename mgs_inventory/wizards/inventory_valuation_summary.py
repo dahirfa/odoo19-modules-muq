@@ -15,24 +15,16 @@ class ValuationSummary(models.TransientModel):
     location_id = fields.Many2one('stock.location', string='Location', domain=[
                                   ('usage', '=', 'internal')])
     company_id = fields.Many2one('res.company', string='Company',
-                                 default=lambda self: self.env.company.id)
+                                 default=lambda self: self.env.company)
     datas = fields.Binary('File', readonly=True)
     datas_fname = fields.Char('Filename', readonly=True)
-
-    @api.onchange('categ_id')
-    def onchange_categ_id(self):
-        if self.categ_id:
-            return {'domain': {'product_id': [('categ_id.id', '=', self.categ_id.id)]}}
-
-        return {'domain': {'product_id': []}}
 
     def confirm(self):
         location_obj = self.env['stock.location']
         domain = [('usage', '=', 'internal')]
         location_id = self.location_id.id
         location_ids = location_obj.sudo().search(
-            # if location_id else location_obj.sudo().search(domain).ids
-            [('id', '=', location_id)]).ids
+            [('id', '=', location_id)]).ids  # if location_id else location_obj.sudo().search(domain).ids
         data = {
             'ids': self.ids,
             'model': self._name,
@@ -51,12 +43,11 @@ class ValuationSummary(models.TransientModel):
         valuation_report_obj = self.env['report.mgs_inventory.valuation_summary_report']
         lines = valuation_report_obj._lines
         get_avg_cost = valuation_report_obj._get_avg_cost
-
         fp = BytesIO()
         workbook = xlsxwriter.Workbook(fp)
+        # wbf, workbook = self.add_workbook_format(workbook)
         filename = 'InventoryValuationSummaryReport'
         worksheet = workbook.add_worksheet(filename)
-
         # Formats
         heading_format = workbook.add_format(
             {'align': 'center', 'valign': 'vcenter', 'bold': True, 'size': 14})
@@ -77,7 +68,6 @@ class ValuationSummary(models.TransientModel):
         row += 1
         worksheet.merge_range(
             'A2:I3', 'Inventory Valuation Summary', heading_format)
-
         # Search criteria
         row += 2
         column = -1
@@ -85,21 +75,25 @@ class ValuationSummary(models.TransientModel):
             row += 1
             worksheet.write(row, column+1, 'Product', cell_text_format)
             worksheet.write(row, column+2, self.product_id.name or '')
-            column += 2
+            column+2
 
         if self.categ_id:
             worksheet.write(row, column+3, 'Category', cell_text_format)
             worksheet.write(row, column+4, self.categ_id.name or '')
 
-        # Locations
+        # if self.company_id:
+        #     column = 0
+        #     worksheet.write(row, column+1, 'Company', cell_text_format)
+        #     worksheet.write(row, column+2, self.company_id.name or '')
+
+        # Sub headers
+
         location_id = self.location_id.id
         location_ids = self.env['stock.location'].sudo().search(
             [('id', '=', location_id)]).ids
-
-        # Sub headers
         row += 2
         column = -1
-        worksheet.write(row, column+1, 'Category', cell_text_format)
+        worksheet.write(row, column+1, 'Cateogry', cell_text_format)
         worksheet.write(row, column+2, 'Item Code', cell_text_format)
         worksheet.write(row, column+3, 'Item Description', cell_text_format)
         worksheet.write(row, column+4, 'On Hand', cell_number_format)
@@ -109,64 +103,50 @@ class ValuationSummary(models.TransientModel):
         worksheet.write(row, column+8, 'Retail Value', cell_number_format)
         worksheet.write(row, column+9, 'Margin', cell_number_format)
 
-        # Totals
-        tot_qty = 0.0
-        tot_asset_value = 0.0
-        tot_retail_value = 0.0
+        # data
+        tot_qty = 0
+        tot_asset_value = 0
+        tot_retail_value = 0
 
         for category in lines(self.date, self.categ_id.id, self.product_id.id, self.company_id.id, location_ids, 'category'):
             row += 1
             column = -1
             worksheet.write(
-                row, column+1, category.get('categ_name', ''), cell_text_format)
+                row, column+1, category['categ_name'], cell_text_format)
 
-            tot_qty_category = 0.0
-            tot_asset_value_category = 0.0
-            tot_retail_value_category = 0.0
+            tot_qty_category = 0
+            tot_asset_value_category = 0
+            tot_retail_value_category = 0
 
             for line in lines(self.date, self.categ_id.id, self.product_id.id, self.company_id.id, location_ids, 'product'):
 
-                # Safely extract numeric values (avoid NoneType errors)
-                on_hand = line.get('on_hand') or 0.0
-                product_value = line.get('product_value') or 0.0
-                product_price = line.get('product_price') or 0.0
-                default_code = line.get('default_code') or ''
-                product_name = line.get(
-                    'product_name', {}).get('en_US', '') or ''
-                product_id = line.get('product_id')
-
-                # Calculations
-                retail_value = product_price * on_hand
-                margin_value = retail_value - product_value
-
-                # Update totals
-                tot_qty += on_hand
-                tot_asset_value += product_value
+                tot_qty += line['on_hand']
+                tot_asset_value += line['product_value']
+                retail_value = line['product_price'] * line['on_hand']
                 tot_retail_value += retail_value
 
-                tot_qty_category += on_hand
-                tot_asset_value_category += product_value
+                tot_qty_category += line['on_hand']
+                tot_asset_value_category += line['product_value']
                 tot_retail_value_category += retail_value
 
-                # Write row
                 row += 1
                 column = -1
-                worksheet.write(row, column+2, default_code)
-                worksheet.write(row, column+3, product_name)
+
+                worksheet.write(row, column+2, line['default_code'])
+                worksheet.write(row, column+3, line['product_name']['en_US'])
                 worksheet.write(
-                    row, column+4, '{:,.2f}'.format(on_hand), align_right)
+                    row, column+4, '{:,.2f}'.format(line['on_hand']), align_right)
                 worksheet.write(
-                    row, column+5, '{:,.2f}'.format(get_avg_cost(product_id)), align_right)
+                    row, column+5, get_avg_cost(line['product_id']), align_right)
                 worksheet.write(
-                    row, column+6, '{:,.2f}'.format(product_value), align_right)
+                    row, column+6, '{:,.2f}'.format(line['product_value']), align_right)
                 worksheet.write(
-                    row, column+7, '{:,.2f}'.format(product_price), align_right)
+                    row, column+7, '{:,.2f}'.format(line['product_price']), align_right)
                 worksheet.write(
                     row, column+8, '{:,.2f}'.format(retail_value), align_right)
                 worksheet.write(
-                    row, column+9, '{:,.2f}'.format(margin_value), align_right)
+                    row, column+9, '{:,.2f}'.format(retail_value-line['product_value']), align_right)
 
-            # Category totals
             row += 1
             column = -1
             worksheet.write(
@@ -175,10 +155,9 @@ class ValuationSummary(models.TransientModel):
                 row, column+6, '{:,.2f}'.format(tot_asset_value_category), cell_number_format)
             worksheet.write(
                 row, column+8, '{:,.2f}'.format(tot_retail_value_category), cell_number_format)
-            worksheet.write(row, column+9, '{:,.2f}'.format(
-                tot_retail_value_category - tot_asset_value_category), cell_number_format)
+            worksheet.write(
+                row, column+9, '{:,.2f}'.format(tot_retail_value_category-tot_asset_value_category), cell_number_format)
 
-        # Final totals
         row += 2
         column = -1
         worksheet.write(
@@ -188,9 +167,8 @@ class ValuationSummary(models.TransientModel):
         worksheet.write(
             row, column+8, '{:,.2f}'.format(tot_retail_value), cell_number_format)
         worksheet.write(
-            row, column+9, '{:,.2f}'.format(tot_retail_value - tot_asset_value), cell_number_format)
+            row, column+9, '{:,.2f}'.format(tot_retail_value-tot_asset_value), cell_number_format)
 
-        # Close and return
         workbook.close()
         out = base64.encodebytes(fp.getvalue())
         self.write({'datas': out, 'datas_fname': filename})
@@ -200,144 +178,120 @@ class ValuationSummary(models.TransientModel):
         return {
             'type': 'ir.actions.act_url',
             'target': 'new',
-            'url': f'web/content/?model={self._name}&id={self.id}&field=datas&download=true&filename={filename}',
+            'url': 'web/content/?model='+self._name+'&id='+str(self.id)+'&field=datas&download=true&filename='+filename,
         }
 
-# comment
+
 class ValuationSummaryReport(models.AbstractModel):
     _name = 'report.mgs_inventory.valuation_summary_report'
     _description = 'Valuation Summary Report'
 
     @api.model
     def _lines(self, date, categ_id, product_id, company_id, location_ids, group_by):
-        if not location_ids:
+        if len(location_ids) < 1:
             return self._lines_without_location(date, categ_id, product_id, company_id, group_by)
 
-        params = [str(company_id)]
-        loc_ids_str = ','.join(map(str, location_ids))
-
-        # Base select for category grouping
-        select_query = f"""
-        SELECT 
-            pc.name AS categ_name,
-            pc.id AS categ_id,
-            SUM(sq.quantity * (pp.standard_price ->> %s)::numeric) AS categ_value,
-            SUM(sq.quantity) AS categ_on_hand
+        params = [company_id]
+        select_query = """
+        select pc.name as categ_name, pc.id as categ_id,
+        COALESCE(sum(case when sl.id in (""" + ','.join(map(str, location_ids)) + """) then sml.quantity else - sml.quantity end * COALESCE((pp.standard_price ->> %s::text)::float, 0.0)), 0) * -1 as categ_value,
+        COALESCE(sum(case when sl.id in (""" + ','.join(map(str, location_ids)) + """) then sml.quantity else - sml.quantity end), 0) * -1 as categ_on_hand
         """
-        order_query = "GROUP BY pc.name, pc.id ORDER BY pc.name"
 
-        # If grouping by product
+        order_query = """
+        group by pc.name, pc.id order by pc.name
+        """
         if group_by == 'product':
-            select_query = f"""
-            SELECT 
-                pt.name AS product_name,
-                pt.default_code AS default_code,
-                pt.list_price AS product_price,
-                pp.id AS product_id,
-                SUM(sq.quantity * (pp.standard_price ->> %s)::numeric) AS product_value,
-                SUM(sq.quantity) AS on_hand
+            select_query = """
+            select pt.name as product_name, pt.default_code as default_code, pt.list_price as product_price, pp.id as product_id, 
+            COALESCE(sum(case when sl.id in (""" + ','.join(map(str, location_ids)) + """) then sml.quantity else - sml.quantity end * COALESCE((pp.standard_price ->> %s::text)::float, 0.0)), 0)  * -1 as product_value,
+            COALESCE(sum(case when sl.id in (""" + ','.join(map(str, location_ids)) + """) then sml.quantity else - sml.quantity end), 0)  * -1 as on_hand
             """
+
             order_query = """
-            GROUP BY pt.name, pt.default_code, pt.list_price, pp.id
-            ORDER BY pt.default_code
-            """
-
-        from_query = f"""
-        FROM stock_quant AS sq
-        LEFT JOIN product_product AS pp ON sq.product_id = pp.id
-        LEFT JOIN product_template AS pt ON pp.product_tmpl_id = pt.id
-        LEFT JOIN product_category AS pc ON pt.categ_id = pc.id
-        LEFT JOIN stock_location AS sl ON sq.location_id = sl.id
-        WHERE pp.active = TRUE
-        AND sl.id IN ({loc_ids_str})
-        AND sl.usage = 'internal'
-        """
-
-        # Filters
-        if product_id:
-            from_query += " AND pp.id = %s"
-            params.append(product_id)
-        if categ_id:
-            from_query += " AND pt.categ_id = %s"
-            params.append(categ_id)
-        if company_id:
-            from_query += " AND sq.company_id = %s"
-            params.append(company_id)
-        if date:
-            from_query += " AND sq.in_date <= %s"
-            params.append(date)
-
-        query = select_query + from_query + " " + order_query
-
-        self.env.cr.execute(query, tuple(params))
-        res = self.env.cr.dictfetchall()
-
-        # Optionally recalculate product_value using avg cost (for accuracy)
-        if group_by == 'product' and categ_id:
-            for r in res:
-                avg_cost = self._get_avg_cost(r['product_id'])
-                r['product_value'] = r['on_hand'] * avg_cost
-
-        return res
-
-    @api.model
-    def _lines_without_location(self, date=None, categ_id=None, product_id=None, company_id=None, group_by='categ'):
-        params = []
-
-        # Base select for category grouping
-        select_query = f"""
-        SELECT 
-            pc.name AS categ_name,
-            pc.id AS categ_id,
-            SUM(sq.quantity * (pp.standard_price ->> %s)::numeric) AS categ_value,
-            SUM(sq.quantity) AS categ_on_hand
-        """
-        order_query = "GROUP BY pc.name, pc.id ORDER BY pc.name"
-
-        # If grouping by product
-        if group_by == 'product':
-            select_query = f"""
-            SELECT 
-                pt.name AS product_name,
-                pt.default_code AS default_code,
-                pt.list_price AS product_price,
-                pp.id AS product_id,
-                SUM(sq.quantity * (pp.standard_price ->> %s)::numeric) AS product_value,
-                SUM(sq.quantity) AS on_hand
-            """
-            order_query = """
-            GROUP BY pt.name, pt.default_code, pt.list_price, pp.id
-            ORDER BY pt.default_code
+             group by pt.name, pt.list_price, pp.id, pt.default_code order by pt.default_code
             """
 
         from_query = """
-        FROM stock_quant AS sq
-        LEFT JOIN product_product AS pp ON sq.product_id = pp.id
-        LEFT JOIN product_template AS pt ON pp.product_tmpl_id = pt.id
-        LEFT JOIN product_category AS pc ON pt.categ_id = pc.id
-        LEFT JOIN stock_location AS sl ON sq.location_id = sl.id
-        WHERE pp.active = TRUE AND sl.usage = 'internal'
+        from stock_move_line as sml
+        left join product_product as pp on sml.product_id=pp.id
+        left join product_template as pt on pp.product_tmpl_id=pt.id
+        left join stock_location as sl on sml.location_id=sl.id
+        left join stock_location as sld on sml.location_dest_id=sld.id
+        left join product_category as pc on pt.categ_id=pc.id
+        left join stock_move as sm on sml.move_id=sm.id
+        where pp.active = true
         """
 
-        # Filters
-        if product_id:
-            from_query += " AND pp.id = %s"
-            params.append(product_id)
+        if date:
+            params.append(date)
+            from_query += " and sml.date <= %s"
+
         if categ_id:
-            from_query += " AND pt.categ_id = %s"
-            params.append(categ_id)
+            from_query += " and pt.categ_id = " + str(categ_id)
+
+        if product_id:
+            from_query += " and pp.id = " + str(product_id)
+
         if company_id:
-            from_query += " AND sq.company_id = %s"
-            params.append(company_id)
+            from_query += " and sml.company_id = " + str(company_id)
 
-        # The company_id also needs to be passed for JSONB extraction
-        params.insert(0, str(company_id))  # for ->> operator
+        if len(location_ids) > 0:
+            from_query += """ and (sl.id in (""" + ','.join(map(str, location_ids)) + \
+                """) or sld.id in (""" + ','.join(map(str,
+                                                      location_ids)) + """))"""
 
-        query = select_query + from_query + " " + order_query
+        query = select_query + from_query + order_query
 
         self.env.cr.execute(query, tuple(params))
         res = self.env.cr.dictfetchall()
         return res
+
+    @api.model
+    def _lines_without_location(self, date, categ_id, product_id, company_id, group_by):
+        company = self.env['res.company'].browse(company_id) if company_id else self.env.company
+        domain = [('is_storable', '=', True)]
+
+        if categ_id:
+            domain.append(('categ_id', '=', categ_id))
+
+        if product_id:
+            domain.append(('id', '=', product_id))
+
+        products = self.env['product.product'].with_company(company).with_context(
+            allowed_company_ids=[company.id], to_date=date, lang='en_US').search(domain)
+
+        product_lines = []
+        for product in products:
+            on_hand = product.qty_available
+            value = product.total_value
+            if not on_hand and not value:
+                continue
+            product_lines.append({
+                'product_name': {'en_US': product.product_tmpl_id.name},
+                'default_code': product.product_tmpl_id.default_code,
+                'product_price': product.product_tmpl_id.list_price,
+                'product_id': product.id,
+                'product_value': value,
+                'on_hand': on_hand,
+                'categ_id': product.categ_id.id,
+                'categ_name': product.categ_id.name,
+            })
+
+        if group_by == 'product':
+            return sorted(product_lines, key=lambda l: (not l['default_code'], l['default_code'] or ''))
+
+        categories = {}
+        for line in product_lines:
+            category = categories.setdefault(line['categ_id'], {
+                'categ_name': line['categ_name'],
+                'categ_id': line['categ_id'],
+                'categ_value': 0.0,
+                'categ_on_hand': 0.0,
+            })
+            category['categ_value'] += line['product_value']
+            category['categ_on_hand'] += line['on_hand']
+        return sorted(categories.values(), key=lambda c: c['categ_name'] or '')
 
     @api.model
     def _get_avg_cost(self, product_id):

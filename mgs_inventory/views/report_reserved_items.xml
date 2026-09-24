@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- <report
+    <report
         id="action_reserved_items_report"
         name="mgs_inventory.reserved_items_report"
         model="mgs_inventory.reserved_items_report"
         string="Reseved Items"
         report_type="qweb-html"
         paperformat="mgs_inventory_paperformat"
-        /> -->
+        />
 
     <record id="action_reserved_items_report" model="ir.actions.report">
         <field name="name">Reserved Items</field>

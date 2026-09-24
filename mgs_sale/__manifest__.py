@@ -6,7 +6,7 @@
     'author': "Meisour Solutions",
     'website': "http://www.meisour.com",
     'category': 'Reporting',
-    'version': '1.0',
+    'version': '19.0.1.0.0',
     'depends': ['sale', 'sale_margin'],
     'license': 'LGPL-3',
     'data': [

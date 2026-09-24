@@ -13,30 +13,16 @@ class CurrentStock(models.TransientModel):
 
     stock_location_ids = fields.Many2many(
         'stock.location', domain=[('usage', '=', 'internal')])
-    date = fields.Datetime(
-        'Inventory at', default=fields.Datetime.now, required=True)
+    date = fields.Datetime('Inventory at', default=fields.Datetime.now, required=True)
     # , domain = [('active', '=', True), ('type', '=', 'product')]
     product_id = fields.Many2one('product.product')
     categ_id = fields.Many2one('product.category')
-    parent_categ_id = fields.Many2one(
-        'product.category', string="Parent Category")
+    parent_categ_id = fields.Many2one('product.category', string="Parent Category")
     company_id = fields.Many2one('res.company', string='Company',
-                                 default=lambda self: self.env.company.id)
+                                 default=lambda self: self.env.company)
     warehouse_id = fields.Many2one('stock.warehouse', string="Warehouse")
     datas = fields.Binary('File', readonly=True)
     datas_fname = fields.Char('Filename', readonly=True)
-
-    @api.onchange('company_id')
-    def onchange_company_id(self):
-        if self.company_id:
-            return {'domain': {'stock_location_ids': [('company_id', '=', self.company_id.id)]}}
-
-    @api.onchange('categ_id')
-    def onchange_categ_id(self):
-        if self.categ_id:
-            return {'domain': {'product_id': [('categ_id.id', '=', self.categ_id.id)]}}
-
-        return {'domain': {'product_id': []}}
 
     def confirm(self):
         stock_location_ids = self.stock_location_ids.ids
@@ -133,8 +119,7 @@ class CurrentStock(models.TransientModel):
 
         # data
         tot_qty_all = 0
-        data = lines(self.date, self.categ_id.id, self.product_id.id,
-                     location_ids.ids, self.company_id.id, self.parent_categ_id.id)
+        data = lines(self.date, self.categ_id.id, self.product_id.id, location_ids.ids, self.company_id.id, self.parent_categ_id.id)
 
         # liens
         for line in group_data_by_product(data, location_ids):
@@ -146,13 +131,11 @@ class CurrentStock(models.TransientModel):
 
             for qty_location in line['qty']:
                 no += 1
-                worksheet.write(
-                    row, column+no, "{:,}".format(int(qty_location)))
+                worksheet.write(row, column+no, "{:,}".format(int(qty_location)))
                 total_qty_product += qty_location
 
             no += 1
-            worksheet.write(
-                row, column+no, "{:,}".format(int(total_qty_product)))
+            worksheet.write(row, column+no, "{:,}".format(int(total_qty_product)))
 
         workbook.close()
         out = base64.encodebytes(fp.getvalue())
@@ -165,7 +148,6 @@ class CurrentStock(models.TransientModel):
             'target': 'new',
             'url': 'web/content/?model='+self._name+'&id='+str(self.id)+'&field=datas&download=true&filename='+filename,
         }
-
 
 class CurrentStockReport(models.AbstractModel):
     _name = 'report.mgs_inventory.current_stock_report'
@@ -185,7 +167,7 @@ class CurrentStockReport(models.AbstractModel):
             sl.id location_id, sl.name location_name,
             sld.id location_dest_id, sld.name location_dest_name,
             -- sml.quantity quantity
-            COALESCE(sml.quantity / u.factor * u2.factor, 0) quantity
+            COALESCE(sml.quantity * u.factor / u2.factor, 0) quantity
         FROM 
             stock_move_line sml
             LEFT JOIN stock_picking sp ON sml.picking_id=sp.id
@@ -247,6 +229,7 @@ class CurrentStockReport(models.AbstractModel):
                     #     product_location_qty += move_line['quantity']
                     # else:
                     #     product_location_qty -= move_line['quantity']
+
 
                 line['qty'].append(product_location_qty)
 
@@ -343,7 +326,7 @@ class CurrentStockReport(models.AbstractModel):
 
 #     def query_execute(self, date=fields.Date.today(), categ_id=None, product_id=None, location_ids=self.env['stock.location'].search([]).ids, company_id=self.env.company.id, parent_categ_id=None):
 #         result = """
-#         %s
+#         %s 
 #         %s
 #         %s
 #         %s

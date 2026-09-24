@@ -25,7 +25,7 @@
 					</sheet>
 
 				<footer>
-					<button name="confirm" string="View" type="object" class="oe_highlight"/>
+					<button name="confirm" string="PDF" type="object" class="oe_highlight"/>
 					<button name="export_to_excel" string="EXCEL" type="object" class="oe_highlight"/>
 					<button string="Cancel" special="cancel"/>
 				</footer>
@@ -45,7 +45,7 @@
 		</record>
 
 
-	<menuitem id="menu_mgs_sale_report" name="Sales Reports" parent="sale.sale_menu_root" sequence="42"/>
+	<menuitem id="menu_mgs_sale_report" name="MGS-Sale Reports" parent="sale.sale_menu_root" sequence="42"/>
     <menuitem id="menu_sale_by_customer_report" name="Sales by Customer" parent="menu_mgs_sale_report" action="action_sales_by_customer_report" sequence="1" />
 
 </odoo>

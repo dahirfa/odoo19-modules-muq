@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- <report
+        id="action_purchases_by_vendor"
+        name="mgs_purchase.purchases_by_vendor_report"
+        model="mgs_purchase.purchases_by_vendor_report"
+        string="Purchases by Vendor"
+        report_type="qweb-html"
+        paperformat="mgs_purchase_paperformat"
+        /> -->
+    <record id="action_purchases_by_vendor" model="ir.actions.report">
+        <field name="name">Purchases by Vendor</field>
+        <field name="model">mgs_purchase.purchases_by_vendo</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">mgs_purchase.purchases_by_vendor_report</field>
+        <field name="paperformat_id" ref="mgs_purchase_paperformat"/>
+        <!-- Add other necessary fields like binding_model_id, binding_type, if needed -->
+    </record>
+    <template id="purchases_by_vendor_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.internal_layout" t-lang="en_US">
+                    <div class="page">
+                        <style>
+                                th,td {
+                                    border-top: 1.5px solid #212529 !important;
+                                    border-bottom: 1.5px solid #212529 !important;
+                                }
+                                .mgs_text_right {
+                                    text-align: right !important
+                                }
+                            </style>
+                        <div class="container" style="font-size:12px;font-family:Arial;margin-top:1px;">
+                            <h2>Purchases by Vendor
+                                <span t-esc="report_by"/>
+                            </h2>
+                            <div class="row" style="margin-top: 32px !important;font-size: 1.2em; font-family: 'Lato-Reg'">
+                                <div class="col-3" t-if="date_from or date_to">
+                                    <strong>Date:</strong>
+                                    <p t-esc="date_from" style="margin-bottom: 0"/>
+                                    <p t-esc="date_to"/>
+                                </div>
+                                <div class="col-3" t-if="partner_id[0]">
+                                    <strong>Vendor:</strong>
+                                    <p class="m-0" t-esc="partner_id[1]"/>
+                                </div>
+                                <div class="col-4" t-if="company_id" groups="base.group_multi_company">
+                                    <strong>Company:</strong>
+                                    <p t-esc="company_id.name"/>
+                                </div>
+                            </div>
+                            <table class="table table-condensed table-sm">
+                                <thead>
+                                    <tr>
+                                        <th nowrap="nowrap">Vendor</th>
+                                        <th nowrap="nowrap">
+                                            <t t-if="report_by == 'Detail'">Date</t>
+                                        </th>
+                                        <th nowrap="nowrap">
+                                            <t t-if="report_by == 'Detail'">Order</t>
+                                        </th>
+                                        <th nowrap="nowrap">
+                                            <t t-if="report_by == 'Detail'">Item</t>
+                                        </th>
+                                        <th style="text-align: right" nowrap="nowrap">Ordered Qty</th>
+                                        <th style="text-align: right" nowrap="nowrap">Received Qty</th>
+                                        <th style="text-align: right" nowrap="nowrap">Billed Qty</th>
+                                        <th style="text-align: right" nowrap="nowrap">Qty to be Billed</th>
+                                        <th style="text-align: right" nowrap="nowrap">
+                                            <t t-if="report_by == 'Detail'">Rate</t>
+                                        </th>
+                                        <th style="text-align: right" nowrap="nowrap">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="total_qty_ordered" t-value="0"/>
+                                    <t t-set="total_qty_received" t-value="0"/>
+                                    <t t-set="total_qty_billed" t-value="0"/>
+                                    <t t-set="total_qty_to_be_billed" t-value="0"/>
+                                    <t t-set="total_amount" t-value="0"/>
+                                    <t t-set="total_cost" t-value="0"/>
+                                    <t t-set="total_margin" t-value="0"/>
+                                    <t t-foreach="lines(date_from, date_to, company_id.id, partner_id[0])" t-as="group">
+                                        <tr t-if="report_by == 'Detail'" style="color: red; font-weight: bold;">
+                                            <td colspan="8">
+                                                <span t-esc="group['name']"/>
+                                            </td>
+                                            <td colspan="2" groups="account.group_account_manager"/>
+                                        </tr>
+                                        
+                                            <tr t-if="report_by == 'Detail'" t-foreach="group['lines']" t-as="line">
+                                                <td />
+                                                <td nowrap="nowrap">
+                                                    <span t-esc="line['date_order']"/>
+                                                </td>
+                                                <td>
+                                                    <span t-esc="line['order_no']"/>
+
+                                                    <t t-if="line['partner_ref']">
+                                                        (<span t-esc="line['partner_ref']"/>)
+                                                    </t>
+                                                </td>
+                                                <td  nowrap="nowrap">
+                                                    <span t-esc="line['product']['en_US']"/>
+                                                </td>
+                                                <td style="text-align: right">
+                                                    <span t-esc="'{0:,.2f}'.format(line['qty_ordered'])" t-if="line['qty_ordered']"/>
+                                                    <span t-esc="line['qty_ordered']" t-if="not line['qty_ordered']"/>
+                                                </td>
+                                                <td style="text-align: right">
+                                                    <span t-esc="'{0:,.2f}'.format(line['qty_received'])" t-if="line['qty_received']"/>
+                                                    <span t-esc="line['qty_received']" t-if="not line['qty_received']"/>
+                                                </td>
+                                                <td style="text-align: right">
+                                                    <span t-esc="'{0:,.2f}'.format(line['qty_billed'])" t-if="line['qty_billed']"/>
+                                                    <span t-esc="line['qty_billed']" t-if="not line['qty_billed']"/>
+                                                </td>
+                                                <td style="text-align: right">
+                                                    <span t-esc="'{0:,.2f}'.format(line['qty_to_be_billed'])" t-if="line['qty_to_be_billed']"/>
+                                                    <span t-esc="line['qty_to_be_billed']" t-if="not line['qty_to_be_billed']"/>
+                                                </td>
+                                                <td style="text-align: right">
+                                                    <t t-set="rate" t-value="0"/>
+                                                    <t t-set="rate" t-value="line['price_total']/line['qty_ordered']" t-if="line['qty_ordered'] and line['price_total']"/>
+                                                    <span t-esc="'{0:,.2f}'.format(rate)"/>
+                                                </td>
+                                                <td style="text-align: right">
+                                                    <!-- <span t-esc="'{0:,.2f}'.format(line['price_total'])" t-if="line['price_total']"/> -->
+                                                    <t t-set="price_subtotal" t-value="0"/>
+                                                    <t t-set="price_subtotal" t-value="rate * line['qty_received']"/>
+                                                    <span t-esc="'{0:,.2f}'.format(price_subtotal)"/>
+                                                </td>
+                                            </tr>
+                                        <tr style="font-weight: bold">
+                                            <td colspan="4">
+                                                <span t-esc="group['name']" t-if="report_by == 'Summary'"/>
+                                                <span t-if="report_by == 'Detail'" style="color: red; font-weight: bold;">TOTAL </span>
+                                            </td>
+                                            <td class="mgs_text_right">
+                                                <span t-if="report_by == 'Detail'" style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(group['total_qty_ordered'])"/>
+                                                <span t-if="report_by == 'Summary'" t-esc="'{0:,.2f}'.format(group['total_qty_ordered'])"/>
+                                            </td>
+                                            <td class="mgs_text_right">
+                                                <span t-if="report_by == 'Detail'" style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(group['total_qty_received'])"/>
+                                                <span t-if="report_by == 'Summary'" t-esc="'{0:,.2f}'.format(group['total_qty_received'])"/>
+                                            </td>
+                                            <td class="mgs_text_right">
+                                                <span t-if="report_by == 'Detail'" style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(group['total_qty_billed'])"/>
+                                                <span t-if="report_by == 'Summary'" t-esc="'{0:,.2f}'.format(group['total_qty_billed'])"/>
+                                            </td>
+                                            <td class="mgs_text_right">
+                                                <span t-if="report_by == 'Detail'" style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(group['total_qty_to_be_billed'])"/>
+                                                <span t-if="report_by == 'Summary'" t-esc="'{0:,.2f}'.format(group['total_qty_to_be_billed'])"/>
+                                            </td>
+                                            <td class="mgs_text_right"></td>
+                                            <td class="mgs_text_right">
+                                                <span t-if="report_by == 'Detail'" style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(group['total_amount'])"/>
+                                                <span t-if="report_by == 'Summary'" t-esc="'{0:,.2f}'.format(group['total_amount'])"/>
+                                            </td>
+                                        </tr>
+                                        <tr t-if="report_by == 'Detail'">
+                                            <td colspan="8"/>
+                                            <td colspan="2" groups="account.group_account_manager"/>
+                                        </tr>
+                                        <t t-set="total_qty_ordered" t-value="total_qty_ordered+group['total_qty_ordered']"/>
+                                        <t t-set="total_qty_received" t-value="total_qty_received+group['total_qty_received']"/>
+                                        <t t-set="total_qty_billed" t-value="total_qty_billed+group['total_qty_billed']"/>
+                                        <t t-set="total_qty_to_be_billed" t-value="total_qty_to_be_billed+group['total_qty_to_be_billed']"/>
+                                        <t t-set="total_amount" t-value="total_amount+group['total_amount']"/>
+                                    </t>
+                                    <tr style="font-weight: bold">
+                                        <td colspan="4"/>
+                                        <td class="mgs_text_right">
+                                            <span t-esc="'{0:,.2f}'.format(total_qty_ordered)"/>
+                                        </td>
+                                        <td class="mgs_text_right">
+                                            <span t-esc="'{0:,.2f}'.format(total_qty_received)"/>
+                                        </td>
+                                        <td class="mgs_text_right">
+                                            <span t-esc="'{0:,.2f}'.format(total_qty_billed)"/>
+                                        </td>
+                                        <td class="mgs_text_right">
+                                            <span t-esc="'{0:,.2f}'.format(total_qty_to_be_billed)"/>
+                                        </td>
+                                        <td class="mgs_text_right"></td>
+                                        <td class="mgs_text_right">
+                                            <span t-esc="'{0:,.2f}'.format(total_amount)"/>
+                                        </td>
+            
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!--container-->
+                    </div>
+                    <!--page-->
+                </t>
+                <!--web.external_layout-->
+            </t>
+        </t>
+        <!--web.html_container-->
+    </template>
+</odoo>

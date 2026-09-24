@@ -15,8 +15,8 @@ class ProductMovesHistory(models.TransientModel):
     date_from = fields.Datetime('From', default=datetime.today().replace(
         day=1, hour=00, minute=00, second=00))
     date_to = fields.Datetime('To', default=fields.Datetime.now)
-    company_id = fields.Many2one(
-        'res.company', string='Company', default=lambda self: self.env.company.id)
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self:
+                                 self.env.company)
     view = fields.Selection([('all', 'All Products'), ('active', 'Active Products'), (
         'inactive', 'Inactive Products')], string='View', default='all')
     include_reserved = fields.Boolean(default=False, string="Include Reserved")

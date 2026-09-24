@@ -37,11 +37,15 @@ class SalesbyItemDetail(models.TransientModel):
             raise ValidationError('''From Date should be less than To Date.''')
 
     def confirm(self):
-        product_ids = []
+        product_obj = self.env['product.product']
+        domain = []
         if self.product_tag_id:
-            product_ids = self.env['product.product'].search(
-                [('product_tag_ids', 'in', [self.product_tag_id.id])]
-            ).ids
+            domain.append(('product_tag_ids', 'in', [self.product_tag_id.id]))
+
+        if self.product_id:
+            domain.append(('id', '=', self.product_id.id))
+
+        product_ids = product_obj.search(domain).ids
 
         data = {
             'ids': self.ids,

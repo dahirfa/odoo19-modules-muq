@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- <report
+        id="action_sales_by_item"
+        name="mgs_sale.sales_by_item_report"
+        model="mgs_sale.sales_by_item_report"
+        string="Sales by Item"
+        report_type="qweb-pdf"
+        paperformat="mgs_sale_paperformat"
+        /> -->
+        <!--  paperformat="paperformat_custom" -->
+
         <record id="action_sales_by_item" model="ir.actions.report">
             <field name="name">Sales by Item</field>
-            <field name="model">mgs_sale.sales_by_item</field>
-            <field name="report_type">qweb-html</field>
+            <field name="model">mgs_sale.sales_by_item_report</field>
+            <field name="report_type">qweb-pdf</field>
             <field name="report_name">mgs_sale.sales_by_item_report</field>
             <field name="paperformat_id" ref="mgs_sale_paperformat"/>
-            <field name="binding_model_id" ref="model_mgs_sale_sales_by_item"/>
+            <!-- Add other necessary fields like binding_model_id, binding_type, if needed -->
         </record>
 
         <template id="sales_by_item_report">

@@ -162,7 +162,7 @@ class MgsReserveditemsReport(models.AbstractModel):
     _name = 'report.mgs_inventory.reserved_items_report'
     _description = 'Mgs Reserved items Report'
 
-    @api.model
+    @ api.model
     def _lines(self, product_id, date, stock_location_ids, partner_id, sort_by, order_id, company_id):
         lines = []
         params = []
@@ -176,10 +176,10 @@ class MgsReserveditemsReport(models.AbstractModel):
         #     when sl.id in (""" + ','.join(map(str, stock_location_ids)) + """) then quantity else 0 end as ProductOut, 0 as Balance"""
 
         # params.append(cases_query)
-#   sml.reserved_qty as reserved_qty, sm.partner_id as partner_id, rp.name as partner_name,
+
         query = """
         select sml.date, sp.origin,sp.name as picking_id, sml.quantity,sml.state as state,
-      
+        sml.quantity as reserved_qty, sm.partner_id as partner_id, rp.name as partner_name,
         sml.product_id as product_id, pt.name as product_name, sml.location_id as location_id,
         sl.name as location_name, sml.location_dest_id as location_dest_id, sld.name as location_dest_name,
         sld.usage as location_usage,  sml.state, sl.usage usage, sld.usage usaged, COALESCE(sm.price_unit, 0) as price_unit
@@ -193,7 +193,7 @@ class MgsReserveditemsReport(models.AbstractModel):
         left join product_product as pp on sml.product_id=pp.id
         left join product_template as pt on pp.product_tmpl_id=pt.id
         where not (sl.id = sld.id) and sml.state = 'assigned'
-        and pt.type = 'product'
+        and pt.is_storable = true
         """
 
         if len(stock_location_ids) > 0:
@@ -221,14 +221,11 @@ class MgsReserveditemsReport(models.AbstractModel):
             query += " and sml.company_id = %s"
 
         if sort_by == 'Date':
-            # Changed to " order by sml.date asc"
-            query += " order by sml.date asc"
+            query += "order by sml.date asc"
         elif sort_by == 'Item':
-            # Changed to " order by pt.name asc"
-            query += " order by pt.name asc"
+            query += "order by pt.name asc"
         else:
-            # Changed to " order by rp.name asc"
-            query += " order by rp.name asc"
+            query += "order by rp.name asc"
 
         self.env.cr.execute(query, tuple(params))
         res = self.env.cr.dictfetchall()
@@ -258,11 +255,10 @@ class MgsReserveditemsReport(models.AbstractModel):
         # select sum(case
         # when sld.id in (
         # """ + ','.join(map(str, stock_location_ids)) +""" ) then quantity else -quantity end) as Balance """
-        # COALESCE(sum(sml.reserved_qty), 0) as result
         date = str(date) + " 23:59:59"
         query = """
         select
-      
+        COALESCE(sum(sml.quantity), 0) as result
         from stock_move_line  as sml
         left join stock_picking as sp on sml.picking_id=sp.id
         left join stock_location as sl on sml.location_id=sl.id
@@ -301,21 +297,21 @@ class MgsReserveditemsReport(models.AbstractModel):
 
         scraps = self.env['stock.scrap'].search(
             [('picking_id', '=', picking_id.id)])
-        domain = [('id', 'in', (picking_id.move_lines + scraps.move_id)
-                   .stock_valuation_layer_ids.ids), ('product_id', '=', product_id)]
+        moves = (picking_id.move_ids + scraps.move_ids).filtered(
+            lambda m: m.product_id.id == product_id and m.is_valued)
 
         qty = 0
         value = 0
-        for valuation in self.env['stock.valuation.layer'].search(domain):
-            qty += valuation.quantity
-            value += valuation.value
+        for move in moves:
+            qty += move.product_qty
+            value += move.value
 
         result = value / qty if qty != 0 else 0
         if qty < 0 or value < 0 and qty != 0:
             result = (value * -1) / (qty * -1) or 0
         return result
 
-    @api.model
+    @ api.model
     # def _get_report_values(self, docids, data=None):
     def _get_report_values(self, docids, data=None):
         model = self.env.context.get('active_model')

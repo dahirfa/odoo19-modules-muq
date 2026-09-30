@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="container_size_type_view_list" model="ir.ui.view">
+        <field name="name">container.size.type.list</field>
+        <field name="model">container.size.type</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="size_feet"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="week1_rate"/>
+                <field name="week2_rate"/>
+                <field name="week3_rate"/>
+                <field name="demurrage_account_id"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="container_size_type_view_form" model="ir.ui.view">
+        <field name="name">container.size.type.form</field>
+        <field name="model">container.size.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <field name="active" invisible="1"/>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. 20DV"/></h1>
+                    </div>
+                    <group>
+                        <group string="Demurrage Rates (per day)">
+                            <field name="currency_id" invisible="1"/>
+                            <field name="week1_rate"/>
+                            <field name="week2_rate"/>
+                            <field name="week3_rate"/>
+                        </group>
+                        <group>
+                            <field name="size_feet"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <div class="text-muted">
+                        Demurrage days 1-7 are charged at the Week 1 rate, days 8-14 at the Week 2 rate
+                        and every day from day 15 onward at the Week 3 rate.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="container_size_type_view_search" model="ir.ui.view">
+        <field name="name">container.size.type.search</field>
+        <field name="model">container.size.type</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <filter name="filter_archived" string="Archived" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="container_size_type_action" model="ir.actions.act_window">
+        <field name="name">Container Size/Types</field>
+        <field name="res_model">container.size.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="mgs_container_control.container_size_type_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add a container size/type</p>
+            <p>Each size/type carries its own Week 1, Week 2 and Week 3 daily demurrage rate.</p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="container_control_menu_root" name="Container Control" sequence="10"
+              web_icon="mgs_container_control,static/description/icon.png"
+              groups="mgs_container_control.group_container_control_user"/>
+
+    <menuitem id="container_control_menu_containers" name="Container Control"
+              parent="mgs_container_control.container_control_menu_root"
+              action="mgs_container_control.container_control_action" sequence="10"/>
+
+    <menuitem id="container_control_menu_delivery_orders" name="Delivery Orders"
+              parent="mgs_container_control.container_control_menu_root"
+              action="mgs_container_control.container_delivery_order_action" sequence="20"/>
+
+    <menuitem id="container_control_menu_reports" name="Report"
+              parent="mgs_container_control.container_control_menu_root"
+              action="mgs_container_control.container_control_report_wizard_action" sequence="30"/>
+
+    <menuitem id="container_control_menu_configuration" name="Configuration"
+              parent="mgs_container_control.container_control_menu_root" sequence="100"
+              groups="mgs_container_control.group_container_control_manager"/>
+
+    <menuitem id="container_control_menu_size_types" name="Container Size/Types"
+              parent="mgs_container_control.container_control_menu_configuration"
+              action="mgs_container_control.container_size_type_action" sequence="10"/>
+</odoo>

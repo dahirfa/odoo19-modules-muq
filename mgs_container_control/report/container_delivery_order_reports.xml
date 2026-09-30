@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="paperformat_delivery_order" model="report.paperformat">
+        <field name="name">Delivery Order Paper Format</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">10</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">30</field>
+        <field name="dpi">90</field>
+    </record>
+    <record id="container_delivery_order_report_action" model="ir.actions.report">
+        <field name="name">Delivery Order</field>
+        <field name="model">container.delivery.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">mgs_container_control.report_delivery_order</field>
+        <field name="report_file">mgs_container_control.report_delivery_order</field>
+        <field name="print_report_name">'Delivery Order - %s' % object.name</field>
+        <field name="binding_model_id" ref="mgs_container_control.model_container_delivery_order"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="mgs_container_control.paperformat_delivery_order"/>
+    </record>
+
+    <template id="report_delivery_order_document">
+        <t t-set="company" t-value="o.company_id"/>
+        <div class="article" t-att-data-oe-model="o._name" t-att-data-oe-id="o.id"
+             t-att-data-oe-lang="o.env.context.get('lang')" style="font-size: 12px;">
+            <div class="page">
+                
+                <table class="table table-borderless mb-2" style="width: 100%;">
+                    <tr>
+                        <td style="width: 35%; vertical-align: middle;">
+                            <img t-if="company.delivery_order_report_logo"
+                                 t-att-src="image_data_uri(company.delivery_order_report_logo)"
+                                 style="max-height: 90px; max-width: 100%;" alt="Logo"/>
+                        </td>
+                        <td style="width: 30%; vertical-align: middle;" class="text-center">
+                            <h3 class="fw-bold mb-0">DELIVERY ORDER</h3>
+                        </td>
+                        <td style="width: 35%; vertical-align: middle; font-size: 10px;" class="text-end">
+                            <t t-set="partner" t-value="company.partner_id"/>
+                            <div t-if="partner.street or partner.street2">
+                                <span t-field="partner.street"/> <span t-field="partner.street2"/>
+                            </div>
+                            <div t-if="partner.city or partner.country_id">
+                                <span t-field="partner.city"/><t t-if="partner.city and partner.country_id">, </t><span t-field="partner.country_id.name"/>
+                            </div>
+                            <div t-if="partner.phone">Tel: <span t-field="partner.phone"/></div>
+                            <div t-if="partner.email">Email: <span t-field="partner.email"/></div>
+                            <div t-if="partner.website">Web: <span t-field="partner.website"/></div>
+                        </td>
+                    </tr>
+                </table>
+                <div style="border-top: 3px solid #0b5394;" class="mb-3"/>
+
+                <!-- Delivery order information -->
+                <table class="table table-borderless table-sm mb-3" style="width: 100%;">
+                    <tr>
+                        <td class="fw-bold" style="width: 22%;">D.O No.</td>
+                        <td style="width: 28%;">: <span t-field="o.name"/></td>
+                        <td class="fw-bold" style="width: 22%;">BL Number</td>
+                        <td style="width: 28%;">: <span t-field="o.bl_number"/></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Vessel Name / Voyage No.</td>
+                        <td>: <span t-field="o.vessel_name"/><t t-if="o.vessel_name and o.voyage_no"> / </t><span t-field="o.voyage_no"/></td>
+                        <td class="fw-bold">Declaration Date</td>
+                        <td>: <span t-field="o.declaration_date"/></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Vessel ETA</td>
+                        <td>: <span t-field="o.vessel_eta"/></td>
+                        <td class="fw-bold">D.O Date</td>
+                        <td>: <span t-field="o.date"/></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Total Packages</td>
+                        <td>: <span t-field="o.total_packages"/></td>
+                        <td class="fw-bold">Consignee</td>
+                        <td>: <span t-field="o.consignee_id.name"/></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Total Weight</td>
+                        <td>: <span t-field="o.total_weight"/></td>
+                        <td class="fw-bold">Terminal</td>
+                        <td>: <span t-field="o.terminal"/></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Quantity of Containers</td>
+                        <td>: <span t-field="o.container_qty_summary"/></td>
+                        <td class="fw-bold">Haulage</td>
+                        <td>: <span t-field="o.haulage"/></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Goods Description</td>
+                        <td colspan="3">: <span t-field="o.goods_description"/></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Port of Load</td>
+                        <td>: <span t-field="o.port_of_load"/></td>
+                        <td class="fw-bold">Port of Discharge</td>
+                        <td>: <span t-field="o.port_of_discharge"/></td>
+                    </tr>
+                </table>
+
+                <!-- Containers -->
+                <table class="table table-sm table-bordered mb-3" style="width: 100%; border: 1px solid #000;">
+                    <thead>
+                        <tr style="background-color: #dce6f1;">
+                            <th class="text-center" style="width: 8%;">NO.</th>
+                            <th class="text-center">Container No</th>
+                            <th class="text-center">Size/Type</th>
+                            <th class="text-center">Tare Weight</th>
+                            <th class="text-center">Cargo Weight</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="o.container_ids" t-as="container">
+                            <td class="text-center"><t t-out="container_index + 1"/></td>
+                            <td class="text-center"><span t-field="container.container_number"/></td>
+                            <td class="text-center"><span t-field="container.size_type_id.name"/></td>
+                            <td class="text-end"><span t-field="container.tare_weight"/></td>
+                            <td class="text-end"><span t-field="container.cargo_weight"/></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-end fw-bold">Total</td>
+                            <td class="text-end fw-bold"><t t-out="sum(o.container_ids.mapped('tare_weight'))" t-options="{'widget': 'float', 'precision': 2}"/></td>
+                            <td class="text-end fw-bold"><t t-out="sum(o.container_ids.mapped('cargo_weight'))" t-options="{'widget': 'float', 'precision': 2}"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Footer -->
+                <table class="table table-borderless" style="width: 100%;">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <div class="fw-bold">Haulage Instructions:</div>
+                            <div t-field="o.haulage_instructions"/>
+                            <div class="fw-bold mt-3">FREE TIME VALID <span t-field="o.free_time_valid_date"/></div>
+                        </td>
+                        <td style="width: 50%; vertical-align: top;" class="fw-bold">
+                            WE KINDLY CONFIRM RELEASING OF ABOVE MENTIONED CARGOES TO MESSRS.
+                            "<t t-out="o.consignee_id.name or ''"/>" WITH THANKS.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-top: 50px;">
+                            <div class="fw-bold">APPROVED STAMP/SIGNATURE</div>
+                            <div>......................................................</div>
+                        </td>
+                        <td style="padding-top: 50px;">
+                            <span class="fw-bold">CONTAINER DATE IN : </span><span t-field="o.container_date_in"/>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </template>
+
+    <template id="report_delivery_order">
+        <t t-call="web.html_container">
+            
+            <t t-foreach="docs" t-as="o">
+                <t t-call="mgs_container_control.report_delivery_order_document"/>
+            </t>
+        </t>
+    </template>
+</odoo>

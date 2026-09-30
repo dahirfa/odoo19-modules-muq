@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="container_control_report_wizard_view_form" model="ir.ui.view">
+        <field name="name">container.control.report.wizard.form</field>
+        <field name="model">container.control.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Container Control Report">
+                <group>
+                    <group>
+                        <field name="consignee_id"/>
+                        <field name="report_type" widget="radio"/>
+                    </group>
+                    <group>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_print_report" type="object" string="Print Report"
+                            class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="container_control_report_wizard_action" model="ir.actions.act_window">
+        <field name="name">Container Control Report</field>
+        <field name="res_model">container.control.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

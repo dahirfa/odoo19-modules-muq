@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="container_control_summary_report_action" model="ir.actions.report">
+        <field name="name">Container Control Summary</field>
+        <field name="model">container.control.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">mgs_container_control.report_container_control_summary</field>
+        <field name="report_file">mgs_container_control.report_container_control_summary</field>
+        <field name="print_report_name">'Container Control Summary - %s' % (object.consignee_id.name or '')</field>
+    </record>
+
+    <record id="container_control_detail_report_action" model="ir.actions.report">
+        <field name="name">Container Control Detail</field>
+        <field name="model">container.control.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">mgs_container_control.report_container_control_detail</field>
+        <field name="report_file">mgs_container_control.report_container_control_detail</field>
+        <field name="print_report_name">'Container Control Detail - %s' % (object.consignee_id.name or '')</field>
+    </record>
+
+    <!-- Logo / address / title block shared by both report modes -->
+    <template id="report_container_control_header">
+        <!-- <table class="table table-borderless mb-1" style="width: 100%;">
+            <tr>
+                <td style="width: 55%; vertical-align: middle;">
+                    <img t-if="company.delivery_order_report_logo"
+                         t-att-src="image_data_uri(company.delivery_order_report_logo)"
+                         style="max-height: 70px; max-width: 100%;" alt="Logo"/>
+                </td>
+                <td style="width: 45%; vertical-align: middle; font-size: 10px;" class="text-end">
+                    <t t-set="partner" t-value="company.partner_id"/>
+                    <div t-if="partner.street or partner.street2">
+                        <span t-field="partner.street"/> <span t-field="partner.street2"/>
+                    </div>
+                    <div t-if="partner.city or partner.country_id">
+                        <span t-field="partner.city"/><t t-if="partner.city and partner.country_id">, </t><span t-field="partner.country_id.name"/>
+                    </div>
+                    <div t-if="partner.phone">Tel: <span t-field="partner.phone"/></div>
+                    <div t-if="partner.email">Email: <span t-field="partner.email"/></div>
+                    <div t-if="partner.website">Web: <span t-field="partner.website"/></div>
+                </td>
+            </tr>
+        </table> -->
+        <div style="border-top: 3px solid #0b5394;" class="mb-2"/>
+        <h4 class="text-center fw-bold mb-2"><t t-out="report_title"/></h4>
+        <table class="table table-borderless table-sm mb-3" style="width: 100%;">
+            <tr>
+                <td class="fw-bold" style="width: 15%;">Consignee</td>
+                <td style="width: 35%;">: <span t-field="o.consignee_id.name"/></td>
+                <td class="fw-bold" style="width: 15%;">Report Date</td>
+                <td style="width: 35%;">: <t t-out="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y')"/></td>
+            </tr>
+        </table>
+    </template>
+
+    <!-- Summary: one line per container -->
+    <template id="report_container_control_summary_document">
+        <t t-set="company" t-value="o.company_id"/>
+        <t t-set="containers" t-value="o._get_containers()"/>
+        <div class="article" t-att-data-oe-model="o._name" t-att-data-oe-id="o.id"
+             t-att-data-oe-lang="o.env.context.get('lang')" style="font-size: 12px;">
+            <div class="page">
+                <t t-call="mgs_container_control.report_container_control_header">
+                    <t t-set="report_title">CONTAINER CONTROL SUMMARY</t>
+                </t>
+
+                <table class="table table-sm table-bordered mb-3" style="width: 100%; border: 1px solid #000;">
+                    <thead>
+                        <tr style="background-color: #dce6f1;">
+                            <th class="text-center" style="width: 8%;">NO.</th>
+                            <th class="text-center">Container No</th>
+                            <th class="text-center">Size/Type</th>
+                            <th class="text-center">Tare Weight</th>
+                            <th class="text-center">Cargo Weight</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="containers" t-as="container">
+                            <td class="text-center"><t t-out="container_index + 1"/></td>
+                            <td class="text-center"><span t-field="container.container_number"/></td>
+                            <td class="text-center"><span t-field="container.size_type_id.name"/></td>
+                            <td class="text-end"><span t-field="container.tare_weight"/></td>
+                            <td class="text-end"><span t-field="container.cargo_weight"/></td>
+                        </tr>
+                        <tr style="background-color: #f2f2f2;">
+                            <td colspan="3" class="text-end fw-bold">
+                                Total Containers: <t t-out="len(containers)"/>
+                            </td>
+                            <td class="text-end fw-bold">
+                                <t t-out="sum(containers.mapped('tare_weight'))" t-options="{'widget': 'float', 'precision': 2}"/>
+                            </td>
+                            <td class="text-end fw-bold">
+                                <t t-out="sum(containers.mapped('cargo_weight'))" t-options="{'widget': 'float', 'precision': 2}"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </template>
+
+    <template id="report_container_control_summary">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="mgs_container_control.report_container_control_summary_document"/>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Detail: one block per container, grouped by section -->
+    <template id="report_container_control_detail_document">
+        <t t-set="company" t-value="o.company_id"/>
+        <t t-set="containers" t-value="o._get_containers()"/>
+        <div class="article" t-att-data-oe-model="o._name" t-att-data-oe-id="o.id"
+             t-att-data-oe-lang="o.env.context.get('lang')" style="font-size: 11px;">
+            <div class="page">
+                <t t-call="mgs_container_control.report_container_control_header">
+                    <t t-set="report_title">CONTAINER CONTROL REPORT</t>
+                </t>
+
+                <div t-foreach="containers" t-as="container" class="mb-3"
+                     style="border: 1px solid #9e9e9e; page-break-inside: avoid;">
+                    <div class="px-2 py-1 fw-bold"
+                         style="background-color: #dce6f1; border-bottom: 1px solid #9e9e9e;">
+                        <t t-out="container_index + 1"/>. <span t-field="container.container_number"/>
+                        <span class="float-end"><span t-field="container.state"/></span>
+                    </div>
+                    <div class="row g-0">
+                        <div class="col-6 p-2" style="border-right: 1px solid #dee2e6;">
+                            <div class="fw-bold mb-1" style="color: #0b5394;">Container Information</div>
+                            <table class="table table-sm table-borderless mb-0">
+                                <tr>
+                                    <td class="fw-bold" style="width: 45%;">Container Number</td>
+                                    <td><span t-field="container.container_number"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Size/Type</td>
+                                    <td><span t-field="container.size_type_id.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Tare Weight</td>
+                                    <td><span t-field="container.tare_weight"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Cargo Weight</td>
+                                    <td><span t-field="container.cargo_weight"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Bill of Lading</td>
+                                    <td><span t-field="container.bill_of_lading"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Consignee</td>
+                                    <td><span t-field="container.consignee_id.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Delivery Order</td>
+                                    <td><span t-field="container.delivery_order_id.name"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-6 p-2">
+                            <div class="fw-bold mb-1" style="color: #0b5394;">Discharge &amp; Movement</div>
+                            <table class="table table-sm table-borderless mb-0">
+                                <tr>
+                                    <td class="fw-bold" style="width: 45%;">Discharge Status</td>
+                                    <td><span t-field="container.discharge_status"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Discharge Date</td>
+                                    <td><span t-field="container.discharge_date"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Discharge PIC</td>
+                                    <td><span t-field="container.discharge_pic"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Responsible Party</td>
+                                    <td><span t-field="container.discharge_responsible_party"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">D.O Date</td>
+                                    <td><span t-field="container.do_date"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Gate Out Date</td>
+                                    <td><span t-field="container.gate_out_date"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Gate In Date</td>
+                                    <td><span t-field="container.gate_in_date"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row g-0" style="border-top: 1px solid #dee2e6;">
+                        <div class="col-6 p-2" style="border-right: 1px solid #dee2e6;">
+                            <div class="fw-bold mb-1" style="color: #0b5394;">Demurrage</div>
+                            <table class="table table-sm table-borderless mb-0">
+                                <tr>
+                                    <td class="fw-bold" style="width: 45%;">Total Days Out</td>
+                                    <td><span t-field="container.total_days_out"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Free Time</td>
+                                    <td><span t-field="container.free_days"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Free Time Ends</td>
+                                    <td><span t-field="container.free_time_end_date"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Demurrage Days</td>
+                                    <td><span t-field="container.demurrage_days"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Demurrage Rate / Day</td>
+                                    <td><span t-field="container.demurrage_amount"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Total Amount</td>
+                                    <td><span t-field="container.total_amount"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Last Billed Day</td>
+                                    <td><span t-field="container.last_billed_date"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-6 p-2">
+                            <div class="fw-bold mb-1" style="color: #0b5394;">Loading</div>
+                            <table class="table table-sm table-borderless mb-0">
+                                <tr>
+                                    <td class="fw-bold" style="width: 45%;">Loading Status</td>
+                                    <td><span t-field="container.loading_status"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Loading Date</td>
+                                    <td><span t-field="container.loading_date"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Loading PIC</td>
+                                    <td><span t-field="container.loading_pic"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Responsible Party</td>
+                                    <td><span t-field="container.loading_responsible_party"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Loading Status Note</td>
+                                    <td><span t-field="container.loading_status_note"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Dwell Days</td>
+                                    <td><span t-field="container.dwell_days"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-sm table-bordered" style="width: 100%; border: 1px solid #000;">
+                    <tr style="background-color: #f2f2f2;">
+                        <td class="fw-bold" style="width: 25%;">
+                            Total Containers: <t t-out="len(containers)"/>
+                        </td>
+                        <td class="fw-bold text-end" style="width: 25%;">
+                            Total Tare Weight:
+                            <t t-out="sum(containers.mapped('tare_weight'))" t-options="{'widget': 'float', 'precision': 2}"/>
+                        </td>
+                        <td class="fw-bold text-end" style="width: 25%;">
+                            Total Cargo Weight:
+                            <t t-out="sum(containers.mapped('cargo_weight'))" t-options="{'widget': 'float', 'precision': 2}"/>
+                        </td>
+                        <td class="fw-bold text-end" style="width: 25%;">
+                            Total Amount:
+                            <t t-out="sum(containers.mapped('total_amount'))"
+                               t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </template>
+
+    <template id="report_container_control_detail">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="mgs_container_control.report_container_control_detail_document"/>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_company_view_form_inherit_mgs_container_control" model="ir.ui.view">
+        <field name="name">res.company.form.inherit.mgs.container.control</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='general_info']//group[@name='social_media']" position="after">
+                <group string="Container Control Reports" name="container_control_reports">
+                    <field name="delivery_order_report_logo" widget="image"
+                           options="{'size': [0, 90]}"/>
+                    <field name="delivery_address" />     
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

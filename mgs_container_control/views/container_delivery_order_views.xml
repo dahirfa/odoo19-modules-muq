@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="container_delivery_order_view_list" model="ir.ui.view">
+        <field name="name">container.delivery.order.list</field>
+        <field name="model">container.delivery.order</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="date"/>
+                <field name="bl_number"/>
+                <field name="consignee_id"/>
+                <field name="vessel_name"/>
+                <field name="voyage_no"/>
+                <field name="container_qty_summary"/>
+                <field name="port_of_discharge" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="container_delivery_order_view_form" model="ir.ui.view">
+        <field name="name">container.delivery.order.form</field>
+        <field name="model">container.delivery.order</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="%(mgs_container_control.container_delivery_order_report_action)d" type="action"
+                            string="Print PDF" class="btn-primary"/>
+                    <button name="action_export_xlsx" type="object" string="Export Excel"/>
+                    <button name="action_generate_demurrage_invoice" type="object" string="Generate Demurrage Invoice"
+                            groups="mgs_container_control.group_container_control_manager"
+                            confirm="Create one invoice for the uninvoiced demurrage days of this delivery order's containers?"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_invoices" type="object" class="oe_stat_button"
+                                icon="fa-pencil-square-o" invisible="invoice_count == 0"
+                                groups="account.group_account_invoice">
+                            <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="bl_number"/>
+                            <field name="consignee_id"/>
+                            <label for="vessel_name" string="Vessel Name / Voyage No."/>
+                            <div class="o_row">
+                                <field name="vessel_name" class="oe_inline" placeholder="Vessel"/>
+                                <span> / </span>
+                                <field name="voyage_no" class="oe_inline" placeholder="Voyage"/>
+                            </div>
+                            <field name="vessel_eta"/>
+                            <field name="total_packages"/>
+                            <field name="total_weight"/>
+                            <field name="container_qty_summary"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                            <field name="declaration_date"/>
+                            <field name="terminal"/>
+                            <field name="haulage"/>
+                            <field name="port_of_load"/>
+                            <field name="port_of_discharge"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Containers" name="containers">
+                            <field name="container_ids"
+                                   context="{'default_consignee_id': consignee_id, 'default_bill_of_lading': bl_number, 'default_vessel_name': vessel_name, 'default_voyage_no': voyage_no, 'default_company_id': company_id}">
+                                <list editable="bottom">
+                                    
+                                    <field name="container_number" readonly="state == 'closed'"/>
+                                    <field name="size_type_id" readonly="state == 'closed'"/>
+                                    <field name="tare_weight" readonly="state == 'closed'"/>
+                                    <field name="cargo_weight" readonly="state == 'closed'"/>
+                                    <field name="discharge_date" readonly="state == 'closed'"/>
+                                    <field name="gate_out_date" readonly="state == 'closed'"/>
+                                    <field name="gate_in_date" readonly="state == 'closed'"/>
+                                    <field name="free_days" readonly="state == 'closed'"/>
+                                    <field name="total_days_out" optional="show"/>
+                                    <field name="demurrage_days" optional="show"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="demurrage_amount" optional="show"/>
+                                    <field name="billed_demurrage_days" optional="hide"/>
+                                    <field name="demurrage_days_to_invoice" optional="show"/>
+                                    <field name="consignee_id" column_invisible="True"/>
+                                    <field name="bill_of_lading" column_invisible="True"/>
+                                    <field name="company_id" column_invisible="True"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Goods &amp; Haulage" name="goods">
+                            <group>
+                                <group>
+                                    <field name="goods_description"/>
+                                    <field name="haulage_instructions"/>
+                                </group>
+                                <group>
+                                    <field name="free_time_valid_date"/>
+                                    <field name="container_date_in"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="container_delivery_order_view_search" model="ir.ui.view">
+        <field name="name">container.delivery.order.search</field>
+        <field name="model">container.delivery.order</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="bl_number"/>
+                <field name="consignee_id"/>
+                <field name="vessel_name" filter_domain="['|', ('vessel_name', 'ilike', self), ('voyage_no', 'ilike', self)]"/>
+                <field name="container_ids" string="Container #" filter_domain="[('container_ids.container_number', 'ilike', self)]"/>
+                <filter name="filter_date" string="D.O Date" date="date"/>
+                <group>
+                    <filter name="group_by_consignee" string="Consignee" context="{'group_by': 'consignee_id'}"/>
+                    <filter name="group_by_vessel" string="Vessel" context="{'group_by': 'vessel_name'}"/>
+                    <filter name="group_by_date" string="D.O Date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="container_delivery_order_action" model="ir.actions.act_window">
+        <field name="name">Delivery Orders</field>
+        <field name="res_model">container.delivery.order</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="mgs_container_control.container_delivery_order_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a delivery order</p>
+            <p>Release containers to a consignee and print or export the delivery order.</p>
+        </field>
+    </record>
+</odoo>

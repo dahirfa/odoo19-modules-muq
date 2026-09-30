@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="container_control_view_list" model="ir.ui.view">
+        <field name="name">container.control.list</field>
+        <field name="model">container.control</field>
+        <field name="arch" type="xml">
+            <list decoration-success="demurrage_days == 0"
+                  decoration-danger=" demurrage_days > 0">
+                <!-- <field name="sequence" widget="handle"/> -->
+                <field name="bill_of_lading"/>
+                <field name="consignee_id"/>
+                <field name="size_type_id"/>
+                <field name="container_number"/>
+                <field name="discharge_status" optional="show"/>
+                <field name="discharge_pic" optional="hide"/>
+                <field name="discharge_responsible_party" optional="hide"/>
+                <field name="discharge_date"/>
+                <field name="do_date"/>
+                <field name="gate_out_date"/>
+                <field name="gate_in_date"/>
+                <field name="total_days_out"/>
+                <field name="free_days"/>
+                <field name="demurrage_days"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="demurrage_amount" sum="Total"/>
+                <field name="total_amount" sum="Total" optional="show"/>
+                <field name="billed_demurrage_days" optional="hide"/>
+                <field name="demurrage_days_to_invoice" optional="hide"/>
+                <field name="loading_status" optional="show"/>
+                <field name="loading_date" optional="show"/>
+                <field name="dwell_days" optional="show"/>
+                <field name="loading_pic" optional="hide"/>
+                <field name="loading_responsible_party" optional="hide"/>
+                <field name="loading_status_note" optional="hide"/>
+                <field name="remarks" optional="hide"/>
+                <!-- <field name="vessel_name" optional="hide"/> -->
+                <field name="delivery_order_id" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'in_progress'"
+                       decoration-success="state == 'closed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="container_control_view_form" model="ir.ui.view">
+        <field name="name">container.control.form</field>
+        <field name="model">container.control</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_start" type="object" string="Start" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_close" type="object" string="Close"
+                            invisible="state != 'in_progress'"
+                            groups="mgs_container_control.group_container_control_manager"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"
+                            groups="mgs_container_control.group_container_control_manager"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,in_progress,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_invoices" type="object" class="oe_stat_button"
+                                icon="fa-pencil-square-o" invisible="invoice_count == 0"
+                                groups="account.group_account_invoice">
+                            <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="container_number"/>
+                        <h1><field name="container_number" readonly="state == 'closed'" placeholder="e.g. CBHU3586176"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="bill_of_lading" readonly="state == 'closed'"/>
+                            <field name="consignee_id" readonly="state == 'closed'"/>
+                            <field name="size_type_id" readonly="state == 'closed'"/>
+                            <field name="delivery_order_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <!-- <field name="vessel_name"/>
+                            <field name="voyage_no"/> -->
+                            <field name="tare_weight" readonly="state == 'closed'"/>
+                            <field name="cargo_weight" readonly="state == 'closed'"/>
+                            <field name="company_id" readonly="state == 'closed'" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Discharge &amp; Demurrage" name="discharge_demurrage">
+                            <group>
+                                <!-- Discharge -->
+                                <group string="Discharge">
+                                    <field name="discharge_status" readonly="state == 'closed'"/>
+                                    <field name="discharge_date" readonly="state == 'closed'"/>
+                                    <field name="discharge_damage_report_ids" readonly="state == 'closed'" widget="many2many_binary"/>
+                                    <field name="discharge_pic" readonly="state == 'closed'"/>
+                                    <field name="discharge_responsible_party" readonly="state == 'closed'"/>
+                                </group>
+                        
+                                <!-- Container Movement -->
+                                <group string="Container Movement">
+                                    <field name="do_date" readonly="state == 'closed'"/>
+                                    <field name="gate_out_date" readonly="state == 'closed'"/>
+                                    <field name="gate_in_date" readonly="state == 'closed'"/>
+                                </group>
+                            </group>
+                        
+                          
+                        
+                            <group>
+                                <!-- Demurrage Period -->
+                                <group string="Demurrage Period">
+                                    <field name="total_days_out" readonly="state == 'closed'"/>
+                                    <field name="free_days" readonly="state == 'closed'"/>
+                                    <field name="free_time_end_date" readonly="state == 'closed'"/>
+                                    <field name="last_billed_date" readonly="state == 'closed'"/>
+                                </group>
+                        
+                                <!-- Demurrage Charges -->
+                                <group string="Demurrage Charges">
+                                    <field name="currency_id" invisible="1"/>
+                                    <field name="demurrage_days" readonly="state == 'closed'"/>
+                                    <field name="demurrage_amount" readonly="state == 'closed'"/>
+                                    <field name="total_amount" readonly="state == 'closed'"/>
+                                    <field name="billed_demurrage_days" readonly="state == 'closed'"/>
+                                    <field name="demurrage_days_to_invoice" readonly="state == 'closed'"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Loading" name="loading">
+                            <group>
+                                <group>
+                                    <field name="loading_status" readonly="state == 'closed'"/>
+                                    <field name="loading_date" readonly="state == 'closed'"/>
+                                    <field name="dwell_days" readonly="state == 'closed'"/>
+                                    <field name="loading_pic" readonly="state == 'closed'"/>
+                                    <field name="loading_responsible_party" readonly="state == 'closed'"/>
+                                </group>
+                                <group>
+                                    <field name="loading_status_note" readonly="state == 'closed'"/>
+                                    <field name="picture_ids" readonly="state == 'closed'" widget="many2many_binary"/>
+                                    <field name="loading_damage_report_ids" readonly="state == 'closed'" widget="many2many_binary"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Remarks" name="remarks">
+                            <field name="remarks" readonly="state == 'closed'" placeholder="Remarks..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="container_control_view_search" model="ir.ui.view">
+        <field name="name">container.control.search</field>
+        <field name="model">container.control</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="container_number"/>
+                <field name="bill_of_lading"/>
+                <field name="consignee_id"/>
+                <!-- <field name="vessel_name" filter_domain="['|', ('vessel_name', 'ilike', self), ('voyage_no', 'ilike', self)]"/> -->
+                <field name="delivery_order_id"/>
+                <field name="size_type_id"/>
+                <filter name="filter_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_in_progress" string="In Progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter name="filter_closed" string="Closed" domain="[('state', '=', 'closed')]"/>
+                <separator/>
+                <filter name="filter_open" string="Not Closed" domain="[('state', '!=', 'closed')]"/>
+                <filter name="filter_in_demurrage" string="In Demurrage" domain="[('demurrage_days', '>', 0)]"/>
+                <filter name="filter_demurrage_to_invoice" string="Demurrage to Invoice"
+                        domain="[('demurrage_days_to_invoice', '>', 0)]"/>
+                <filter name="filter_damaged" string="Damaged"
+                        domain="['|', ('discharge_status', '=', 'damage'), ('loading_status', '=', 'damage')]"/>
+                <group>
+                    <filter name="group_by_state" string="Status" context="{'group_by': 'state'}"/>
+                    <!-- <filter name="group_by_vessel" string="Vessel" context="{'group_by': 'vessel_name'}"/> -->
+                    <filter name="group_by_consignee" string="Consignee" context="{'group_by': 'consignee_id'}"/>
+                    <filter name="group_by_bill_of_lading" string="Bill of Lading" context="{'group_by': 'bill_of_lading'}"/>
+                    <filter name="group_by_size_type" string="Size/Type" context="{'group_by': 'size_type_id'}"/>
+                    <filter name="group_by_delivery_order" string="Delivery Order" context="{'group_by': 'delivery_order_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="container_control_action" model="ir.actions.act_window">
+        <field name="name">Container Control</field>
+        <field name="res_model">container.control</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="mgs_container_control.container_control_view_search"/>
+        <field name="context">{'search_default_filter_open': 1, 'create': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Track your first container</p>
+            <p>One record per container: discharge, gate out/in, demurrage and loading.</p>
+        </field>
+    </record>
+</odoo>

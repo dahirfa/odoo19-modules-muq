@@ -11,3 +11,8 @@ class AttendanceEmployee(models.Model):
     _inherit = "hr.employee"
     
     is_real_employee = fields.Boolean(string="Is Real Employee", default=True)
+    
+class AttendanceEmployeePublic(models.AbstractModel):
+    _inherit = "hr.employee.public"
+    
+    is_real_employee = fields.Boolean(string="Is Real Employee", default=True)

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Partner Ledger PaperFormate-->
+    <record id="paperformat_partner_ledger" model="report.paperformat">
+        <field name="name">Partner Ledger</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Landscape</field>
+        <!-- same margins as Odoo's standard A4 format; side margins come from
+             css_margins so the PDF gets the same padding as the HTML view -->
+        <field name="margin_top">52</field>
+        <field name="margin_bottom">32</field>
+        <field name="margin_left">0</field>
+        <field name="margin_right">0</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">52</field>
+        <field name="css_margins" eval="True"/>
+        <!-- dpi 90 makes wkhtmltopdf zoom by 96/90, which leaves uneven gaps between table rows -->
+        <field name="dpi">96</field>
+    </record>
+
+    <!-- Partner Ledger -->
+    <record id="multi_currency_partner_ledger" model="ir.actions.report">
+        <field name="name">Partner Ledger</field>
+        <field name="model">multicurrency.partnerledger</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">multi_currency_partner_ledger_app_fatah.report_partnerledger</field>
+        <field name="report_file">multi_currency_partner_ledger_app_fatah.report_partnerledger</field>
+        <field name="paperformat_id" ref="paperformat_partner_ledger"/>
+        <field name="binding_model_id" ref="model_multicurrency_partnerledger"/>
+        <field name="binding_type">report</field>
+    </record>
+
+  
+
+
+    
+
+</odoo>

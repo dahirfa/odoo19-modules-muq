@@ -23,11 +23,12 @@ class AttendanceEmployee(models.Model):
     code_ids        = fields.One2many('sa.attendance.employee.code', 'employee_id', string='Codes', copy=False)
     sa_timoff_ids  = fields.One2many('sa.employee.timeoff', 'employee_id')
     
-class AttendanceEmployeeBase(models.AbstractModel):
-    _inherit = "hr.employee.public"
+# class AttendanceEmployeeBase(models.AbstractModel):
+#     _inherit = "hr.employee.base"
     
-    attendance_type = fields.Selection([('smart', 'Smart'),('punch', 'Punch Type')], default='punch',required=True)
-
+#     attendance_type = fields.Selection([('smart', 'Smart'),('punch', 'Punch Type')], default='punch',required=True)
+#     code_ids        = fields.One2many('sa.attendance.employee.code', 'employee_id', string='Codes', copy=False)
+#     sa_timoff_ids  = fields.One2many('sa.employee.timeoff', 'employee_id')
     
 
 class HrEmployeeTimeOff(models.Model):

@@ -14,6 +14,8 @@
                 <field name="container_qty_summary"/>
                 <field name="port_of_discharge" optional="hide"/>
                 <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'"
+                       decoration-warning="state == 'confirmed'" decoration-success="state == 'closed'"/>
             </list>
         </field>
     </record>
@@ -27,9 +29,13 @@
                     <button name="%(mgs_container_control.container_delivery_order_report_action)d" type="action"
                             string="Print PDF" class="btn-primary"/>
                     <button name="action_export_xlsx" type="object" string="Export Excel"/>
+                    <button name="action_confirm" type="object" string="Confirm" class="btn-primary"
+                            invisible="state != 'draft'"/>
                     <button name="action_generate_demurrage_invoice" type="object" string="Generate Demurrage Invoice"
                             groups="mgs_container_control.group_container_control_manager"
-                            confirm="Create one invoice for the uninvoiced demurrage days of this delivery order's containers?"/>
+                            invisible="state == 'closed'"
+                            confirm="Invoice the uninvoiced demurrage days of this delivery order's containers (if any) and close the delivery order? A closed delivery order can no longer be modified."/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,closed"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -45,32 +51,33 @@
                     </div>
                     <group>
                         <group>
-                            <field name="bl_number"/>
-                            <field name="consignee_id"/>
+                            <field name="bl_number" readonly="state == 'closed'"/>
+                            <field name="consignee_id" readonly="state == 'closed'"/>
                             <label for="vessel_name" string="Vessel Name / Voyage No."/>
                             <div class="o_row">
-                                <field name="vessel_name" class="oe_inline" placeholder="Vessel"/>
+                                <field name="vessel_name" readonly="state == 'closed'" class="oe_inline" placeholder="Vessel"/>
                                 <span> / </span>
-                                <field name="voyage_no" class="oe_inline" placeholder="Voyage"/>
+                                <field name="voyage_no" readonly="state == 'closed'" class="oe_inline" placeholder="Voyage"/>
                             </div>
-                            <field name="vessel_eta"/>
-                            <field name="total_packages"/>
-                            <field name="total_weight"/>
+                            <field name="vessel_eta" readonly="state == 'closed'"/>
+                            <field name="total_packages" readonly="state == 'closed'"/>
+                            <field name="total_weight" readonly="state == 'closed'"/>
                             <field name="container_qty_summary"/>
                         </group>
                         <group>
-                            <field name="date"/>
-                            <field name="declaration_date"/>
-                            <field name="terminal"/>
-                            <field name="haulage"/>
-                            <field name="port_of_load"/>
-                            <field name="port_of_discharge"/>
-                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="date" readonly="state == 'closed'"/>
+                            <field name="declaration_date" readonly="state == 'closed'"/>
+                            <field name="terminal" readonly="state == 'closed'"/>
+                            <field name="haulage" readonly="state == 'closed'"/>
+                            <field name="port_of_load" readonly="state == 'closed'"/>
+                            <field name="port_of_discharge" readonly="state == 'closed'"/>
+                            <field name="manifest_number" readonly="state == 'closed'"/>
+                            <field name="company_id" readonly="state == 'closed'" groups="base.group_multi_company"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="Containers" name="containers">
-                            <field name="container_ids"
+                            <field name="container_ids" readonly="state == 'closed'"
                                    context="{'default_consignee_id': consignee_id, 'default_bill_of_lading': bl_number, 'default_vessel_name': vessel_name, 'default_voyage_no': voyage_no, 'default_company_id': company_id}">
                                 <list editable="bottom">
                                     
@@ -98,12 +105,12 @@
                         <page string="Goods &amp; Haulage" name="goods">
                             <group>
                                 <group>
-                                    <field name="goods_description"/>
-                                    <field name="haulage_instructions"/>
+                                    <field name="goods_description" readonly="state == 'closed'"/>
+                                    <field name="haulage_instructions" readonly="state == 'closed'"/>
                                 </group>
                                 <group>
-                                    <field name="free_time_valid_date"/>
-                                    <field name="container_date_in"/>
+                                    <field name="free_time_valid_date" readonly="state == 'closed'"/>
+                                    <field name="container_date_in" readonly="state == 'closed'"/>
                                 </group>
                             </group>
                         </page>
@@ -124,8 +131,13 @@
                 <field name="consignee_id"/>
                 <field name="vessel_name" filter_domain="['|', ('vessel_name', 'ilike', self), ('voyage_no', 'ilike', self)]"/>
                 <field name="container_ids" string="Container #" filter_domain="[('container_ids.container_number', 'ilike', self)]"/>
+                <filter name="filter_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_confirmed" string="Confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <filter name="filter_closed" string="Closed" domain="[('state', '=', 'closed')]"/>
+                <separator/>
                 <filter name="filter_date" string="D.O Date" date="date"/>
                 <group>
+                    <filter name="group_by_state" string="Status" context="{'group_by': 'state'}"/>
                     <filter name="group_by_consignee" string="Consignee" context="{'group_by': 'consignee_id'}"/>
                     <filter name="group_by_vessel" string="Vessel" context="{'group_by': 'vessel_name'}"/>
                     <filter name="group_by_date" string="D.O Date" context="{'group_by': 'date'}"/>

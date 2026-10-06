@@ -21,6 +21,18 @@ class ContainerDeliveryOrder(models.Model):
     _check_company_auto = True
 
     name = fields.Char(string='D.O No.', required=True, readonly=True, copy=False, default='New')
+    state = fields.Selection(
+        selection=[
+            ('draft', 'Draft'),
+            ('confirmed', 'Confirmed'),
+            ('closed', 'Closed'),
+        ],
+        string='Status',
+        required=True,
+        default='draft',
+        copy=False,
+        tracking=True,
+    )
     date = fields.Date(string='D.O Date', required=True, default=fields.Date.context_today, tracking=True)
     company_id = fields.Many2one(
         comodel_name='res.company',
@@ -68,7 +80,11 @@ class ContainerDeliveryOrder(models.Model):
         readonly=True,
     )
     invoice_count = fields.Integer(string='Invoice Count', compute='_compute_invoice_count')
-
+    
+    manifest_number = fields.Float(
+        string='Manifest Number',
+    )
+    
     @api.depends('container_ids.cargo_weight')
     def _compute_total_weight(self):
         for order in self:
@@ -133,10 +149,23 @@ class ContainerDeliveryOrder(models.Model):
     # Demurrage invoicing
     # ------------------------------------------------------------
 
+    def action_confirm(self):
+        for order in self:
+            if order.state != 'draft':
+                raise UserError(self.env._("Only draft delivery orders can be confirmed."))
+        self.write({'state': 'confirmed'})
+
     def action_generate_demurrage_invoice(self):
         invoices = self.env['account.move']
         for order in self:
+            if order.state == 'closed':
+                raise UserError(self.env._(
+                    "Delivery Order %s is closed: its demurrage invoice has already been generated.", order.name))
             invoices |= order._create_demurrage_invoice()
+            order.state = 'closed'
+        if not invoices:
+            
+            return True
         return invoices._get_records_action(name=self.env._("Demurrage Invoices"))
 
     def action_view_invoices(self):
@@ -149,34 +178,42 @@ class ContainerDeliveryOrder(models.Model):
     def _create_demurrage_invoice(self):
         """One customer invoice for the delivery order, one line per container.
 
-        Each line bills only the container's demurrage days that are not on an invoice
-        yet, so running this again later adds just the newly accrued days. Invoiced
+        Every container must be started (no Draft left). Each line bills only the
+        container's demurrage days that are not on an invoice yet; when there is nothing
+        to bill, no invoice is created and an empty recordset is returned. Either way,
         containers that have their Gate In Date are closed afterwards.
         """
         self.ensure_one()
-        if not self.consignee_id:
+        drafts = self.container_ids.filtered(lambda container: container.state == 'draft')
+        if drafts:
             raise UserError(self.env._(
-                "Delivery Order %s: set the Consignee before generating the demurrage invoice.", self.name))
-        containers = self.container_ids.filtered(lambda container: container.state != 'draft')
+                "Delivery Order %(order)s still has containers in Draft: %(containers)s. "
+                "Start them before generating the demurrage invoice.",
+                order=self.name,
+                containers=", ".join(drafts.mapped(lambda container: container.container_number or '')),
+            ))
+        containers = self.container_ids
         containers._refresh_demurrage_days()
         line_vals_list = containers._prepare_demurrage_invoice_line_vals()
-        if not line_vals_list:
-            raise UserError(self.env._(
-                "Delivery Order %s has no uninvoiced demurrage days on its started containers.", self.name))
-        invoice = self.env['account.move'].with_company(self.company_id).create({
-            'move_type': 'out_invoice',
-            'partner_id': self.consignee_id.id,
-            'company_id': self.company_id.id,
-            'currency_id': self.company_id.currency_id.id,
-            'invoice_date': fields.Date.context_today(self),
-            'invoice_origin': self.name,
-            'ref': " / ".join(filter(None, [self.name, self.bl_number])),
-            'container_delivery_order_id': self.id,
-            'invoice_line_ids': [Command.create(vals) for vals in line_vals_list],
-        })
-        self.message_post(body=self.env._("Demurrage invoice %s created.", invoice._get_html_link()))
+        invoice = self.env['account.move']
+        if line_vals_list:
+            if not self.consignee_id:
+                raise UserError(self.env._(
+                    "Delivery Order %s: set the Consignee before generating the demurrage invoice.", self.name))
+            invoice = invoice.with_company(self.company_id).create({
+                'move_type': 'out_invoice',
+                'partner_id': self.consignee_id.id,
+                'company_id': self.company_id.id,
+                'currency_id': self.company_id.currency_id.id,
+                'invoice_date': fields.Date.context_today(self),
+                'invoice_origin': self.name,
+                'ref': " / ".join(filter(None, [self.name, self.bl_number])),
+                'container_delivery_order_id': self.id,
+                'invoice_line_ids': [Command.create(vals) for vals in line_vals_list],
+            })
+            self.message_post(body=self.env._("Demurrage invoice %s created.", invoice._get_html_link()))
         # Containers back in (Gate In set) are fully billed now: close them. Containers
-        # still out stay In Progress so their next demurrage days can be invoiced later.
+        # still out stay In Progress.
         self.container_ids.filtered(
             lambda container: container.state == 'in_progress' and container.gate_in_date
         ).action_close()

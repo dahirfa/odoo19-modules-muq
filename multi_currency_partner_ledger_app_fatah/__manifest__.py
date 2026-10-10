@@ -49,6 +49,11 @@ multi-currency partner ledger
             # 'views/account_move.xml',
             
     ],
+    "assets": {
+        "web.report_assets_common": [
+            "multi_currency_partner_ledger_app_fatah/static/src/scss/partner_ledger_report.scss",
+        ],
+    },
     "installable": True,
     "auto_install": False,
     "price": 45,

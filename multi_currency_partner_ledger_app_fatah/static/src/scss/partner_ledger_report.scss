@@ -1,0 +1,12 @@
+// Horizontal scrolling for the Partner Ledger tables in the browser view only.
+// Scoped to `.o_body_html` so the PDF (`.o_body_pdf`) layout is unchanged.
+@media screen {
+    .o_body_html .o_mcpl_scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+
+        > table {
+            min-width: 1000px;
+        }
+    }
+}

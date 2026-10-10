@@ -44,6 +44,7 @@
                                 </div>
 
 
+                                <div class="o_mcpl_scroll">
                                 <table class="table table-sm">
                                     <thead>
                                         <tr>
@@ -186,6 +187,7 @@
                                         </t>
                                     </tbody>
                                 </table>
+                                </div>
 
                             </div>
                         </t>
@@ -231,6 +233,7 @@
                         <div class='row'>
                             <h3>Summary</h3>
                         </div>
+                        <div class="o_mcpl_scroll">
                         <table class="table table-sm">
                             <thead>
                                 <tr>
@@ -374,6 +377,7 @@
                                 </t>
                             </tbody>
                         </table>
+                        </div>
                     </t>
                 </div>
 

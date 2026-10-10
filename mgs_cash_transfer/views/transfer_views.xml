@@ -31,21 +31,15 @@
               <label for="amount"/>
               <div name="amount_div" class="o_row">
                 <field name="amount" readonly="state != 'draft'"/>
+                <field name="currency_id" readonly="1" options="{'no_create': True, 'no_open': True}" groups="base.group_multi_currency"/>
               </div>
-              <!-- <field name="show_rate" invisible="1"/>
-              <field name="currency_rate" invisible="show_rate != True" string="Currency Rate" groups="base.group_multi_currency"/>
-              <label for="override_rate" string="Custom Rate" groups="base.group_multi_currency"/>
-              <div name="amount_div" class="o_row" groups="base.group_multi_currency">
-                <field name="override_rate" readonly="state != 'draft'" invisible="show_rate != True"/>
-                <field name="custom_rate"  readonly="state != 'draft'" invisible="override_rate != True" required="override_rate == True"/>
-              </div> -->
               <field name="date" readonly="state != 'draft'"/>
               <field name="memo"/>
               <field name="company_id" readonly="1" options="{'no_create': True}" groups="base.group_multi_company"/>
             </group>
             <group>
-              <field name="journal_id" string="From" readonly="state != 'draft'" options="{'no_create': True}" domain="[('id', '!=', destination_journal_id), ('type', 'in', ['cash', 'bank'])]"/>
-              <field name="destination_journal_id" string="To" readonly="state != 'draft'" options="{'no_create': True}" domain="[('id', '!=', journal_id), ('type', 'in', ['cash', 'bank'])]"/>
+              <field name="journal_id" string="From" readonly="state != 'draft'" options="{'no_create': True}" domain="[('id', '!=', destination_journal_id), ('type', 'in', ['cash', 'bank']), ('company_id', '=', company_id)]"/>
+              <field name="destination_journal_id" string="To" readonly="state != 'draft'" options="{'no_create': True}" domain="[('id', '!=', journal_id), ('type', 'in', ['cash', 'bank']), ('company_id', '=', company_id)]"/>
             </group>
           </group>
         </sheet>

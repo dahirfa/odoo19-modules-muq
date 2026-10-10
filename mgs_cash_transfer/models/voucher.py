@@ -1,36 +1,52 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 
 class MGSCashTransferVoucher(models.Model):
     _name = 'mgs_cash_transfer.voucher'
     _description = 'Cash Transfer Voucher'
     _inherit = ['mail.thread', 'mail.activity.mixin']
+    _check_company_auto = True
 
     name = fields.Char(string='Name', default='/', copy=False)
     voucher_type = fields.Selection([('in', 'In'), ('out', 'Out')], string='Voucher Type', required=True)
     date = fields.Date(string='Pay Date', default=fields.Date.today)
-    amount = fields.Float(string='Pay Amount', required=True)
-    memo = fields.Char(string='Reference')
+    amount = fields.Monetary(string='Pay Amount', required=True, currency_field='currency_id')
     state = fields.Selection([('draft', 'Draft'), ('posted', 'Posted'), ('cancel', 'Cancel')], string='State', default='draft')
-    journal_id = fields.Many2one('account.journal', string='Journal', domain=[('type', 'in', ['bank', 'cash'])])
+    journal_id = fields.Many2one('account.journal', string='Journal', check_company=True, domain=[('type', 'in', ['bank', 'cash'])])
     move_id = fields.Many2one('account.move', string='Journal Entry')
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
-    currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.company.currency_id)
+    currency_id = fields.Many2one('res.currency', string='Currency', compute='_compute_currency_id',
+                                  store=True, readonly=False, precompute=True)
     voucher_line_ids = fields.One2many('mgs_cash_transfer.voucher.line', 'voucher_id', string='Voucher Lines')
     memo = fields.Char(string="Memo")
+
+    @api.depends('journal_id', 'company_id')
+    def _compute_currency_id(self):
+        for record in self:
+            record.currency_id = record.journal_id.currency_id or record.company_id.currency_id
 
     @api.constrains('amount', 'voucher_line_ids')
     def _check_amount(self):
         for record in self:
             total_line_amount = sum(line.amount for line in record.voucher_line_ids)
-            if record.amount != total_line_amount:
-                raise ValidationError('The total amount must be equal to the sum of the voucher line amounts.')
+            if record.currency_id.compare_amounts(record.amount, total_line_amount) != 0:
+                raise ValidationError(_('The total amount must be equal to the sum of the voucher line amounts.'))
+
+    @api.constrains('currency_id', 'journal_id')
+    def _check_currency(self):
+        for record in self:
+            if record.journal_id.currency_id and record.currency_id != record.journal_id.currency_id:
+                raise ValidationError(_(
+                    "The journal %(journal)s only accepts %(currency)s, the voucher currency must match it.",
+                    journal=record.journal_id.display_name,
+                    currency=record.journal_id.currency_id.name,
+                ))
 
     def _prepare_move_vals(self):
         """
         Prepare the values for creating an account move.
         """
-        ref = 'Payment Voucher' if self.voucher_type == 'in' else 'Receipt Voucher'
+        ref = 'Receipt Voucher' if self.voucher_type == 'in' else 'Payment Voucher'
 
         if self.memo:
             ref += ": %s" % self.memo
@@ -41,86 +57,52 @@ class MGSCashTransferVoucher(models.Model):
             'journal_id': self.journal_id.id,  
             'ref': ref,
             'name': '/',
-            'company_id': self.env.company.id
+            'company_id': self.company_id.id
         }]
     
     def _prepare_move_line_vals(self):
-        current_company = self.env.company
-        liquidity_amount_currency = self.amount
-        liquidity_balance = self.currency_id._convert(
-                liquidity_amount_currency,
-                self.company_id.currency_id,
-                self.company_id,
-                self.date,
-            )
+        company_currency = self.company_id.currency_id
+        date = self.date or fields.Date.context_today(self)
         currency_id = self.currency_id.id
-        move_line_vals = []
         journal_id = self.journal_id
-        if self.voucher_type == 'in':
-            move_line_vals.append((0, 0, {
-                'account_id': journal_id.default_account_id.id,  # Bank/Cash account
-                'name': self.memo,
-                'amount_currency': liquidity_amount_currency,
-                'debit': liquidity_balance,
-                'credit': 0.0,
-                'date_maturity': self.date,
-                'date': self.date,
-                'currency_id': currency_id,
-                'company_id': current_company.id
-            }))
+        sign = -1 if self.voucher_type == 'in' else 1
 
-        current_company = self.env.company
+        # Convert every line on its own and balance the liquidity line with their sum, so the
+        # entry stays balanced in company currency whatever the rounding of each conversion.
+        counterpart_vals = []
+        total_balance = 0.0
         for line in self.voucher_line_ids:
-            line_amount_currency = line.amount
-            line_balance = self.currency_id._convert(
-                    liquidity_amount_currency,
-                    self.company_id.currency_id,
-                    self.company_id,
-                    self.date,
-                )
-            
+            line_balance = self.currency_id._convert(line.amount, company_currency, self.company_id, date)
+            total_balance += line_balance
+
             rec = {
-                'account_id': line.account_id.id,  # Bank/Cash account
+                'account_id': line.account_id.id,
                 'partner_id': line.partner_id.id,
                 'name': line.name,
                 'date_maturity': self.date,
-                'date': self.date,
                 'currency_id': currency_id,
+                'amount_currency': sign * line.amount,
+                'balance': sign * line_balance,
             }
 
             if line.analytic_distribution:
                 rec.update ({'analytic_distribution': {str(line.analytic_distribution.id): 100},})
 
-            if self.voucher_type == 'in':
-                rec.update ({
-                    'credit': line_balance,
-                    'debit': 0,
-                    'amount_currency': line_amount_currency * -1
-                })
-            else:
-                rec.update ({
-                    'debit': line_balance,
-                    'credit': 0,
-                    'amount_currency': line_amount_currency
-                })
+            counterpart_vals.append((0, 0, rec))
 
-            move_line_vals.append((0, 0, rec))
+        liquidity_vals = (0, 0, {
+            'account_id': journal_id.default_account_id.id,  # Bank/Cash account
+            'name': self.memo,
+            'date_maturity': self.date,
+            'currency_id': currency_id,
+            'amount_currency': -sign * self.amount,
+            'balance': -sign * company_currency.round(total_balance),
+        })
 
-        if self.voucher_type == 'out':
-            move_line_vals.append((0, 0, {
-                'account_id': journal_id.default_account_id.id,  # Bank/Cash account
-                'name': self.memo,
-                'amount_currency': liquidity_amount_currency * -1,
-                'credit': liquidity_balance,
-                'debit': 0.0,
-                'date_maturity': self.date,
-                'date': self.date,
-                'currency_id': currency_id,
-                'company_id': current_company.id
-            }))
-        
-        return move_line_vals
-    
+        if self.voucher_type == 'in':
+            return [liquidity_vals] + counterpart_vals
+        return counterpart_vals + [liquidity_vals]
+
     def action_post(self):
         for r in self:
             if r.move_id:
@@ -175,7 +157,8 @@ class MGSCashTransferVoucherLine(models.Model):
     partner_id = fields.Many2one('res.partner', string='Partner')
     analytic_distribution = fields.Many2one('account.analytic.account', string='Analytic Distribution')
     analytic_precision = fields.Integer()
-    amount = fields.Float(string='Amount', required=True)
+    currency_id = fields.Many2one(related='voucher_id.currency_id')
+    amount = fields.Monetary(string='Amount', required=True, currency_field='currency_id')
 
     @api.constrains('account_id', 'partner_id', 'analytic_distribution')
     def _check_account_partner_analytic(self):

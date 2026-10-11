@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form_purchase_automation" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.mgs.purchase.order.automation</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="40"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Purchase Order Automation" string="Purchase Order Automation"
+                     name="mgs_purchase_order_automation" groups="purchase.group_purchase_manager">
+                    <block title="On Purchase Order Confirmation" name="mgs_purchase_order_automation_container">
+                        <setting id="mgs_po_auto_receipt" company_dependent="1"
+                                 help="Validate the receipt for the full ordered quantity">
+                            <field name="is_receipt_set_to_done"/>
+                        </setting>
+                        <setting id="mgs_po_auto_create_bill" company_dependent="1"
+                                 help="Create the vendor bill">
+                            <field name="create_bill"/>
+                        </setting>
+                        <setting id="mgs_po_auto_post_bill" company_dependent="1"
+                                 help="Post the vendor bill">
+                            <field name="validate_bill"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

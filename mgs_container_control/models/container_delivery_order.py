@@ -324,6 +324,9 @@ class ContainerDeliveryOrder(models.Model):
         )
         # Delivery order information
         vessel_voyage = " / ".join(filter(None, [self.vessel_name, self.voyage_no]))
+        manifest_number = self.manifest_number or None
+        if manifest_number:
+            manifest_number = int(manifest_number)
         info_rows = [
             (self.env._("D.O No."), self.name, self.env._("BL Number"), self.bl_number),
             (self.env._("Vessel Name / Voyage No."), vessel_voyage,
@@ -333,7 +336,8 @@ class ContainerDeliveryOrder(models.Model):
             (self.env._("Total Weight"), self.total_weight, self.env._("Terminal"), self.terminal),
             (self.env._("Quantity of Containers"), self.container_qty_summary, self.env._("Haulage"), self.haulage),
             (self.env._("Goods Description"), self.goods_description, None, None),
-            (self.env._("Port of Load"), self.port_of_load, self.env._("Port of Discharge"), self.port_of_discharge),
+            (self.env._("Port of Load"), self.port_of_load, self.env._("Manifest Number"), manifest_number),
+            (self.env._("Port of Discharge"), self.port_of_discharge, None, None),
         ]
         row = 3
         for left_label, left_value, right_label, right_value in info_rows:

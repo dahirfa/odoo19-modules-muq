@@ -102,8 +102,12 @@
                     <tr>
                         <td class="fw-bold">Port of Load</td>
                         <td>: <span t-field="o.port_of_load"/></td>
+                        <td class="fw-bold">Manifest Number</td>
+                        <td>: <span t-if="o.manifest_number" t-out="int(o.manifest_number) if o.manifest_number.is_integer() else o.manifest_number"/></td>
+                    </tr>
+                    <tr>
                         <td class="fw-bold">Port of Discharge</td>
-                        <td>: <span t-field="o.port_of_discharge"/></td>
+                        <td colspan="3">: <span t-field="o.port_of_discharge"/></td>
                     </tr>
                 </table>
 

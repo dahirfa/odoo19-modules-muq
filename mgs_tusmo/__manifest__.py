@@ -14,6 +14,7 @@
         
         "views/aged_receivable.xml",
         "views/sms.xml",
+        "views/account_payment.xml",
     ],
     "application": True,
     "installable": True,

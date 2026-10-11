@@ -14,7 +14,7 @@ class account_move(models.Model):
 
     container_referrence = fields.Char(string="Container", tracking=True)
     bill_referrence = fields.Char(string="Container", tracking=True)
-
+    is_a_car_invoice = fields.Boolean(string="Car Invoice")
 
 
 class AccountPaymentInherit(models.Model):
@@ -56,3 +56,9 @@ class ResConfigSettings(models.TransientModel):
 
     custom_bank_text = fields.Html(related='company_id.custom_bank_text', readonly=False)
     
+class account_move_line(models.Model):
+    _inherit = "account.move.line"
+
+    car_model = fields.Char(string="Model")
+    car_color = fields.Char(string="Color")
+    class_no = fields.Char(string="Class No.")

@@ -9,11 +9,36 @@
                 <field name="mgs_container_type" readonly="state != 'draft'" string="TYPE" invisible="move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund')"/>
                 <field name="container_referrence" readonly="state != 'draft'" string="Container No." invisible="move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund') or mgs_container_type != 'container'"/>
                 <field name="bill_referrence" readonly="state != 'draft'" string="Bill No." invisible="move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund') or mgs_container_type != 'bill'"/>
+                <field name="is_a_car_invoice" readonly="state != 'draft'" invisible="move_type not in ('out_invoice', 'out_refund')" widget="boolean_toggle"/>
+            </xpath>
+
+            <xpath expr="//field[@name='invoice_line_ids']//field[@name='account_id']" position="after">
+                <field name="car_model" column_invisible="parent.move_type not in ['out_invoice', 'out_refund'] or not parent.is_a_car_invoice" readonly="parent.state != 'draft'"/>
+                <field name="car_color" column_invisible="parent.move_type not in ['out_invoice', 'out_refund'] or not parent.is_a_car_invoice" readonly="parent.state != 'draft'"/>
+                <field name="class_no" column_invisible="parent.move_type not in ['out_invoice', 'out_refund'] or not parent.is_a_car_invoice" readonly="parent.state != 'draft'"/>
             </xpath>
         </field>
     </record>
 
 
+
+    <record id="account_move_view_list_inherit_mgs_tusmo" model="ir.ui.view">
+        <field name="name">account.move.list.inherit.mgs.tusmo</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='status_in_payment']" position="before">
+                <field name="state" column_invisible="1"/>
+                <field name="payment_state" string="Payment" widget="badge"
+                       decoration-danger="payment_state == 'not_paid'"
+                       decoration-warning="payment_state in ('partial', 'in_payment')"
+                       decoration-success="payment_state in ('paid', 'reversed')"
+                       invisible=" state != 'posted' or move_type == 'entry'"
+                       optional="show"/>
+            </xpath>
+        </field>
+    </record>
+  
 
     <record id="mgs_inherit_view_account_payment_form" model="ir.ui.view">
         <field name="name">account.view_account_payment_form.form</field>

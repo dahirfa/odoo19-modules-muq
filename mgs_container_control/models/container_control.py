@@ -232,12 +232,12 @@ class ContainerControl(models.Model):
                 record.demurrage_amount * record.demurrage_days
             )
 
-    @api.depends('do_date', 'free_days')
+    @api.depends('discharge_date', 'free_days')
     def _compute_free_time_end_date(self):
         for record in self:
-            if record.do_date:
+            if record.discharge_date:
                 record.free_time_end_date = (
-                    record.do_date + timedelta(days=record.free_days - 1)
+                    record.discharge_date + timedelta(days=record.free_days - 1)
                 )
             else:
                 record.free_time_end_date = False

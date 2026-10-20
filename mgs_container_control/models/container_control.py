@@ -200,7 +200,7 @@ class ContainerControl(models.Model):
         for record in self:
             if record.discharge_date:
                 end_date = record.gate_in_date or today
-                record.total_days_out = max((end_date - record.discharge_date).days, 0)
+                record.total_days_out = max((end_date - record.discharge_date).days + 1, 0)
             else:
                 record.total_days_out = 0
             record.demurrage_days = max(record.total_days_out - record.free_days, 0)

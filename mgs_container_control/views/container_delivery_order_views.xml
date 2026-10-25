@@ -35,6 +35,10 @@
                             groups="mgs_container_control.group_container_control_manager"
                             invisible="state == 'closed'"
                             confirm="Invoice the uninvoiced demurrage days of this delivery order's containers (if any) and close the delivery order? A closed delivery order can no longer be modified."/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            groups="mgs_container_control.group_container_control_manager"
+                            invisible="state != 'closed'"
+                            />
                     <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,closed"/>
                 </header>
                 <sheet>

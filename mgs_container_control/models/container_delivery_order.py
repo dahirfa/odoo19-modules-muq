@@ -168,6 +168,16 @@ class ContainerDeliveryOrder(models.Model):
             return True
         return invoices._get_records_action(name=self.env._("Demurrage Invoices"))
 
+    def action_reset_to_draft(self):
+        """Delete the demurrage invoices (posted ones are reset to Draft first) and reopen the order."""
+        for order in self:
+            if order.state != 'closed':
+                raise UserError(self.env._("Only closed delivery orders can be reset to draft."))
+        invoices = self.invoice_ids
+        invoices.filtered(lambda move: move.state != 'draft').button_draft()
+        invoices.unlink()
+        self.write({'state': 'draft'})
+
     def action_view_invoices(self):
         self.ensure_one()
         return self.invoice_ids._get_records_action(
@@ -211,7 +221,7 @@ class ContainerDeliveryOrder(models.Model):
                 'container_delivery_order_id': self.id,
                 'invoice_line_ids': [Command.create(vals) for vals in line_vals_list],
             })
-            self.message_post(body=self.env._("Demurrage invoice %s created.", invoice._get_html_link()))
+            
         # Containers back in (Gate In set) are fully billed now: close them. Containers
         # still out stay In Progress.
         self.container_ids.filtered(

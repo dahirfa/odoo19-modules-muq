@@ -364,29 +364,31 @@ class ContainerControl(models.Model):
         records.flush_recordset()
 
     def _prepare_demurrage_invoice_line_vals(self):
-        """One invoice line per container for its demurrage days not invoiced yet.
+        """One invoice line per container and rate week for its demurrage days not invoiced yet.
 
-        Demurrage days billed_demurrage_days + 1 .. demurrage_days are priced with the
-        Week 1 / Week 2 / Week 3 tiers; the unit price is their daily rate (averaged when
-        the unbilled days span more than one tier). Lines carry no product: only
-        the container number as label.
+        Demurrage days billed_demurrage_days + 1 .. demurrage_days are split into the
+        Week 1 / Week 2 / Week 3 tiers of the size/type; each part becomes its own line
+        priced at that week's daily rate. Lines are ordered by week, then container.
+        Lines carry no product: only the container number as label.
         """
-        vals_list = []
+        line_parts = []
         for record in self:
-            quantity = record.demurrage_days_to_invoice
-            if quantity <= 0:
+            if record.demurrage_days_to_invoice <= 0:
                 continue
             size_type = record.size_type_id
-            amount = (
-                size_type._get_tiered_amount(record.demurrage_days)
-                - size_type._get_tiered_amount(record.billed_demurrage_days)
-            )
+            for week, first_day, last_day in size_type._split_days_by_week(
+                record.billed_demurrage_days + 1, record.demurrage_days,
+            ):
+                line_parts.append((week, record, first_day, last_day))
+
+        vals_list = []
+        for week, record, first_day, last_day in sorted(line_parts, key=lambda part: part[0]):
+            size_type = record.size_type_id
             vals_list.append({
                 'name': record.container_number,
-                'quantity': quantity,
-                'price_unit': amount / quantity,
+                'quantity': last_day - first_day + 1,
+                'price_unit': size_type[f'week{week}_rate'],
                 'container_control_id': record.id,
                 'account_id': size_type.demurrage_account_id.id,
-                
             })
         return vals_list

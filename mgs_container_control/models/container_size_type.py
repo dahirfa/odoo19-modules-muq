@@ -73,3 +73,15 @@ class ContainerSizeType(models.Model):
     def _get_tiered_amount(self, demurrage_days):
         self.ensure_one()
         return sum(self._get_daily_rate(day) for day in range(1, demurrage_days + 1))
+
+    @api.model
+    def _split_days_by_week(self, first_day, last_day):
+        """Split 1-based demurrage days first_day..last_day into their rate weeks."""
+        periods = []
+        day = first_day
+        while day <= last_day:
+            week = self._get_rate_week(day)
+            period_end = last_day if week == 3 else min(week * DAYS_PER_WEEK, last_day)
+            periods.append((week, day, period_end))
+            day = period_end + 1
+        return periods

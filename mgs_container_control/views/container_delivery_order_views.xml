@@ -33,7 +33,7 @@
                             invisible="state != 'draft'"/>
                     <button name="action_generate_demurrage_invoice" type="object" string="Generate Demurrage Invoice"
                             groups="mgs_container_control.group_container_control_manager"
-                            invisible="state == 'closed'"
+                            invisible="state != 'confirmed'"
                             confirm="Invoice the uninvoiced demurrage days of this delivery order's containers (if any) and close the delivery order? A closed delivery order can no longer be modified."/>
                     <button name="action_reset_to_draft" type="object" string="Reset to Draft"
                             groups="mgs_container_control.group_container_control_manager"

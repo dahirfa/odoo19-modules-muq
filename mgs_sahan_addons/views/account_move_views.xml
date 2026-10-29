@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="account_move_view_form_inherit_sahan_addons" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.sahan.addons</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='payment_reference'][1]" position="before">
+                <field name="show_pos_reference" invisible="1"/>
+                <field name="pos_reference" invisible="not show_pos_reference or not pos_reference"/>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record id="account_move_view_search_inherit_sahan_addons" model="ir.ui.view">
+        <field name="name">account.move.search.inherit.sahan.addons</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="pos_reference"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

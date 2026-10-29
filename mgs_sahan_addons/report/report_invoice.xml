@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_invoice_document_inherit_sahan_addons" inherit_id="account.report_invoice_document">
+        <xpath expr="//div[@id='informations']" position="attributes">
+            <attribute name="t-if">o.invoice_date or (o.invoice_date_due and o.move_type == 'out_invoice' and o.state == 'posted') or o.delivery_date or o.invoice_origin or o.partner_id.ref or o.ref or (o.company_id.show_pos_reference and o.pos_reference) or o.invoice_incoterm_id</attribute>
+        </xpath>
+        <xpath expr="//div[@name='reference']" position="replace">
+            <t t-set="sahan_pos_reference" t-value="o.company_id.show_pos_reference and o.pos_reference"/>
+            <div class="col" t-if="o.ref or sahan_pos_reference" name="reference">
+                <strong>Reference</strong>
+                <div t-if="o.ref" t-field="o.ref"/>
+                <div t-if="sahan_pos_reference" t-field="o.pos_reference"/>
+            </div>
+        </xpath>
+    </template>
+</odoo>

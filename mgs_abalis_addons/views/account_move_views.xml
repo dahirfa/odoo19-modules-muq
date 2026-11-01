@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Let users link a manually created invoice / bill to its rent contract -->
+    <record id="account_move_view_form_inherit_mgs_abalis_addons" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.mgs.abalis.addons</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="rental_management.property_invoice_form_inherit"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='tenancy_id']" position="attributes">
+                <attribute name="invisible">move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund') or sold_id</attribute>
+                <attribute name="readonly">state != 'draft'</attribute>
+                <attribute name="options">{'no_create': True}</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

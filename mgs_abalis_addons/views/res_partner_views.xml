@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_partner_document_view_list" model="ir.ui.view">
+        <field name="name">res.partner.document.list</field>
+        <field name="model">res.partner.document</field>
+        <field name="arch" type="xml">
+            <list >
+                <field name="id_card_number"/>
+                <field name="document_type"/>
+                <field name="valid_from"/>
+                <field name="valid_to"/>
+                <field name="name"/>
+                <field name="gender" optional="show"/>
+                <field name="date_of_birth" optional="show"/>
+                <field name="issuing_authority" optional="show"/>
+                <field name="country_id" optional="show" options="{'no_create': True}"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="res_partner_document_view_form" model="ir.ui.view">
+        <field name="name">res.partner.document.form</field>
+        <field name="model">res.partner.document</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="id_card_number"/>
+                            <field name="document_type"/>
+                            <field name="valid_from"/>
+                            <field name="valid_to"/>
+                            <field name="issuing_authority"/>
+                        </group>
+                        <group>
+                            <field name="name"/>
+                            <field name="gender"/>
+                            <field name="date_of_birth"/>
+                            <field name="country_id" options="{'no_create': True}"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="res_partner_view_form_inherit_mgs_abalis_addons" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.mgs.abalis.addons</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='internal_notes']" position="before">
+                <page name="documents" string="Documents">
+                    <field name="document_ids" context="{'default_name': name}"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

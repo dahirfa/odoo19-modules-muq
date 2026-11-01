@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-inherit="rental_management.rental_dashboard" t-inherit-mode="extension">
+        <xpath expr="//section[hasclass('tk_rental_dash')]/div[hasclass('container')]/div[hasclass('row')][1]" position="before">
+            <div class="row mgs_landlord_filter">
+                <div class="col-md-12 mt32">
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <h4 class="tk-primary mb-0 text-nowrap">
+                            <i class="fa fa-filter me-1" title="Landlord Filter"/>
+                            Landlords
+                        </h4>
+                        <div class="mgs_landlord_selector flex-grow-1">
+                            <MultiRecordSelector
+                                resModel="'res.partner'"
+                                resIds="landlordFilter.ids"
+                                domain="landlordSelectorDomain"
+                                update.bind="onLandlordFilterUpdate"
+                                placeholder.translate="All Landlords"
+                                fieldString.translate="Landlords"/>
+                        </div>
+                        <button t-if="landlordFilter.ids.length"
+                                class="btn btn-secondary"
+                                t-on-click="() => this.onLandlordFilterUpdate([])">
+                            <i class="fa fa-times me-1"/>
+                            Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </t>
+</templates>

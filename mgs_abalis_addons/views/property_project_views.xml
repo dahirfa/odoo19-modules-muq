@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="property_project_view_form_inherit_mgs_abalis_addons" model="ir.ui.view">
+        <field name="name">property.project.form.inherit.mgs.abalis.addons</field>
+        <field name="model">property.project</field>
+        <field name="inherit_id" ref="rental_management.property_project_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='license_details']" position="after">
+                <group string="Accounting" name="accounting" groups="account.group_account_invoice">
+                 
+                        <field name="income_account_id" options="{'no_create': True}"/>
+                    
+                   
+                        <field name="analytic_account_id"
+                               options="{'no_create': True}"
+                               groups="analytic.group_analytic_accounting"/>
+                    
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

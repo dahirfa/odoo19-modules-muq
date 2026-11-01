@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="stock_picking_view_form_inherit_mgs_abalis_addons" model="ir.ui.view">
+        <field name="name">stock.picking.form.inherit.mgs.abalis.addons</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='picking_type_id']" position="after">
+                <field name="property_details" readonly="state in ['cancel', 'done']" string="Property"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="stock_picking_view_list_inherit_mgs_abalis_addons" model="ir.ui.view">
+        <field name="name">stock.picking.list.inherit.mgs.abalis.addons</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.vpicktree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='origin']" position="after">
+                <field name="property_details" optional="show" string="Property"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

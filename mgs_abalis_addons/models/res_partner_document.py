@@ -10,7 +10,6 @@ class ResPartnerDocument(models.Model):
 
     id_card_number = fields.Char(
         string='ID Card Number',
-        required=True,
         help="Number printed on the identity document.",
     )
     document_type = fields.Selection(

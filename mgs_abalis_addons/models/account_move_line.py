@@ -8,7 +8,11 @@ class AccountMoveLine(models.Model):
         self.ensure_one()
         return self.move_id.tenancy_id.property_project_id
 
-    @api.depends('move_id.tenancy_id.property_project_id.income_account_id')
+    @api.depends(
+        'move_id.tenancy_id.property_type',
+        'move_id.tenancy_id.property_project_id.income_account_id',
+        'move_id.tenancy_id.property_project_id.commercial_income_account_id',
+    )
     def _compute_account_id(self):
         # Posted lines keep their account: a recompute (e.g. a project changing its
         # income account) must not touch accounting entries already validated.
@@ -20,7 +24,10 @@ class AccountMoveLine(models.Model):
         for line in draft_lines:
             if line.display_type != 'product' or not line.move_id.is_sale_document(include_receipts=True):
                 continue
-            income_account = line._get_property_project().income_account_id
+            project = line._get_property_project()
+            if not project:
+                continue
+            income_account = project._get_income_account(line.move_id.tenancy_id.property_type)
             if income_account and income_account.company_ids & line.company_id.parent_ids:
                 line.account_id = income_account
 

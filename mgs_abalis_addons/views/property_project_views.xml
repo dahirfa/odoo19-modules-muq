@@ -9,6 +9,7 @@
                 <group string="Accounting" name="accounting" groups="account.group_account_invoice">
                  
                         <field name="income_account_id" options="{'no_create': True}"/>
+                        <field name="commercial_income_account_id" options="{'no_create': True}"/>
                     
                    
                         <field name="analytic_account_id"

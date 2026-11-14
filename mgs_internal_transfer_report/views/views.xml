@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Detailed operations (move lines) list -->
+    <record id="view_employee_form" model="ir.ui.view">
+        <field name="name">stock.move.line.operations.list.inherit.mgs.internal.transfer.report</field>
+        <field name="model">stock.move.line</field>
+        <field name="inherit_id" ref="stock.view_stock_move_line_detailed_operation_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_uom_id']" position="after">
+                <field name="unit_value"/>
+                <field name="mgs_total_value" sum="Total"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Transfer form: operations list -->
+    <record id="view_picking_form_inherit" model="ir.ui.view">
+        <field name="name">stock.picking.form.inherit.mgs.internal.transfer.report</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='move_ids']/list//field[@name='product_uom']" position="before">
+                <field name="unit_value"/>
+                <field name="mgs_total_value" sum="Total"/>
+            </xpath>
+            <xpath expr="//field[@name='move_ids']/list//field[@name='quantity']" position="attributes">
+                <attribute name="sum">Total</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Transfers list -->
+    <record id="stock_add_tree" model="ir.ui.view">
+        <field name="name">stock.picking.list.inherit.mgs.internal.transfer.report</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.vpicktree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='origin']" position="after">
+                <field name="total" sum="Total"/>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="employee_id"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

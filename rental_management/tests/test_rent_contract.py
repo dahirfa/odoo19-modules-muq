@@ -612,3 +612,22 @@ class TestRentContract(CreateRentalData):
         self.assertIn(str(contract_one.start_date), agreement_str)
         self.assertIn(str(contract_one.duration_type), agreement_str)
         self.assertIn(str(contract_one.property_id.name), agreement_str)
+
+    def test_bulk_active_rent_contract(self):
+        """Activate several draft contracts at once from the list view"""
+        contracts = self.contract_two | self.contract_three
+        action = contracts.action_bulk_active_rent_contract()
+        self.assertEqual(action["context"]["default_contract_ids"], contracts.ids)
+        wizard = self.env["active.contract"].with_context(**action["context"]).create(
+            {"type": "automatic"})
+        self.assertEqual(wizard.contract_ids, contracts)
+        self.assertTrue(wizard.is_bulk)
+        result = wizard.action_create_contract()
+        self.assertEqual(result["tag"], "display_notification")
+        self.assertEqual(set(contracts.mapped("contract_type")), {"running_contract"})
+        self.assertEqual(self.contract_two.type, "automatic")
+        # Day-unit contracts are always activated with manual installments
+        self.assertEqual(self.contract_three.type, "manual")
+        # Nothing left in Draft: the list action refuses
+        with self.assertRaises(ValidationError):
+            contracts.action_bulk_active_rent_contract()

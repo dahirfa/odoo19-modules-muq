@@ -741,6 +741,20 @@ class TenancyDetails(models.Model):
             action['context'] = {'active_id': self.id}
             return action
 
+    def action_bulk_active_rent_contract(self):
+        """Open the activation wizard for every selected draft contract (list view)"""
+        contracts = self.filtered(
+            lambda c: c.contract_type == 'new_contract' and not c.close_contract_state)
+        if not contracts:
+            raise ValidationError(_("None of the selected contracts is in Draft, "
+                                    "so there is nothing to activate."))
+        action = self.env["ir.actions.act_window"]._for_xml_id(
+            "rental_management.active_contract_action")
+        action['name'] = _("Activate Contracts")
+        action['context'] = {'default_contract_ids': contracts.ids,
+                             'bulk_activate': True}
+        return action
+
     def _process_separate_added_services(self):
         """Add Extra Service Invoice : Separate"""
         invoice_lines = []

@@ -15,11 +15,22 @@ class ActiveContract(models.Model):
         ("manual", "Manual Installment (List out all rent installment)")], default="automatic", )
     contract_id = fields.Many2one(comodel_name="tenancy.details")
     rent_unit = fields.Selection(related="contract_id.rent_unit")
+    contract_ids = fields.Many2many(comodel_name="tenancy.details",
+                                    relation="active_contract_tenancy_details_rel",
+                                    string="Contracts")
+    is_bulk = fields.Boolean(compute="_compute_is_bulk")
+
+    @api.depends("contract_ids")
+    def _compute_is_bulk(self):
+        for rec in self:
+            rec.is_bulk = bool(rec.contract_ids)
 
     @api.model
     def default_get(self, fields_list):
         """Default get"""
         res = super().default_get(fields_list)
+        if self.env.context.get("bulk_activate"):
+            return res
         active_id = self.env.context.get("active_id")
         contract_id = self.env["tenancy.details"].browse(active_id)
         res["contract_id"] = contract_id.id
@@ -29,6 +40,8 @@ class ActiveContract(models.Model):
 
     def action_create_contract(self):
         """Process activation of rent contract"""
+        if self.contract_ids:
+            return self._action_bulk_create_contract()
         active_contract_check = self.check_current_active_contract_status()
         if active_contract_check:
             raise ValidationError(_(active_contract_check))
@@ -39,6 +52,42 @@ class ActiveContract(models.Model):
         if self.type == "manual":
             self._prepare_installment()
             self._process_post_installment()
+
+    def _action_bulk_create_contract(self):
+        """Activate every selected draft contract with the chosen installment type.
+
+        Each contract goes through the same single-contract flow (one wizard per
+        contract, with its own active_id). Day-based contracts always use manual
+        installments, as in the single activation. All-or-nothing: if one contract
+        fails, nothing is activated and the error names that contract.
+        """
+        contracts = self.contract_ids.filtered(
+            lambda c: c.contract_type == "new_contract" and not c.close_contract_state)
+        if not contracts:
+            raise ValidationError(_("None of the selected contracts is in Draft."))
+        for contract in contracts:
+            wizard = self.with_context(
+                active_id=contract.id, bulk_activate=False, default_contract_ids=False,
+            ).create({
+                "contract_id": contract.id,
+                "contract_ids": False,
+                "type": "manual" if contract.rent_unit == "Day" else self.type,
+            })
+            try:
+                wizard.action_create_contract()
+            except ValidationError as error:
+                raise ValidationError(
+                    _("%(contract)s: %(error)s",
+                      contract=contract.display_name, error=error.args[0])) from error
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "type": "success",
+                "message": _("%(count)s contract(s) activated.", count=len(contracts)),
+                "next": {"type": "ir.actions.act_window_close"},
+            },
+        }
 
     def _prepare_installment(self):
         """Prepare installment for rent manual installment type"""

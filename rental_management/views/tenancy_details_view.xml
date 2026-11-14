@@ -560,6 +560,13 @@
             <field name="model">tenancy.details</field>
             <field name="arch" type="xml">
                 <list string="Rent" js_class="rental_contract_dashboard_list" create="false">
+                    <header>
+                        <button name="action_bulk_active_rent_contract"
+                            type="object"
+                            string="Activate"
+                            class="btn btn-outline-primary"
+                            groups="rental_management.property_rental_officer" />
+                    </header>
                     <field name="tenancy_seq" />
                     <field name="property_id" />
                     <field name="property_type" />

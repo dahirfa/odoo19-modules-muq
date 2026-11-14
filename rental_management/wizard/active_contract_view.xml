@@ -6,6 +6,23 @@
             <field name="model">active.contract</field>
             <field name="arch" type="xml">
                 <form string="Booking">
+                    <field name="is_bulk" invisible="1"/>
+                    <group invisible="not is_bulk">
+                        <div colspan="2" class="text-muted">
+                            The installment type below is applied to every contract listed.
+                            Contracts with a daily rent unit always use manual installments.
+                        </div>
+                        <field name="contract_ids" nolabel="1" colspan="2" readonly="1">
+                            <list>
+                                <field name="tenancy_seq"/>
+                                <field name="property_id"/>
+                                <field name="tenancy_id" string="Customer"/>
+                                <field name="rent_unit"/>
+                                <field name="start_date"/>
+                                <field name="end_date"/>
+                            </list>
+                        </field>
+                    </group>
                     <group>
                         <label for="type"/>
                         <div class="d-inline-block">
@@ -24,7 +41,9 @@
                         </div>
                     </group>
                     <footer>
-                        <button string="Create Contract" type="object" class="btn btn-outline-success"
+                        <button string="Activate Contracts" type="object" class="btn btn-outline-success"
+                                name="action_create_contract" invisible="not is_bulk"/>
+                        <button string="Create Contract" type="object" invisible="is_bulk" class="btn btn-outline-success"
                                 name="action_create_contract"/>
                         <button string="Cancel" special="cancel" class="btn btn-outline-danger"/>
                     </footer>

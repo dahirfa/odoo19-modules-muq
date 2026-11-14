@@ -4,3 +4,5 @@ from . import account_move_line
 from . import property_details
 from . import res_partner_document
 from . import res_partner
+from . import tenancy_details
+from . import project_valuation

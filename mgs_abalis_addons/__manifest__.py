@@ -1,6 +1,6 @@
 {
     'name': 'MGS Abalis Addons',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'summary': 'Abalis customizations: link inventory transfers to properties',
     'description': """
 MGS Abalis Addons

@@ -8,6 +8,12 @@ class AccountMoveLine(models.Model):
         self.ensure_one()
         return self.move_id.tenancy_id.property_project_id
 
+    def _is_property_payment_line(self):
+        """Return True if this line invoices the rental_management 'Property Payment' product."""
+        self.ensure_one()
+        property_payment = self.env.ref('rental_management.property_product_1', raise_if_not_found=False)
+        return bool(property_payment) and self.product_id == property_payment
+
     @api.depends(
         'move_id.tenancy_id.property_type',
         'move_id.tenancy_id.property_project_id.income_account_id',
@@ -22,7 +28,13 @@ class AccountMoveLine(models.Model):
         draft_lines = self - posted_lines
         super(AccountMoveLine, draft_lines)._compute_account_id()
         for line in draft_lines:
-            if line.display_type != 'product' or not line.move_id.is_sale_document(include_receipts=True):
+            # Only Property Payment lines take the project's income account; Deposit,
+            # Broker, Maintenance and any other product keep the product's account.
+            if (
+                line.display_type != 'product'
+                or not line.move_id.is_sale_document(include_receipts=True)
+                or not line._is_property_payment_line()
+            ):
                 continue
             project = line._get_property_project()
             if not project:

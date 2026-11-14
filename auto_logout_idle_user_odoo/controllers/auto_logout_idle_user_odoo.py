@@ -23,26 +23,13 @@ from odoo import http
 from odoo.http import request
 
 
-class EasyLanguageSelector(http.Controller):
-    """
-    The EasyLanguageSelector passing minute that selected in the  login user
-    account.
+class IdleTimerController(http.Controller):
+    """Provides the idle-logout setting of the logged-in user to the web
+    client countdown (static/src/js/systray.js)."""
 
-        Methods:
-            get_idle_time(self):
-                when the page is loaded adding total activated languages options
-                 to the selection field.
-                return a list variable.
-    """
-
-    @http.route('/get_idle_time/timer', auth='public', type='jsonrpc')
+    @http.route('/get_idle_time/timer', auth='user', type='jsonrpc')
     def get_idle_time(self):
-        """
-        Summery:
-            Getting value that selected from the login user account and pass it
-            to the js function.
-        return:
-            type:It is a variable, that contain selected minutes.
-        """
-        if request.env.user.enable_idle:
-            return request.env.user.idle_time
+        """Return the idle time in minutes, or False when the timer is
+        disabled for the current user."""
+        user = request.env.user
+        return user.idle_time if user.enable_idle else False

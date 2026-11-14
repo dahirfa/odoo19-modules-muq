@@ -19,46 +19,50 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
+from psycopg2.errors import CheckViolation
+
+from odoo.tests import HttpCase, tagged
 from odoo.tests.common import TransactionCase
 from odoo.tools import mute_logger
-from psycopg2.errors import CheckViolation
-import psycopg2
+
 
 class TestResUsers(TransactionCase):
 
-    def setUp(self):
-        super(TestResUsers, self).setUp()
-        self.User = self.env['res.users']
-
     def test_update_user_valid_idle_time(self):
-        """Test updating a user with a valid idle time"""
+        """A positive idle time is stored."""
         user = self.env.user
-        user.write({
-            'enable_idle': True,
-            'idle_time': 15,
-        })
+        user.write({'enable_idle': True, 'idle_time': 15})
         self.env.flush_all()
-        self.assertEqual(user.idle_time, 15, "Idle time should be set correctly.")
-        self.assertTrue(user.enable_idle, "Enable idle should be True.")
+        self.assertEqual(user.idle_time, 15)
+        self.assertTrue(user.enable_idle)
 
     @mute_logger('odoo.sql_db')
     def test_update_user_invalid_idle_time(self):
-        """Test updating a user with an invalid idle time (< 1)"""
-        user = self.env.user
-        with self.assertRaises(Exception):
-            user.write({
-                'enable_idle': True,
-                'idle_time': 0,
-            })
+        """An idle time of 0 violates the constraint."""
+        with self.assertRaises(CheckViolation):
+            self.env.user.write({'enable_idle': True, 'idle_time': 0})
             self.env.flush_all()
 
     @mute_logger('odoo.sql_db')
     def test_update_user_negative_idle_time(self):
-        """Test updating a user with a negative idle time"""
-        user = self.env.user
-        with self.assertRaises(Exception):
-            user.write({
-                'enable_idle': True,
-                'idle_time': -5,
-            })
+        """A negative idle time violates the constraint."""
+        with self.assertRaises(CheckViolation):
+            self.env.user.write({'enable_idle': True, 'idle_time': -5})
             self.env.flush_all()
+
+
+@tagged('post_install', '-at_install')
+class TestIdleTimeController(HttpCase):
+
+    def _get_idle_time(self):
+        return self.make_jsonrpc_request('/get_idle_time/timer', {})
+
+    def test_returns_minutes_when_enabled(self):
+        self.env.ref('base.user_admin').write({'enable_idle': True, 'idle_time': 7})
+        self.authenticate('admin', 'admin')
+        self.assertEqual(self._get_idle_time(), 7)
+
+    def test_returns_false_when_disabled(self):
+        self.env.ref('base.user_admin').write({'enable_idle': False})
+        self.authenticate('admin', 'admin')
+        self.assertIs(self._get_idle_time(), False)

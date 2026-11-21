@@ -6,3 +6,5 @@ from . import res_partner_document
 from . import res_partner
 from . import tenancy_details
 from . import project_valuation
+from . import account_payment
+from . import contract_wizard

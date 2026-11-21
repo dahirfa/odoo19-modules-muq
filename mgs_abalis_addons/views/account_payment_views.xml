@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Customer payments: pick the property first, the tenant is filled in from its running contract -->
+    <record id="account_payment_view_form_inherit_mgs_abalis_addons" model="ir.ui.view">
+        <field name="name">account.payment.form.inherit.mgs.abalis.addons</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='group1']/field[@name='payment_type']" position="after">
+                <field name="property_id"
+                       options="{'no_create': True}"
+                       invisible="partner_type != 'customer'"
+                       readonly="state != 'draft'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="account_payment_view_list_inherit_mgs_abalis_addons" model="ir.ui.view">
+        <field name="name">account.payment.list.inherit.mgs.abalis.addons</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_tree"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="property_id" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="account_payment_view_search_inherit_mgs_abalis_addons" model="ir.ui.view">
+        <field name="name">account.payment.search.inherit.mgs.abalis.addons</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_search"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="property_id"/>
+            </field>
+        </field>
+    </record>
+</odoo>

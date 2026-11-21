@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Bubble report layout: show the company logo on the left side of the header -->
+    <template id="external_layout_bubble_inherit_mgs_abalis_addons" inherit_id="web.external_layout_bubble">
+        
+        <xpath expr="//img[hasclass('o_company_logo')]" position="replace"/>
+        
+        <xpath expr="(//tbody)[1]/tr/td[1]" position="before">
+            
+            <td t-if="company.logo" class="p-0 pe-3 align-top" style="width: 40%;">
+                <img class="mgs_abalis_company_logo mb-2" t-att-src="image_data_uri(company.logo)" alt="Logo"
+                    style="max-height: 10rem; max-width: 100%; width: auto; height: auto;"/>
+            </td>
+        </xpath>
+    </template>
+</odoo>

@@ -6,5 +6,5 @@ class PropertyDetails(models.Model):
     
     owner_id = fields.Many2one('res.partner',
                                   string='Owner',
-                                  domain=[('user_type', '==', 'owner')])
+                                  domain=[('user_type', 'in', ['owner', 'customer_owner'])])
 

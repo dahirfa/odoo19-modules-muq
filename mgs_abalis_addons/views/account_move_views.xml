@@ -13,4 +13,16 @@
             </xpath>
         </field>
     </record>
+
+    <!-- Show the rented property on invoice / bill lists -->
+    <record id="account_move_view_list_inherit_mgs_abalis_addons" model="ir.ui.view">
+        <field name="name">account.move.list.inherit.mgs.abalis.addons</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="(//field[@name='invoice_partner_display_name'])[last()]" position="after">
+                <field name="tenancy_property_id" optional="show"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>

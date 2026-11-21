@@ -1,8 +1,10 @@
-from odoo import models
+from odoo import fields, models
 
 
 class TenancyDetails(models.Model):
     _inherit = 'tenancy.details'
+
+    tenancy_id = fields.Many2one(domain=[('user_type', 'in', ['customer', 'customer_owner'])])
 
     def _get_rent_collection(self):
         """Return ``(invoiced, paid)`` rent amounts (tax included) of these contracts.

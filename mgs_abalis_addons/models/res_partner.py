@@ -11,7 +11,7 @@ class ResPartner(models.Model):
     )
 
     user_type = fields.Selection(
-        selection_add=[('owner', 'Owner')],
-        ondelete={'owner': 'set null'},
+        selection_add=[('owner', 'Owner'), ('customer_owner', 'Customer & Owner')],
+        ondelete={'owner': 'set null', 'customer_owner': 'set null'},
     )
 

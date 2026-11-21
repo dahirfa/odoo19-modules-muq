@@ -1,6 +1,6 @@
 {
     'name': 'MGS Abalis Addons',
-    'version': '19.0.1.1.0',
+    'version': '19.0.1.4.0',
     'summary': 'Abalis customizations: link inventory transfers to properties',
     'description': """
 MGS Abalis Addons
@@ -19,7 +19,9 @@ MGS Abalis Addons
         'views/property_details.xml',
         'views/property_project_views.xml',
         'views/account_move_views.xml',
+        'views/account_payment_views.xml',
         'views/res_partner_views.xml',
+        'views/report_templates.xml',
     ],
     'installable': True,
     'application': False,

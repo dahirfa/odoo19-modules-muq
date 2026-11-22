@@ -20,4 +20,5 @@ access_freight_product_lin,freight.product.line,model_freight_product_line,mgs_f
 access_freight_delivery_wizard_user,freight.delivery.wizard,model_freight_delivery_wizard,mgs_freight.group_freight_user,1,1,1,0
 access_freight_receipt_wizard_user,freight.receipt.wizard,model_freight_receipt_wizard,mgs_freight.group_freight_user,1,1,1,0
 access_freight_line_transfer__user,freight.line.transfer.wizard,model_freight_line_transfer_wizard,mgs_freight.group_freight_user,1,1,1,1
-
+access_freight_receipt_print_wizard_manager,freight.receipt.print.wizard.manager,model_freight_receipt_print_wizard,mgs_freight.group_freight_manager,1,1,1,1
+access_freight_receipt_print_wizard_user,freight.receipt.print.wizard.user,model_freight_receipt_print_wizard,mgs_freight.group_freight_user,1,1,1,0

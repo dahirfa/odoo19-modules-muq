@@ -5,8 +5,9 @@
         <field name="name">freight.receipts.tree</field>
         <field name="model">freight.receipts</field>
         <field name="arch" type="xml">
-            <list>
+            <list default_order="id desc">
                 <field name="customer_id" />
+                <field name="shipping_type" optional="show" />
                 <field name="total_ctn" sum="Total CTN" />
                 <field name="total_cbm" sum="Total CBM" />
                 <field name="total_ctn_delivered" sum="Total ctn Delivered" />
@@ -27,6 +28,10 @@
                     string="Transfer"
                     class="btn-primary"
                     icon="fa-exchange"/>
+                    <button name="action_open_print_receipt_wizard"
+                    type="object"
+                    string="Print Receipt"
+                    icon="fa-print"/>
 
                 </header>
                 <sheet>
@@ -42,6 +47,7 @@
                         <group>
                             <field name="name" />
                             <field name="customer_id" />
+                            <field name="shipping_type" widget="radio" options="{'horizontal': true}" />
                             <field name="company_id" invisible="1" />
                         </group>
                         <notebook>

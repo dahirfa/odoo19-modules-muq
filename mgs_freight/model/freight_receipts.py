@@ -52,6 +52,13 @@ class FreightReceipts(models.Model):
         string="Delivery Count",
         compute="_compute_delivery_count"
     )
+    shipping_type = fields.Selection(
+        selection=[('sea', 'Sea'), ('air', 'Air')],
+        string="Shipping Type",
+        default='sea',
+        required=True,
+        tracking=True,
+        )
     @api.depends('freight_receipt_ids.ctn', 'freight_receipt_ids.ctn_delivered', 'freight_receipt_ids.t_cmb','freight_receipt_ids.remaining')
     def _compute_totals(self): 
         for record in self:
@@ -82,6 +89,19 @@ class FreightReceipts(models.Model):
             }
         }
     
+
+    def action_open_print_receipt_wizard(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Print Receipt'),
+            'res_model': 'freight.receipt.print.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_receipt_id': self.id,
+            },
+        }
 
     def _compute_delivery_count(self):
         for rec in self:

@@ -22,6 +22,8 @@
         'wizard/freight_transfer.xml',
         'report/freight_delivery_report.xml',
         'report/freight_receipt_report.xml',
+        'report/freight_consignment_note_report.xml',
+        'wizard/freight_receipt_print_wizard_view.xml',
         
     ],
     

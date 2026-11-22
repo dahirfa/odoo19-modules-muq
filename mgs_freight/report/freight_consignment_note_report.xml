@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="freight_consignment_note_report" model="ir.actions.report">
+        <field name="name">Shipping Consignment Note</field>
+        <field name="model">freight.receipts</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">mgs_freight.consignment_note_template</field>
+        <field name="report_file">mgs_freight.consignment_note_template</field>
+        <field name="print_report_name">'Consignment Note - %s' % (object.name or object.customer_id.name)</field>
+    </record>
+
+    <template id="consignment_note_template">
+        <t t-call="web.html_container">
+            <t t-foreach="notes" t-as="note">
+                <t t-set="o" t-value="note['receipt']"/>
+                <t t-set="company" t-value="o.company_id"/>
+                <t t-call="web.external_layout">
+                    <div class="page mgs_consignment_note">
+                        <style>
+                            .mgs_consignment_note .cn-title { text-align: center; font-weight: bold; letter-spacing: 1px; margin-bottom: 12px; }
+                            .mgs_consignment_note .cn-info td { border: 1px solid #212529; padding: 4px 8px; vertical-align: middle; }
+                            .mgs_consignment_note .cn-label { font-weight: bold; white-space: nowrap; width: 1%; }
+                            .mgs_consignment_note .cn-type { font-size: 18px; font-weight: bold; text-transform: uppercase; }
+                            .mgs_consignment_note .cn-lines { width: 100%; border-collapse: collapse; margin-top: 12px; }
+                            .mgs_consignment_note .cn-lines th,
+                            .mgs_consignment_note .cn-lines td { border: 1px solid #212529; padding: 4px 6px; height: 26px; }
+                            .mgs_consignment_note .cn-lines th { text-align: center; text-transform: uppercase; }
+                            .mgs_consignment_note .cn-total td { font-weight: bold; }
+                            .mgs_consignment_note .cn-sign { margin-top: 48px; }
+                            .mgs_consignment_note .cn-sign-line { border-top: 1px solid #212529; width: 260px; margin-left: auto; padding-top: 4px; text-align: center; font-weight: bold; }
+                        </style>
+
+                        <h4 class="cn-title">SHIPPING CONSIGNMENT NOTE</h4>
+
+                        <table class="cn-info" style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td colspan="4" class="cn-type" t-out="note['shipping_label']"/>
+                            </tr>
+                            <tr>
+                                <td class="cn-label">Customer Name</td>
+                                <td t-out="o.customer_id.name"/>
+                                <td class="cn-label">Reference</td>
+                                <td t-out="o.name or ''"/>
+                                
+                            </tr>
+                            <tr>
+                                <td class="cn-label">Tel</td>
+                                <td t-out="o.customer_id.phone or ''"/>
+                                <td class="cn-label">Date</td>
+                                <td t-out="date" t-options="{'widget': 'date'}"/>
+                            </tr>
+                        </table>
+
+                        <table class="cn-lines">
+                            <thead>
+                                <tr>
+                                    <th style="width: 7%;">No.</th>
+                                    <th>Description</th>
+                                    <th style="width: 12%;">PCS</th>
+                                    <th style="width: 15%;">Weight</th>
+                                    <th style="width: 20%;">CBM</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="note['lines']" t-as="line">
+                                    <td class="text-center" t-out="line_index + 1"/>
+                                    <td>
+                                        <span t-out="line.product_id.name or ''"/>
+                                        <!-- <span t-if="line.model"> </span> -->
+                                        <!-- <div t-if="line.reference" class="text-muted small"></div> -->
+                                    </td>
+                                    <td class="text-center" t-out="line.ctn" t-options="{'widget': 'float', 'precision': 0}"/>
+                                    <td class="text-end">
+                                        <t t-out="line.t_weight" t-options="{'widget': 'float', 'precision': 2}"/> KG
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-out="line.t_cmb" t-options="{'widget': 'float', 'precision': 3}"/>
+                                        <div t-if="line.length and line.width and line.height" class="text-muted small">
+                                            <t t-out="'%g x %g x %g' % (line.length, line.width, line.height)"/>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="cn-total">
+                                    <td colspan="2" class="text-end">TOTAL:</td>
+                                    <td class="text-center" t-out="note['total_pcs']" t-options="{'widget': 'float', 'precision': 0}"/>
+                                    <td class="text-end">
+                                        <t t-out="note['total_weight']" t-options="{'widget': 'float', 'precision': 2}"/> KG
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-out="note['total_cbm']" t-options="{'widget': 'float', 'precision': 3}"/> CBM
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="cn-sign">
+                            <div class="cn-sign-line">Receiver's Signature</div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

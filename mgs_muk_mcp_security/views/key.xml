@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+
+	<record id="view_mcp_key_kanban" model="ir.ui.view">
+		<field name="name">muk_mcp.key.kanban.security</field>
+		<field name="model">muk_mcp.key</field>
+		<field name="inherit_id" ref="muk_mcp.view_mcp_key_kanban"/>
+		<field name="arch" type="xml">
+			<xpath expr="//small[field[@name='scope']]" position="after">
+				<small class="ms-2" invisible="not expiration_date">Expires: <field name="expiration_date"/></small>
+			</xpath>
+		</field>
+	</record>
+
+	<record id="view_mcp_key_list" model="ir.ui.view">
+		<field name="name">muk_mcp.key.list.security</field>
+		<field name="model">muk_mcp.key</field>
+		<field name="inherit_id" ref="muk_mcp.view_mcp_key_list"/>
+		<field name="arch" type="xml">
+			<field name="last_used" position="after">
+				<field name="expiration_date"/>
+			</field>
+		</field>
+	</record>
+
+	<record id="view_mcp_key_form" model="ir.ui.view">
+		<field name="name">muk_mcp.key.form.security</field>
+		<field name="model">muk_mcp.key</field>
+		<field name="inherit_id" ref="muk_mcp.view_mcp_key_form"/>
+		<field name="arch" type="xml">
+			<field name="create_date" position="after">
+				<field name="expiration_date"/>
+			</field>
+		</field>
+	</record>
+
+</odoo>

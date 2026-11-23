@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+
+	<record id="rule_mcp_connect_own" model="ir.rule">
+		<field name="name">MCP Connect Wizard: own records</field>
+		<field name="model_id" ref="muk_mcp.model_muk_mcp_connect"/>
+		<field name="domain_force">[('create_uid', '=', user.id)]</field>
+	</record>
+
+</odoo>

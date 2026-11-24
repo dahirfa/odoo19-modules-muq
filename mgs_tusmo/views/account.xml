@@ -27,12 +27,11 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_invoice_tree" />
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='status_in_payment']" position="before">
+            <xpath expr="//field[@name='status_in_payment']" position="replace">
                 <field name="state" column_invisible="1"/>
-                <field name="payment_state" string="Payment" widget="badge"
+                <field name="payment_state" string="Status" widget="badge"
                        decoration-danger="payment_state == 'not_paid'"
-                       decoration-warning="payment_state in ('partial', 'in_payment')"
-                       decoration-success="payment_state in ('paid', 'reversed')"
+                       decoration-success="payment_state in ('partial', 'in_payment', 'paid', 'reversed')"
                        invisible=" state != 'posted' or move_type == 'entry'"
                        optional="show"/>
             </xpath>

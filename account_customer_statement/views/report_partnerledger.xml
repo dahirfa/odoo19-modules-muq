@@ -74,7 +74,21 @@
 							<t t-if="data['form']['date_from']" t-set="balance_forward" t-value="sum_open_balance(data, o, 'debit - credit')"/>
 							<t t-set="current_balance" t-value="sum_partner(data, o, 'debit - credit')"/>
 							<!--<table class="table table-condensed mt32">-->
-							<table class="table table-sm o_main_table mt-0" style="font-weight:bold">
+							<style>
+								.o_cust_stmt_table { table-layout: fixed; width: 100%; }
+								.o_cust_stmt_table th, .o_cust_stmt_table td { white-space: normal; word-wrap: break-word; word-break: break-word; overflow-wrap: break-word; vertical-align: top; }
+							</style>
+							<table class="table table-sm o_main_table mt-0 o_cust_stmt_table" style="font-weight:bold">
+								<colgroup>
+									<col style="width:10%"/>
+									<col style="width:7%"/>
+									<col style="width:13%"/>
+									<col/>
+									<col style="width:11%"/>
+									<col style="width:11%"/>
+									<col style="width:12%"/>
+									<col t-if="data['form']['amount_currency']" style="width:11%"/>
+								</colgroup>
 								<thead>
 									<tr style="background-color:#FEF9E7;">
 										<th style="text-align:left">Date</th>
@@ -152,25 +166,25 @@
 												<t t-set="printnew" t-value="1"/>
 																</t>
 											<t t-if="printnew==1">
-												<tr t-foreach="lines(data, o)" t-as="intline">
+												<t t-foreach="lines(data, o)" t-as="intline">
 													<t t-if="groupline==intline['move_name']">
 														<t t-set="tdr" t-value="tdr + intline['debit']"/>
 														<t t-set="tcred" t-value="tcred + intline['credit']"/>
 														<t t-set="wcurr" t-value="wcurr + intline['amount_currency']"/>
 																		</t>
-												</tr>
+												</t>
 												<t t-if="data['form']['result_selection'] == 'customer' or data['form']['result_selection'] == 'customer_supplier' " t-set="prevbal" t-value="tdr-tcred+prevbal"/>
 												<t t-if="data['form']['result_selection'] == 'supplier'" t-set="prevbal" t-value="tcred-tdr+prevbal"/>
-												<td nowrap="nowrap">
+												<td>
 													<span t-esc="trdate"/>
 												</td>
-												<td nowrap="nowrap">
+												<td>
 													<span t-esc="line['a_code']"/>
 												</td>
-												<td nowrap="nowrap">
+												<td>
 													<span t-esc="groupline"/>
 												</td>
-												<td colospan="3">
+												<td style="text-align:left">
 													<span t-esc="line['displayed_name']"/>
 													<t t-foreach="get_invoice(line['move_name'])" t-as="invoice_line">
 														<t t-if="invoice_line.journal_id.type == 'sale'">
@@ -184,20 +198,20 @@
 														</t>
 													</t>
 												</td>
-												<td class="text-right" nowrap="nowrap" style="text-align:right">
+												<td class="text-right" style="text-align:right">
 													<t t-if="tdr != 0">
 														<span t-esc="'{0:,.2f}'.format(tdr)" t-esc-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;res_company.currency_id&quot;}"/>
 													</t>
 												</td>
-												<td class="text-right" nowrap="nowrap" style="text-align:right">
+												<td class="text-right" style="text-align:right">
 													<t t-if="tcred != 0">
 														<span t-esc="'{0:,.2f}'.format(tcred)" t-esc-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;res_company.currency_id&quot;}"/>
 													</t>
 												</td>
-												<td class="text-right" nowrap="nowrap" style="text-align:right">
+												<td class="text-right" style="text-align:right">
 													<span t-esc="'{0:,.2f}'.format(prevbal)" t-esc-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;res_company.currency_id&quot;}"/>
 												</td>
-												<td t-if="data['form']['amount_currency']" nowrap="nowrap">
+												<td t-if="data['form']['amount_currency']">
 													<span t-esc="'{0:,.2f}'.format(line['amount_currency'])"/>
 													<span t-esc="line['currency_code']"/>
 												</td>
@@ -226,41 +240,41 @@
 												<t t-set="printnew" t-value="1"/>
 																</t>
 											<t t-if="printnew==1">
-												<tr t-foreach="lines(data, o)" t-as="intline">
+												<t t-foreach="lines(data, o)" t-as="intline">
 													<t t-if="groupline==intline['move_name']">
 														<t t-set="tdr" t-value="tdr + intline['debit']"/>
 														<t t-set="tcred" t-value="tcred + intline['credit']"/>
 														<t t-set="wcurr" t-value="wcurr + intline['amount_currency']"/>
 																		</t>
-												</tr>
+												</t>
 												<t t-if="data['form']['result_selection'] == 'customer' or data['form']['result_selection'] == 'customer_supplier' " t-set="prevbal" t-value="tdr-tcred+prevbal"/>
 												<t t-if="data['form']['result_selection'] == 'supplier'" t-set="prevbal" t-value="tcred-tdr+prevbal"/>
-												<td nowrap="nowrap">
+												<td>
 													<span t-esc="trdate"/>
 												</td>
-												<td nowrap="nowrap">
+												<td>
 													<span t-esc="line['a_code']"/>
 												</td>
-												<td nowrap="nowrap">
+												<td>
 													<span t-esc="groupline"/>
 												</td>
-												<td colospan="3" nowrap="nowrap">
+												<td style="text-align:left">
 													<span t-esc="line['displayed_name']"/>
 												</td>
-												<td class="text-right" nowrap="nowrap" style="text-align:right">
+												<td class="text-right" style="text-align:right">
 													<t t-if="tdr != 0">
 														<span t-esc="'{0:,.2f}'.format(tdr)" t-esc-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;res_company.currency_id&quot;}"/>
 													</t>
 												</td>
-												<td class="text-right" nowrap="nowrap" style="text-align:right">
+												<td class="text-right" style="text-align:right">
 													<t t-if="tcred != 0">
 														<span t-esc="'{0:,.2f}'.format(tcred)" t-esc-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;res_company.currency_id&quot;}"/>
 													</t>
 												</td>
-												<td class="text-right" nowrap="nowrap" style="text-align:right">
+												<td class="text-right" style="text-align:right">
 													<span t-esc="'{0:,.2f}'.format(prevbal)" t-esc-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;res_company.currency_id&quot;}"/>
 												</td>
-												<td t-if="data['form']['amount_currency']" nowrap="nowrap" style="text-align:right">
+												<td t-if="data['form']['amount_currency']" style="text-align:right">
 													<span t-esc="'{0:,.2f}'.format(line['amount_currency'])"/>
 													<span t-esc="line['currency_code']"/>
 												</td>
@@ -321,4 +335,4 @@
 			</t>
 		</template>
 	</data>
-</odoo>
+</odoo>
